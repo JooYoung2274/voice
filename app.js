@@ -11,18 +11,10 @@ app.use(express.static("uploads"));
 sequelize
   .sync({ force: false })
   .then(() => {
-    console.log(`
-    🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧
-    🚧🚧 DB연결 성공! 이게되네🚧🚧
-    🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧
-    `);
+    console.log("DB성공");
   })
   .catch((error) => {
-    console.error(`
-    🪓🪓🪓🪓🪓🪓🪓🪓🪓🪓🪓🪓🪓
-    🪓🪓 DB연결 실패! ... 🪓🪓
-    🪓🪓🪓🪓🪓🪓🪓🪓🪓🪓🪓🪓🪓
-    `);
+    console.error("DB실패");
   });
 
 app.use((req, res, next) => {
