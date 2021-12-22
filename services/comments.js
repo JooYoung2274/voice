@@ -1,36 +1,74 @@
 const { Comments } = require("../models/index");
+const CommentClass = require("../classes/comments");
 
-const findComments = (trackId) => {
+const findComments = ({ trackId }) => {
   return Comments.findAll({ where: { trackId } });
 };
 
-const findComment = (commentId) => {
-  return Comments.findOne({ where: { commentId } });
+const findComment = async ({ newCommentId }) => {
+  try {
+    const comment = await Comments.findOne({ where: { commentId: newCommentId } });
+    return comment;
+  } catch (error) {
+    console.log(error);
+    return error;
+  }
 };
 
-// track 추가하면
-// const createComment = (trackId, comment, userId) => {
-//     const commentData = Comments.create({
-//       trackId,
-//       comment,
-//       userId,
-//     });
-//     return commentData;
+const createComment = async ({ newComment, newTrackId, loginUserId, loginNickname }) => {
+  try {
+    const { comment, commentId, createdAt } = await Comments.create({
+      comment: newComment,
+      trackId: newTrackId,
+      userId: loginUserId,
+    });
+    const commentObj = new CommentClass.CommentForm({
+      commentId: commentId,
+      nickname: loginNickname,
+      comment: comment,
+      createdAt: createdAt,
+    });
+    return commentObj;
+  } catch (error) {
+    console.log(error);
+    // throw Error(error)?
 
-// };
-
-const createComment = (comment) => {
-  return Comments.create({
-    comment,
-  });
+    return error;
+  }
 };
 
-const updateComment = (comment, commentId) => {
-  return Comments.update({ comment }, { where: { commentId } });
+const updateComment = async ({
+  newComment,
+  newCommentId,
+  loginNickname,
+  comment,
+  commentId,
+  createdAt,
+}) => {
+  try {
+    await Comments.update({ comment: newComment }, { where: { commentId: newCommentId } });
+    const commentObj = new CommentClass.CommentForm({
+      commentId: commentId,
+      nickname: loginNickname,
+      comment: comment,
+      createdAt: createdAt,
+    });
+    return commentObj;
+  } catch (error) {
+    console.log(error);
+    // throw Error(error)?
+    return error;
+  }
 };
 
-const deleteComment = (commentId) => {
-  return Comments.destroy({ where: { commentId } });
+const deleteComment = async ({ newCommentId }) => {
+  try {
+    await Comments.destroy({ where: { newCommentId } });
+    return;
+  } catch (error) {
+    console.log(error);
+    return error;
+  }
 };
 
 module.exports = { findComments, createComment, findComment, updateComment, deleteComment };
