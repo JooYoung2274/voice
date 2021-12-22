@@ -4,8 +4,6 @@ const port = 3000;
 const app = express();
 const { sequelize } = require("./models");
 
-// test
-
 app.use(express.json());
 app.use("/api", router);
 app.use(express.static("uploads"));
