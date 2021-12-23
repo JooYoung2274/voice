@@ -7,19 +7,23 @@ const trackUploads = async (req, res, next) => {
     const { category, tag, script } = req.body;
     const thumbnailUrl = req.files.thumbnailUrl[0].filename;
     const trackUrl = req.files.trackUrl[0].filename;
-    if (!category || !tag || !script || !thumbnailUrl || !trackUrl) {
-      return res.sendStatus(400);
-    }
-    const categoryId = await categoryModel.findModel(category);
-    const tracks = await trackModel.createTrack(
+
+    const categoryId = await categoryModel.getCategoryId({ category });
+    const tagId = await tagModel.getTagId({ tag });
+    await trackModel.createTrack({
       categoryId,
+      tagId,
       thumbnailUrl,
       trackUrl,
-      script
-    );
-    const trackId = tracks.trackId;
-    await tagModel.createModel(tag, trackId);
-    res.status(200).json({ tracks });
+      script,
+    });
+
+    if (!categoryId || !tagId || !thumbnailUrl || !trackUrl) {
+      res.sendStatus(400);
+      return;
+    }
+
+    res.sendStatus(200);
   } catch (error) {
     console.log(error);
     next(error);
@@ -28,8 +32,14 @@ const trackUploads = async (req, res, next) => {
 
 const trackDelete = async (req, res, next) => {
   try {
-    const { trackId } = res.params;
-    await trackModel.deleteTrack(trackId);
+    const { trackId } = req.params;
+    const track = await trackModel.getTrack({ trackId });
+
+    if (!track) {
+      res.sendStatus(400);
+    }
+
+    await trackModel.deleteTrack({ trackId });
     res.sendStatus(200);
   } catch (error) {
     console.log(error);
@@ -37,4 +47,20 @@ const trackDelete = async (req, res, next) => {
   }
 };
 
-module.exports = { trackUploads, trackDelete };
+const trackPage = async (req, res, next) => {
+  try {
+    const { trackId: newTrackId } = req.params;
+    const track = await trackModel.getTrack({ newTrackId });
+
+    if (!track) {
+      res.sendStatus(400);
+    }
+
+    res.status(200).json({ track });
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+};
+
+module.exports = { trackUploads, trackDelete, trackPage };
