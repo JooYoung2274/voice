@@ -3,12 +3,14 @@ const { Users } = require("../models");
 //로그인 필수
 const needLogin = (req, res, next) => {
   const { authorization } = req.headers;
+  if (!authorization) {
+    res.sendStatus(401);
+    return;
+  }
   const [tokenType, tokenValue] = authorization.split(" ");
   console.log(authorization);
   if (tokenType !== "Bearer") {
-    res.status(401).send({
-      errorMessage: "로그인 후 사용하세요.",
-    });
+    res.sendStatus(401);
     return;
   }
 
@@ -21,9 +23,7 @@ const needLogin = (req, res, next) => {
     });
   } catch (error) {
     console.log(error);
-    res.status(401).send({
-      errorMessage: "로그인 후 사용하세요.",
-    });
+    res.sendStatus(401);
     return;
   }
 };

@@ -2,8 +2,20 @@ const { Comments } = require("../models/index");
 const CommentClass = require("../classes/comments");
 const { Track } = require("../models/index");
 
-const findComments = ({ trackId }) => {
-  return Comments.findAll({ where: { trackId } });
+const findComments = async ({ newTrackId }) => {
+  const findedComments = await Comments.findAll({
+    attributes: ["commentId", "userId", "comment"],
+    where: { trackId: newTrackId },
+    order: [["commentId", "DESC"]],
+  });
+
+  let comments = [];
+  for (let i = 0; i < findedComments.length; i++) {
+    const { commentId, userId, comment } = findedComments[i];
+    const findedcomment = { commentId, userId, comment };
+    comments.push(findedcomment);
+  }
+  return comments;
 };
 
 const findComment = async ({ newCommentId }) => {
