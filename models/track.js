@@ -32,18 +32,6 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         type: Sequelize.STRING,
       },
-      script: {
-        allowNull: false,
-        type: Sequelize.STRING,
-      },
-      // likeCnt: {
-      //   allowNull: false,
-      //   type: Sequelize.INTEGER,
-      // },
-      // viewCnt: {
-      //   allowNull: false,
-      //   type: Sequelize.INTEGER,
-      // },
       thumbnailUrl: {
         allowNull: false,
         type: Sequelize.STRING,
