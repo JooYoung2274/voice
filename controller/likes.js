@@ -1,11 +1,11 @@
 const likeService = require("../services/likes");
-const trackService = require("../services/tracks");
+const trackService = require("../services/track");
 
 const likePost = (req, res, next) => {
   try {
     const { trackId: newtrackId } = req.params;
     const { userId: loginUserId } = res.locals.user;
-    const { userId: trackUserId } = trackService.findComment({ newtrackId });
+    const { userId: trackUserId } = trackService.getPlainTrack({ newtrackId });
     if (loginUserId !== trackUserId) {
       res.sendStatus(400);
       return;

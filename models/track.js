@@ -10,6 +10,9 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       Track.hasMany(models.TrackTag, { foreignKey: "trackId" });
+      Track.hasMany(models.Comments, { foreignKey: "commentId" });
+      Track.hasMany(models.Likes, { foreignKey: "likeId" });
+
       Track.belongsTo(models.Category, { foreignKey: "categoryId" });
     }
   }

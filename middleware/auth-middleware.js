@@ -35,7 +35,7 @@ const notNeedLogin = (req, res, next) => {
     const [tokenType, tokenValue] = authorization.split(" ");
 
     const { userId } = jwt.verify(tokenValue, "secret-secret-key");
-    User.findByPk(userId).then((user) => {
+    Users.findByPk(userId).then((user) => {
       // async가 없으므로 await은 안됨. sequelize는 기본적으로 promise이므로  then
       res.locals.user = user;
     });

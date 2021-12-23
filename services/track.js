@@ -71,6 +71,16 @@ const getTrack = async ({ newTrackId }) => {
   return track;
 };
 
+const getPlainTrack = async ({ newTrackId }) => {
+  const findedTrack = await Track.findOne({
+    where: { trackId: newTrackId },
+  });
+  if (!findedTrack) {
+    return;
+  }
+  return findedTrack;
+};
+
 const getSearchedTracks = async (findedTracks) => {
   let tracks = [];
   for (let i = 0; i < findedTracks.length; i++) {
@@ -127,6 +137,7 @@ module.exports = {
   deleteTrack,
   getTracks,
   getTrack,
+  getPlainTrack,
   getMainTracks,
   getSearchedTracks,
 };

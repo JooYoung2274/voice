@@ -5,6 +5,8 @@ const app = express();
 const { sequelize } = require("./models");
 const session = require("express-session");
 const passportConfig = require("./passport");
+const passport = require("passport");
+
 app.use(
   session({
     resave: false,
