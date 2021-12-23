@@ -2,30 +2,35 @@
 const Sequelize = require("sequelize");
 const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
-  class Users extends Model {
+  class Category extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
-    static associate(models) {}
+    static associate(models) {
+      Category.hasMany(models.Track, { foreignKey: "categoryId" });
+    }
   }
-  Users.init(
+  Category.init(
     {
-      userId: {
+      categoryId: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      loginId: {
+      category: {
+        allowNull: false,
         type: Sequelize.STRING,
       },
-      nickname: {
-        type: Sequelize.STRING,
+      likeSum: {
+        allowNull: false,
+        type: Sequelize.INTEGER,
       },
-      password: {
-        type: Sequelize.STRING,
+      viewSum: {
+        allowNull: false,
+        type: Sequelize.INTEGER,
       },
       createdAt: {
         allowNull: false,
@@ -38,8 +43,8 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       sequelize,
-      modelName: "Users",
+      modelName: "Category",
     },
   );
-  return Users;
+  return Category;
 };
