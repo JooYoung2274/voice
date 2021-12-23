@@ -8,7 +8,23 @@ module.exports = (sequelize, DataTypes) => {
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
-    static associate(models) {}
+    static associate(models) {
+      models.Users.hasMany(models.Comments, {
+        foreignKey: "userId",
+        sourceKey: "userId",
+        onDelete: "cascade",
+      });
+      models.Users.hasMany(models.Tracks, {
+        foreignKey: "userId",
+        sourceKey: "userId",
+        onDelete: "cascade",
+      });
+      models.Users.hasMany(models.Likes, {
+        foreignKey: "userId",
+        sourceKey: "userId",
+        onDelete: "cascade",
+      });
+    }
   }
   Users.init(
     {
@@ -18,27 +34,35 @@ module.exports = (sequelize, DataTypes) => {
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      loginId: {
+      snsId: {
         type: Sequelize.STRING,
       },
       nickname: {
         type: Sequelize.STRING,
       },
-      password: {
+      flatformType: {
         type: Sequelize.STRING,
       },
-      createdAt: {
-        allowNull: false,
-        type: Sequelize.DATE,
+      email: {
+        type: Sequelize.STRING,
       },
-      updatedAt: {
-        allowNull: false,
-        type: Sequelize.DATE,
+      profileImage: {
+        type: Sequelize.STRING,
+      },
+      nickUnChanged: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: true,
       },
     },
     {
       sequelize,
-      modelName: "Users",
+      timestamps: true,
+      underscored: false, //_사용 여부
+      modelName: "Users", //js에서사용
+      tableName: "User", //db에서 사용
+      paranoid: false,
+      charset: "utf8",
+      collate: "utf8_general_ci",
     },
   );
   return Users;
