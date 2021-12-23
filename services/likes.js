@@ -12,22 +12,28 @@ const likes = require("../models/likes");
 //   }
 // };
 
-const postLike = async ({ newTrackId, loginUserId }) => {
+const clickLike = async ({ newTrackId, loginUserId }) => {
   try {
     const likeExist = await Likes.findOne({ where: { trackId: newTrackId, userId: loginUserId } });
-    const likeCnt = await Likes.count({
-      where: { trackId: newTrackId },
-    });
     if (!likeExist) {
       //   2개 선택하는거 맞나?
       await Likes.create({
         trackId: newTrackId,
         userId: loginUserId,
       });
+      // likeCnt 중복됨
+      const likeCnt = await Likes.count({
+        where: { trackId: newTrackId },
+      });
       const likeObj = new likeClass.likeForm({ likeCnt, like: true });
       return likeObj;
     }
+
     await Likes.destroy({ where: { trackId: newTrackId, userId: loginUserId } });
+    // likeCnt 중복됨
+    const likeCnt = await Likes.count({
+      where: { trackId: newTrackId },
+    });
     const likeObj = new likeClass.likeForm({ likeCnt, like: false });
     return likeObj;
   } catch (error) {
@@ -36,4 +42,4 @@ const postLike = async ({ newTrackId, loginUserId }) => {
   }
 };
 
-module.exports = { postLike };
+module.exports = { clickLike };

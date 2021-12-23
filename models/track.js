@@ -10,8 +10,8 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       Track.hasMany(models.TrackTag, { foreignKey: "trackId" });
-      Track.hasMany(models.Comments, { foreignKey: "commentId" });
-      Track.hasMany(models.Likes, { foreignKey: "likeId" });
+      Track.hasMany(models.Comments, { foreignKey: "trackId" });
+      Track.hasMany(models.Likes, { foreignKey: "trackId" });
 
       Track.belongsTo(models.Category, { foreignKey: "categoryId" });
     }
@@ -24,10 +24,10 @@ module.exports = (sequelize, DataTypes) => {
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      // userId: {
-      // allowNull: false,
-      //   type: Sequelize.INTEGER,
-      // },
+      userId: {
+        allowNull: false,
+        type: Sequelize.INTEGER,
+      },
       trackUrl: {
         allowNull: false,
         type: Sequelize.STRING,

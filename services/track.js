@@ -72,13 +72,20 @@ const getTrack = async ({ newTrackId }) => {
 };
 
 const getPlainTrack = async ({ newTrackId }) => {
-  const findedTrack = await Track.findOne({
-    where: { trackId: newTrackId },
-  });
-  if (!findedTrack) {
-    return;
+  try {
+    const findedTrack = await Track.findOne({
+      where: { trackId: newTrackId },
+    });
+    if (!findedTrack) {
+      throw new Error("존재하지 않는 트랙입니다.");
+    }
+    const { dataValues: trackData } = findedTrack;
+    console.log(trackData);
+    return trackData;
+  } catch (error) {
+    console.log(error);
+    return error;
   }
-  return findedTrack;
 };
 
 const getSearchedTracks = async (findedTracks) => {
