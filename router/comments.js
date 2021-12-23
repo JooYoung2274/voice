@@ -6,7 +6,7 @@ const { needLogin } = require("../middleware/auth-middleware");
 const router = express.Router();
 
 router.post("/:trackId/comment", needLogin, commentsController.commentPost);
-router.put("/:trackId/comment", needLogin, commentsController.commentPost);
+router.put("/:trackId/comment/:commentId", needLogin, commentsController.commentPut);
 router.delete("/:trackId/comment/:commentId", needLogin, commentsController.commentDelete);
 
 module.exports = router;

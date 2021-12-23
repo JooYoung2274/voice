@@ -1,13 +1,14 @@
-const { Track } = require("../models/index");
+const { Track, sequelize } = require("../models/index");
 const { TrackTag } = require("../models/index");
 const { Category } = require("../models/index");
 
-const createTrack = async ({ categoryId, tagId, thumbnailUrl, trackUrl, script }) => {
+const createTrack = async ({ categoryId, tagId, thumbnailUrl, trackUrl, script, loginUserId }) => {
   const createdTrack = await Track.create({
     categoryId,
     thumbnailUrl,
     trackUrl,
     script,
+    userId: loginUserId,
   });
 
   await TrackTag.create({
@@ -72,13 +73,20 @@ const getTrack = async ({ newTrackId }) => {
 };
 
 const getPlainTrack = async ({ newTrackId }) => {
-  const findedTrack = await Track.findOne({
-    where: { trackId: newTrackId },
-  });
-  if (!findedTrack) {
-    return;
+  try {
+    const findedTrack = await Track.findOne({
+      where: { trackId: newTrackId },
+    });
+    if (!findedTrack) {
+      throw new Error("존재하지 않는 트랙입니다.");
+    }
+    const { dataValues: trackData } = findedTrack;
+    console.log(trackData);
+    return trackData;
+  } catch (error) {
+    console.log(error);
+    return error;
   }
-  return findedTrack;
 };
 
 const getSearchedTracks = async (findedTracks) => {
@@ -131,6 +139,26 @@ const getMainTracks = async () => {
   }
   return tracksArray;
 };
+
+// const getLikeTrack = () => {
+//   return Track.findAll({
+//     attributes: {
+//       include: [
+//         [
+//           sequelize.literal(`(
+//         SELECT COUNT(*)
+//         FROM likes AS like
+//         WHERE
+//             like.userId = user.userId
+//             AND
+//             like.trackId = track.trackId
+//       )`),
+//           "trackLikeCount",
+//         ],
+//       ],
+//     },
+//   });
+// };
 
 module.exports = {
   createTrack,
