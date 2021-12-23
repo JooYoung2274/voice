@@ -24,14 +24,6 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         type: Sequelize.STRING,
       },
-      likeSum: {
-        allowNull: false,
-        type: Sequelize.INTEGER,
-      },
-      viewSum: {
-        allowNull: false,
-        type: Sequelize.INTEGER,
-      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
