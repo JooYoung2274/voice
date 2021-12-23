@@ -1,4 +1,3 @@
-const res = require("express/lib/response");
 const sequelize = require("sequelize");
 const Op = sequelize.Op;
 
@@ -11,10 +10,11 @@ const { Track } = require("../models/track");
 //   return;
 // };
 
-const getTagId = async (tag) => {
+const getTagId = async ({ tag }) => {
+  console.log(tag);
   const findedTag = await Tag.findOne({
     attributes: ["tagId"],
-    where: tag,
+    where: { tag },
   });
 
   if (!findedTag) {
@@ -43,11 +43,11 @@ const getTagIds = async (tag1, tag2, tag3) => {
   for (let i = 0; i < findedTag.length; i++) {
     tagIdArray.push(findedTag[i].tagId);
   }
+
   return tagIdArray;
 };
 
 const getTrackTag = async (findedTags, categoryId) => {
-  console.log(findedTags, categoryId);
   let tracksArray = [];
   for (let i = 0; i < findedTags.length; i++) {
     const findedTracks = await TrackTag.findAll({

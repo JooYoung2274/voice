@@ -42,4 +42,18 @@ const clickLike = async ({ newTrackId, loginUserId }) => {
   }
 };
 
-module.exports = { clickLike };
+const findLikes = async ({ newTrackId }) => {
+  const findedLikes = await Likes.count({ where: { trackId: newTrackId } });
+  return findedLikes;
+};
+
+const findLike = async ({ findedTracks }) => {
+  let array = [];
+  for (let i = 0; i < findedTracks.length; i++) {
+    const findedLikes = await Likes.count({ where: { trackId: findedTracks[i] } });
+    array.push(findedLikes);
+  }
+  return array;
+};
+
+module.exports = { clickLike, findLikes, findLike };
