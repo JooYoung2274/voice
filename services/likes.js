@@ -1,6 +1,5 @@
-const { Likes } = require("../models/likes");
+const { Likes } = require("../models/index");
 const likeClass = require("../classes/likes");
-const likes = require("../models/likes");
 
 // const findLike = async ({ newTrackId, loginUserId }) => {
 //   try {
@@ -14,6 +13,7 @@ const likes = require("../models/likes");
 
 const clickLike = async ({ newTrackId, loginUserId }) => {
   try {
+    // newTrackId는 string, loginUserId는 int값임
     const likeExist = await Likes.findOne({ where: { trackId: newTrackId, userId: loginUserId } });
     if (!likeExist) {
       //   2개 선택하는거 맞나?

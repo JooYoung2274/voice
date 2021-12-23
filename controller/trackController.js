@@ -7,6 +7,7 @@ const trackUploads = async (req, res, next) => {
     const { category, tag, script } = req.body;
     const thumbnailUrl = req.files.thumbnailUrl[0].filename;
     const trackUrl = req.files.trackUrl[0].filename;
+    const { userId: loginUserId } = res.locals.user;
 
     const categoryId = await categoryModel.getCategoryId({ category });
     const tagId = await tagModel.getTagId({ tag });
@@ -16,6 +17,7 @@ const trackUploads = async (req, res, next) => {
       thumbnailUrl,
       trackUrl,
       script,
+      loginUserId,
     });
 
     if (!categoryId || !tagId || !thumbnailUrl || !trackUrl) {
