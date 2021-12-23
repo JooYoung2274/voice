@@ -24,16 +24,6 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         type: Sequelize.STRING,
       },
-      email: {
-        type: Sequelize.STRING,
-      },
-      profileImage: {
-        type: Sequelize.STRING,
-      },
-      nickUnChanged: {
-        type: Sequelize.BOOLEAN,
-        defaultValue: true,
-      },
     },
     {
       sequelize,

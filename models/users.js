@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
         sourceKey: "userId",
         onDelete: "cascade",
       });
-      models.Users.hasMany(models.Tracks, {
+      models.Users.hasMany(models.Track, {
         foreignKey: "userId",
         sourceKey: "userId",
         onDelete: "cascade",
@@ -59,7 +59,7 @@ module.exports = (sequelize, DataTypes) => {
       timestamps: true,
       underscored: false, //_사용 여부
       modelName: "Users", //js에서사용
-      tableName: "User", //db에서 사용
+      tableName: "Users", //db에서 사용
       paranoid: false,
       charset: "utf8",
       collate: "utf8_general_ci",
