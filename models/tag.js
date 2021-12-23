@@ -24,13 +24,15 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         type: Sequelize.STRING,
       },
-      createdAt: {
-        allowNull: false,
-        type: Sequelize.DATE,
+      email: {
+        type: Sequelize.STRING,
       },
-      updatedAt: {
-        allowNull: false,
-        type: Sequelize.DATE,
+      profileImage: {
+        type: Sequelize.STRING,
+      },
+      nickUnChanged: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: true,
       },
     },
     {
