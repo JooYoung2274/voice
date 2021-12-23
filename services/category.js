@@ -1,12 +1,15 @@
 const { Category } = require("../models/index");
 
-const findModel = async (input) => {
+const getCategoryId = async ({ category }) => {
   const selectedCategory = await Category.findOne({
     attributes: ["categoryId"],
-    where: { category: input },
+    where: { category },
   });
+  if (!selectedCategory) {
+    return;
+  }
   const catergoryId = selectedCategory.categoryId;
   return catergoryId;
 };
 
-module.exports = { findModel };
+module.exports = { getCategoryId };
