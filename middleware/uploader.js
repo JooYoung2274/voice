@@ -9,10 +9,13 @@ const uploader = multer({
     filename: function (req, file, cb) {
       cb(
         null,
-        file.originalname.split(".")[0] + "-" + Date.now() + path.extname(file.originalname),
-      );
+        Math.random().toString(36).substr(2, 11) + Date.now() + "." + file.mimetype.split("/")[1],
+      ); // 생성한 난수 + 현재 시각 + . + 파일 확장자명
     },
   }),
+  limits: {
+    fileSize: 20 * 1024 * 1024, //20메가 제한
+  },
 });
 
 module.exports = uploader;
