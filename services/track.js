@@ -5,8 +5,6 @@ const { Users } = require("../models");
 const { Likes } = require("../models/index");
 const { Tag } = require("../models/index");
 
-const Sequelize = require("sequelize");
-
 const createTrack = async ({ categoryId, tagId, newThumbnailUrl, newTrackUrl, loginUserId }) => {
   const createdTrack = await Track.create({
     categoryId: categoryId,
@@ -44,7 +42,7 @@ const getTracks = async ({ userId }) => {
 
   let categoryArray = [];
   for (let i = 0; i < tracks.length; i++) {
-    const { trackId, categoryId, thumbnailUrl, trackUrl } = tracks[i];
+    const { trackId, categoryId, thumbnailUrl, trackUrl, userId } = tracks[i];
 
     const findedCategory = await Category.findOne({
       attributes: ["category"],
@@ -78,41 +76,49 @@ const getTracks = async ({ userId }) => {
 
 const getTrack = async ({ newTrackId, likes }) => {
   const findedTrack = await Track.findOne({
-    attributes: ["trackId", "categoryId", "thumbnailUrl", "trackUrl", "userId"],
+    attributes: ["trackId", "categoryId", "thumbnailUrl", "trackUrl"],
+    include: [
+      {
+        model: TrackTag,
+        attributes: ["tagId"],
+        include: [
+          {
+            model: Tag,
+            attributes: ["tag"],
+          },
+        ],
+      },
+      {
+        model: Category,
+        attributes: ["category"],
+      },
+      {
+        model: Users,
+        attributes: ["nickname"],
+      },
+    ],
     where: { trackId: newTrackId },
   });
 
   if (!findedTrack) {
     return;
   }
-  const { trackId, categoryId, thumbnailUrl, trackUrl, userId } = findedTrack;
 
-  const findedCategory = await Category.findOne({
-    attributes: ["category"],
-    where: { categoryId: categoryId },
-  });
-  const category = findedCategory.category;
+  const { trackId, categoryId, thumbnailUrl, trackUrl } = findedTrack;
+  const { nickname } = findedTrack.User;
+  const { category } = findedTrack.Category;
+  const categoryArray = { categoryId: categoryId, category: category };
 
-  const findedNickname = await Users.findOne({
-    attributes: ["nickname"],
-    where: { userId: userId },
-  });
-  const nickname = findedNickname.nickname;
+  let tagArray = [];
+  for (let i = 0; i < findedTrack.TrackTags.length; i++) {
+    const { tagId } = findedTrack.TrackTags[i];
+    const { tag } = findedTrack.TrackTags[i].Tag;
+    tagArray.push({ tagId: tagId, tag: tag });
+  }
 
-  const findedTagid = await TrackTag.findOne({
-    attributes: ["tagId"],
-    where: { trackId: trackId, categoryId: categoryId },
-  });
-  const tagId = findedTagid.tagId;
+  const array = { trackId, nickname, likes, thumbnailUrl, trackUrl, tagArray, categoryArray };
 
-  const findedTag = await Tag.findOne({
-    attributes: ["tag"],
-    where: { tagId: tagId },
-  });
-  const tag = findedTag.tag;
-
-  const track = { trackId, category, tag, thumbnailUrl, trackUrl, nickname, userId, likes };
-  return track;
+  return array;
 };
 
 const getPlainTrack = async ({ newTrackId }) => {

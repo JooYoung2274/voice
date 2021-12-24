@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
       Track.hasMany(models.TrackTag, { foreignKey: "trackId" });
       Track.hasMany(models.Comments, { foreignKey: "trackId" });
       Track.hasMany(models.Likes, { foreignKey: "trackId" });
-
+      Track.belongsTo(models.Users, { foreignKey: "userId" });
       Track.belongsTo(models.Category, { foreignKey: "categoryId" });
     }
   }
