@@ -5,8 +5,13 @@ const updateNickCon = async (req, res, next) => {
   try {
     const { userId } = res.locals.user;
     const { nickname } = req.body;
-    await userService.updateNick(userId, nickname);
-    res.sendStatus(200);
+    const nickcheck = await userService.findNick(nickname);
+    if (!nickcheck) {
+      await userService.updateNick(userId, nickname);
+      return res.sendStatus(200);
+    } else if (nickcheck.userId === userId) {
+      return res.sendStatus(400);
+    }
   } catch (error) {
     console.log(error);
     next(error);
@@ -28,4 +33,16 @@ const findUserCon = async (req, res, next) => {
   }
 };
 
-module.exports = { updateNickCon, findUserCon };
+const updateProfileCon = async (req, res, next) => {
+  try {
+    const { userId } = res.locals.user;
+    const { filename } = req.file;
+    await userService.updateProfile(userId, filename);
+    res.sendStatus(200);
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+};
+
+module.exports = { updateNickCon, findUserCon, updateProfileCon };

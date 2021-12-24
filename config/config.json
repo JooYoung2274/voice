@@ -1,7 +1,7 @@
 {
   "development": {
     "username": "root",
-    "password": "111111",
+    "password": "sparta",
     "database": "voice",
     "host": "127.0.0.1",
     "dialect": "mysql"
