@@ -7,7 +7,7 @@ const uploader = require("../middleware/uploader");
 const imageUploader = uploader.fields([{ name: "thumbnailUrl" }, { name: "trackUrl" }]);
 
 router.post("/", needLogin, imageUploader, trackController.trackUploads);
-router.get("/:trackId", trackController.trackPage);
-// router.delete("/:trackId", trackController.trackDelete);
+router.get("/:trackId", needLogin, trackController.trackPage);
+router.delete("/:trackId", needLogin, trackController.trackDelete);
 
 module.exports = router;

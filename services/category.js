@@ -1,9 +1,10 @@
 const { Category } = require("../models/index");
 
-const getCategoryId = async ({ category }) => {
+const getCategoryId = async ({ newCategory }) => {
+  console.log(newCategory);
   const selectedCategory = await Category.findOne({
     attributes: ["categoryId"],
-    where: { category },
+    where: { category: newCategory },
   });
   if (!selectedCategory) {
     return;

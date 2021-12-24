@@ -12,7 +12,7 @@ const updateNick = async (userId, nickname) => {
   }
 };
 
-const findUser = async (userId) => {
+const findUser = async ({ userId }) => {
   try {
     const userOne = await Users.findOne({
       attributes: ["userId", "email", "nickname", "profileImage", "nickUnChanged"],
