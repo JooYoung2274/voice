@@ -1,4 +1,4 @@
-const { Track, sequelize } = require("../models/index");
+const { Track } = require("../models/index");
 const { TrackTag } = require("../models/index");
 const { Category } = require("../models/index");
 const { Users } = require("../models");
@@ -15,11 +15,15 @@ const createTrack = async ({ categoryId, tagId, newThumbnailUrl, newTrackUrl, lo
     userId: loginUserId,
   });
 
-  await TrackTag.create({
-    trackId: createdTrack.trackId,
-    categoryId: categoryId,
-    tagId: tagId,
-  });
+  for (let i = 0; i < tagId.length; i++) {
+    if (tagId[i]) {
+      await TrackTag.create({
+        trackId: createdTrack.trackId,
+        categoryId: categoryId,
+        tagId: tagId[i],
+      });
+    }
+  }
 
   return createdTrack.trackId;
 };
@@ -29,10 +33,10 @@ const deleteTrack = async ({ newTrackId }) => {
   return;
 };
 
-const getTracks = async (input) => {
+const getTracks = async ({ userId }) => {
   const tracks = await Track.findAll({
-    attributes: ["trackId", "categoryId", "thumbnailUrl", "trackUrl"],
-    where: input,
+    attributes: ["trackId", "categoryId", "thumbnailUrl", "trackUrl", "userId"],
+    where: { userId: userId },
   });
   if (!tracks) {
     return;
@@ -48,7 +52,25 @@ const getTracks = async (input) => {
     });
     const category = findedCategory.category;
 
-    const searchedCategory = { trackId, category, thumbnailUrl, trackUrl };
+    const findedNickname = await Users.findOne({
+      attributes: ["nickname"],
+      where: { userId: userId },
+    });
+    const nickname = findedNickname.nickname;
+
+    const findedTagid = await TrackTag.findOne({
+      attributes: ["tagId"],
+      where: { trackId: trackId, categoryId: categoryId },
+    });
+    const tagId = findedTagid.tagId;
+
+    const findedTag = await Tag.findOne({
+      attributes: ["tag"],
+      where: { tagId: tagId },
+    });
+    const tag = findedTag.tag;
+
+    const searchedCategory = { trackId, category, tag, thumbnailUrl, trackUrl, nickname };
     categoryArray.push(searchedCategory);
   }
   return categoryArray;
