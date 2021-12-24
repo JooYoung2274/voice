@@ -6,9 +6,9 @@ const likeService = require("../services/likes");
 
 const trackUploads = async (req, res, next) => {
   try {
-    const { category, tag } = req.body;
+    const { category: newCategory, tag1, tag2, tag3 } = req.body;
     const { thumbnailUrl, trackUrl } = req.files;
-
+    const tag = [tag1, tag2, tag3];
     if (!thumbnailUrl || !trackUrl) {
       res.sendStatus(400);
       return;
@@ -17,7 +17,8 @@ const trackUploads = async (req, res, next) => {
     const newTrackUrl = req.files.trackUrl[0].filename;
     const { userId: loginUserId } = res.locals.user;
 
-    const categoryId = await categoryModel.getCategoryId({ category });
+    const categoryId = await categoryModel.getCategoryId({ newCategory });
+
     const tagId = await tagModel.getTagId({ tag });
 
     if (!categoryId || !tagId) {

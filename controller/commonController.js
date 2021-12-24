@@ -6,15 +6,27 @@ const commentService = require("../services/comments");
 const likeService = require("../services/likes");
 
 const myTracksGet = async (req, res, next) => {
-  const { userId } = req.params;
-  const tracks = trackModel.getTracks({ userId });
+  const { userId: loginUserId } = res.locals.user;
+
+  let { userId } = req.params;
+  userId = parseInt(userId, 10);
+
+  if (!loginUserId) {
+    const tracks = await trackModel.getTracks({ userId });
+    res.status(200).send({ tracks });
+    return;
+  }
+  if (loginUserId === userId) {
+    const tracks = await trackModel.getTracks({ userId });
+    const likes = await likeService.getTracks({ userId });
+    res.status(200).send({ tracks, likes });
+  }
 };
 
 const detailTrackGet = async (req, res, next) => {
   try {
     const { trackId: newTrackId } = req.params;
     const likes = await likeService.findLikes({ newTrackId });
-
     const track = await trackModel.getTrack({ newTrackId, likes });
     const comments = await commentService.findComments({ newTrackId });
 
@@ -63,7 +75,6 @@ const categorySelect = async (req, res, next) => {
 
       const findedTracks = await trackTagModel.getTrackTag(findedTags, categoryId);
       const likes = await likeService.findLike({ findedTracks });
-
       const tracks = await trackModel.getSearchedTracks(findedTracks, likes);
       res.status(200).json({ tracks });
     } else {
