@@ -1,7 +1,7 @@
 const passport = require("passport");
 const naverStrategy = require("passport-naver").Strategy;
 const { Users } = require("../models");
-
+const userService = require("../services/auth");
 const randomstring = require("randomstring");
 const newNickname = randomstring.generate({ length: 15 });
 

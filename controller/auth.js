@@ -3,11 +3,11 @@ const userService = require("../services/auth");
 //nickname update
 const updateNickCon = async (req, res, next) => {
   try {
-    const { userId } = res.locals.user;
-    const { nickname } = req.body;
-    const nickcheck = await userService.findNick(nickname);
+    const { userId: userId } = res.locals.user;
+    const { nickname: nickname } = req.body;
+    const nickcheck = await userService.getUserByNickname({ nickname });
     if (!nickcheck) {
-      await userService.updateNick(userId, nickname);
+      await userService.updateUserByNickname({ userId, nickname });
       return res.sendStatus(200);
     } else if (nickcheck.userId === userId) {
       return res.sendStatus(400);
@@ -20,13 +20,14 @@ const updateNickCon = async (req, res, next) => {
 //user info
 const findUserCon = async (req, res, next) => {
   try {
-    const { userId } = res.locals.user;
-    const userOne = await userService.findUser(userId);
+    const { userId: userId } = res.locals.user;
+    const userOne = await userService.getUserByUserId({ userId });
     if (!userOne) {
       res.sendStatus(404);
       return;
     }
-    res.status(200).send({ user: userOne });
+    const result = userOne;
+    res.status(200).send({ user: result });
   } catch (error) {
     console.log(error);
     next(error);
@@ -35,9 +36,9 @@ const findUserCon = async (req, res, next) => {
 
 const updateProfileCon = async (req, res, next) => {
   try {
-    const { userId } = res.locals.user;
-    const { filename } = req.file;
-    await userService.updateProfile(userId, filename);
+    const { userId: userId } = res.locals.user;
+    const { filename: filename } = req.file;
+    await userService.updateUserBy({ userId, filename });
     res.sendStatus(200);
   } catch (error) {
     console.log(error);

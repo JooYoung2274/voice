@@ -1,6 +1,6 @@
 const { Users } = require("../models");
 
-const updateNick = async (userId, nickname) => {
+const updateUserByNickname = async ({ userId, nickname }) => {
   try {
     await Users.update(
       { nickname: nickname, nickUnChanged: 0 },
@@ -12,7 +12,7 @@ const updateNick = async (userId, nickname) => {
   }
 };
 
-const findUser = async ({ userId }) => {
+const getUserByUserId = async ({ userId }) => {
   try {
     const userOne = await Users.findOne({
       attributes: ["userId", "email", "nickname", "profileImage", "nickUnChanged"],
@@ -21,22 +21,24 @@ const findUser = async ({ userId }) => {
     if (!userOne) {
       return;
     }
-    return userOne;
+    const result = ({ userId, email, nickname, profile, nickUnChanged } = userOne.dataValues);
+    return result;
   } catch (error) {
     console.log(error);
   }
 };
 
-const findNick = async (nickname) => {
+const getUserByNickname = async ({ nickname }) => {
   try {
     const userOne = await Users.findOne({ attributes: ["userId"], where: { nickname: nickname } });
-    return userOne;
+    const result = userOne;
+    return result;
   } catch (error) {
     console.log(error);
   }
 };
 
-const updateProfile = async (userId, filename) => {
+const updateUserByFilename = async ({ userId, filename }) => {
   try {
     await Users.update({ profileImage: `uploads/${filename}` }, { where: { userId: userId } });
     return;
@@ -44,4 +46,4 @@ const updateProfile = async (userId, filename) => {
     console.log(error);
   }
 };
-module.exports = { updateNick, findUser, findNick, updateProfile };
+module.exports = { updateUserByNickname, getUserByUserId, getUserByNickname, updateUserByFilename };
