@@ -1,5 +1,8 @@
 "use strict";
 
+// cmd창에 npx sequelize-cli db:seed:all 하면 seeders전부 적용
+// cmd창에 npx sequelize-cli db:seed:undo:all seeders 전부 삭제
+
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     return queryInterface.bulkInsert("tags", [
