@@ -12,8 +12,8 @@ module.exports = (app) => {
   passport.use(
     new naverStrategy(
       {
-        clientID: "vNamYzNai5L1YAnpDWjU",
-        clientSecret: "uvlqNozWDw",
+        clientID: process.env.NAVER_CLIENT_ID,
+        clientSecret: process.env.NAVER_CLIENT_SECRET,
         callbackURL: "/api/auth/naver/callback",
       },
       async (accessToken, refreshToken, profile, done) => {
@@ -44,7 +44,7 @@ module.exports = (app) => {
   passport.use(
     new kakaoStrategy(
       {
-        clientID: "f1e0d9ea23cc43e8717f86da6573a3a1",
+        clientID: process.env.KAKAO_CLIENT_ID,
         callbackURL: "/api/auth/kakao/callback",
       },
       async (accessToken, refreshToken, profile, done) => {
@@ -73,8 +73,8 @@ module.exports = (app) => {
   passport.use(
     new googleStrategy(
       {
-        clientID: "283372056185-4d683ifd0ec8u3un2lmtmrq94qh0cgc8.apps.googleusercontent.com",
-        clientSecret: "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",
+        clientID: process.env.GOOGLE_CLIENT_ID,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
         callbackURL: "/api/auth/google/callback",
       },
       async (accessToken, refreshToken, profile, done) => {

@@ -7,7 +7,9 @@ const passportConfig = require("./passport");
 const passport = require("passport");
 const swaggerUi = require("swagger-ui-express");
 const swaggerFile = require("./swagger-output");
+const dotenv = require("dotenv");
 app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerFile));
+dotenv.config();
 passportConfig(app);
 
 //test용
