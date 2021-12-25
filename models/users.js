@@ -43,15 +43,18 @@ module.exports = (sequelize, DataTypes) => {
       flatformType: {
         type: Sequelize.STRING,
       },
-      email: {
-        type: Sequelize.STRING,
-      },
       profileImage: {
         type: Sequelize.STRING,
       },
       nickUnChanged: {
         type: Sequelize.BOOLEAN,
         defaultValue: true,
+      },
+      contact: {
+        type: Sequelize.STRING,
+      },
+      introduce: {
+        type: Sequelize.STRING,
       },
     },
     {

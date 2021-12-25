@@ -1,4 +1,5 @@
 const userService = require("../services/auth");
+const passport = require("passport");
 
 //nickname update
 const updateNickCon = async (req, res, next) => {
@@ -46,4 +47,35 @@ const updateProfileCon = async (req, res, next) => {
   }
 };
 
-module.exports = { updateNickCon, findUserCon, updateProfileCon };
+const kakaoCallback = (req, res, next) => {
+  passport.authenticate("kakao", { failureRedirect: "/" }, (err, user, token) => {
+    if (err) return next(err);
+    const { accessToken } = token;
+    res.send({ jwtToken: accessToken });
+  })(req, res, next);
+};
+
+const googleCallback = (req, res, next) => {
+  passport.authenticate("google", { failureRedirect: "/" }, (err, user, token) => {
+    if (err) return next(err);
+    const { accessToken } = token;
+    res.send({ jwtToken: accessToken });
+  })(req, res, next);
+};
+
+const naverCallback = (req, res, next) => {
+  passport.authenticate("naver", { failureRedirect: "/" }, (err, user, token) => {
+    if (err) return next(err);
+    const { accessToken } = token;
+    res.send({ jwtToken: accessToken });
+  })(req, res, next);
+};
+
+module.exports = {
+  updateNickCon,
+  findUserCon,
+  updateProfileCon,
+  kakaoCallback,
+  googleCallback,
+  naverCallback,
+};
