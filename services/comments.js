@@ -1,6 +1,4 @@
-const { Comments } = require("../models/index");
-const CommentClass = require("../classes/comments");
-const { Track } = require("../models/index");
+const { Comments, Track } = require("../models");
 
 const findComments = async ({ newTrackId }) => {
   const findedComments = await Comments.findAll({
@@ -18,7 +16,7 @@ const findComments = async ({ newTrackId }) => {
   return comments;
 };
 
-const findComment = async ({ commentId }) => {
+const findCommentByCommentId = async ({ commentId }) => {
   try {
     const comment = await Comments.findOne({
       where: { commentId },
@@ -108,4 +106,10 @@ const deleteComment = async ({ trackId, commentId }) => {
   }
 };
 
-module.exports = { findComments, createComment, findComment, updateComment, deleteComment };
+module.exports = {
+  findComments,
+  createComment,
+  findCommentByCommentId,
+  updateComment,
+  deleteComment,
+};

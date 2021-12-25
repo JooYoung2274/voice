@@ -36,7 +36,9 @@ const commentPut = async (req, res, next) => {
       return;
     }
     // updateComment에 들어가는 객체도 class화 해서 만들자
-    const { createdAt, userId: commentUserId } = await commentService.findComment({ commentId });
+    const { createdAt, userId: commentUserId } = await commentService.findCommentByCommentId({
+      commentId,
+    });
     if (userId !== commentUserId) {
       res.sendStatus(400);
       return;
@@ -59,7 +61,7 @@ const commentDelete = async (req, res, next) => {
   try {
     const { trackId, commentId } = req.params;
     const { userId } = res.locals.user;
-    const { userId: commentUserId } = await commentService.findComment({ commentId });
+    const { userId: commentUserId } = await commentService.findCommentByCommentId({ commentId });
 
     // 비교로직 utils에 만들자 throw error
     if (userId !== commentUserId) {
