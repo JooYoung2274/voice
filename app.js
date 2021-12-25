@@ -5,7 +5,9 @@ const app = express();
 const { sequelize } = require("./models");
 const passportConfig = require("./passport");
 const passport = require("passport");
-
+const swaggerUi = require("swagger-ui-express");
+const swaggerFile = require("./swagger-output");
+app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerFile));
 passportConfig(app);
 
 //test용
