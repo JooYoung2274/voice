@@ -4,15 +4,21 @@ const jwt = require("jsonwebtoken");
 
 const updateUser = async (req, res, next) => {
   try {
-    const { userId: userId } = req.params;
+    const { userId: userId } = res.locals.user;
     const { nickname, contact, introduce } = req.body;
-    if (req.file !== undefined) {
-      const { filename: filename } = req.file;
-      await userService.updateUser({ userId, filename, nickname, contact, introduce });
+    const userOne = await userService.getUser({ nickname });
+    if (!userOne || userOne.userId === userId) {
+      if (req.file !== undefined) {
+        const { filename: filename } = req.file;
+        await userService.updateUser({ userId, filename, nickname, contact, introduce });
+      } else {
+        await userService.updateUser({ userId, nickname, contact, introduce });
+      }
+      res.status(200).send();
+      return;
     } else {
-      await userService.updateUser({ userId, nickname, contact, introduce });
+      res.status(400).send({});
     }
-    res.status(200).send();
   } catch (error) {
     console.log(error);
     next(error);

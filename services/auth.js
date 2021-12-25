@@ -3,7 +3,7 @@ const { Users } = require("../models");
 const updateUser = async ({ userId, filename, nickname, contact, introduce }) => {
   try {
     let profileImage = "";
-    if (!filename) {
+    if (filename) {
       profileImage = `uploads/${filename}`;
     }
     await Users.update(
@@ -24,9 +24,6 @@ const updateUser = async ({ userId, filename, nickname, contact, introduce }) =>
 const getUser = async ({ nickname }) => {
   try {
     const result = Users.findOne({ where: { nickname: nickname } });
-    if (result) {
-      return;
-    }
     return result;
   } catch (error) {
     console.log(error);

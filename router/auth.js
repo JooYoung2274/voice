@@ -16,7 +16,7 @@ router.get("/kakao", passport.authenticate("kakao"));
 
 router.get("/kakao/callback", kakaoCallback);
 
-router.get("/google", passport.authenticate("google", { scope: ["profile", "email"] }));
+router.get("/google", passport.authenticate("google", { scope: ["profile"] }));
 
 router.get("/google/callback", googleCallback);
 
@@ -24,5 +24,5 @@ router.get("/naver", passport.authenticate("naver"));
 
 router.get("/naver/callback", naverCallback);
 
-router.post("/profile/:userId", uploader.single("profileImage"), updateUser);
+router.post("/profile", uploader.single("profileImage"), needLogin, updateUser);
 module.exports = router;
