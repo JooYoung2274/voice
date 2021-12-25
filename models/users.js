@@ -56,10 +56,20 @@ module.exports = (sequelize, DataTypes) => {
       introduce: {
         type: Sequelize.STRING,
       },
+      createdAt: {
+        type: "TIMESTAMP",
+        defaultValue: sequelize.literal("CURRENT_TIMESTAMP"),
+        allowNull: false,
+      },
+      updatedAt: {
+        type: "TIMESTAMP",
+        defaultValue: sequelize.literal("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"),
+        allowNull: false,
+      },
     },
     {
       sequelize,
-      timestamps: true,
+      timestamps: false,
       underscored: false, //_사용 여부
       modelName: "Users", //js에서사용
       tableName: "Users", //db에서 사용

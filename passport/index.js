@@ -6,7 +6,6 @@ const { Users } = require("../models");
 const userService = require("../services/auth");
 const randomstring = require("randomstring");
 const newNickname = randomstring.generate({ length: 15 });
-const jwt = require("jsonwebtoken");
 
 module.exports = (app) => {
   app.use(passport.initialize());
@@ -20,21 +19,17 @@ module.exports = (app) => {
       async (accessToken, refreshToken, profile, done) => {
         console.log("*********naver profile*********", profile);
         try {
-          const providerId = profile.id;
           const exUser = await Users.findOne({
             where: { snsId: profile.id, flatformType: profile.provider },
           });
           if (exUser) {
-            const accessToken = jwt.sign({ providerId }, "secret-secret-key");
-            done(null, exUser, { accessToken });
+            done(null, exUser);
           } else {
             const newUser = await Users.create({
               nickname: newNickname,
               flatformType: profile.provider,
               snsId: profile.id,
             });
-            //done(null, newUser);
-            const accessToken = jwt.sign({ providerId }, "secret-secret-key");
             done(null, newUser, {
               accessToken,
             });
@@ -54,24 +49,19 @@ module.exports = (app) => {
       },
       async (accessToken, refreshToken, profile, done) => {
         console.log("*********kakao profile*********", profile);
-        const providerId = profile?.id;
         try {
           const exUser = await Users.findOne({
             where: { snsId: profile.id, flatformType: profile.provider },
           });
           if (exUser) {
-            const accessToken = jwt.sign({ providerId }, "secret-secret-key");
-            done(null, exUser, { accessToken });
+            done(null, exUser);
           } else {
             const newUser = await Users.create({
               nickname: newNickname,
               flatformType: profile.provider,
               snsId: profile.id,
             });
-            const accessToken = jwt.sign({ providerId }, "secret-secret-key");
-            done(null, newUser, {
-              accessToken,
-            });
+            done(null, newUser);
           }
         } catch (error) {
           console.error(error);
@@ -90,23 +80,18 @@ module.exports = (app) => {
       async (accessToken, refreshToken, profile, done) => {
         console.log("*********google profile*********", profile);
         try {
-          const providerId = profile.id;
           const exUser = await Users.findOne({
             where: { snsId: profile.id, flatformType: profile.provider },
           });
           if (exUser) {
-            const accessToken = jwt.sign({ providerId }, "secret-secret-key");
-            done(null, exUser, { accessToken });
+            done(null, exUser);
           } else {
             const newUser = await Users.create({
               nickname: newNickname,
               flatformType: profile.provider,
               snsId: profile.id,
             });
-            const accessToken = jwt.sign({ providerId }, "secret-secret-key");
-            done(null, newUser, {
-              accessToken,
-            });
+            done(null, newUser);
           }
         } catch (error) {
           console.error(error);

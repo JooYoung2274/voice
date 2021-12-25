@@ -1,46 +1,18 @@
 const userService = require("../services/auth");
 const passport = require("passport");
+const jwt = require("jsonwebtoken");
 
-//nickname update
-const updateNickCon = async (req, res, next) => {
+const updateUser = async (req, res, next) => {
   try {
-    const { userId: userId } = res.locals.user;
-    const { nickname: nickname } = req.body;
-    const nickcheck = await userService.getUserByNickname({ nickname });
-    if (!nickcheck) {
-      await userService.updateUserByNickname({ userId, nickname });
-      return res.sendStatus(200);
-    } else if (nickcheck.userId === userId) {
-      return res.sendStatus(400);
+    const { userId: userId } = req.params;
+    const { nickname, contact, introduce } = req.body;
+    if (req.file !== undefined) {
+      const { filename: filename } = req.file;
+      await userService.updateUser({ userId, filename, nickname, contact, introduce });
+    } else {
+      await userService.updateUser({ userId, nickname, contact, introduce });
     }
-  } catch (error) {
-    console.log(error);
-    next(error);
-  }
-};
-//user info
-const findUserCon = async (req, res, next) => {
-  try {
-    const { userId: userId } = res.locals.user;
-    const userOne = await userService.getUserByUserId({ userId });
-    if (!userOne) {
-      res.sendStatus(404);
-      return;
-    }
-    const result = userOne;
-    res.status(200).send({ user: result });
-  } catch (error) {
-    console.log(error);
-    next(error);
-  }
-};
-
-const updateProfileCon = async (req, res, next) => {
-  try {
-    const { userId: userId } = res.locals.user;
-    const { filename: filename } = req.file;
-    await userService.updateUserBy({ userId, filename });
-    res.sendStatus(200);
+    res.status(200).send();
   } catch (error) {
     console.log(error);
     next(error);
@@ -48,33 +20,55 @@ const updateProfileCon = async (req, res, next) => {
 };
 
 const kakaoCallback = (req, res, next) => {
-  passport.authenticate("kakao", { failureRedirect: "/" }, (err, user, token) => {
+  passport.authenticate("kakao", { failureRedirect: "/" }, (err, user) => {
     if (err) return next(err);
-    const { accessToken } = token;
-    res.send({ jwtToken: accessToken });
+    const { userId, nickname, contact, profileImage, introduce } = user;
+    const jwtToken = jwt.sign({ userId: userId }, "secret-secret-key");
+    result = {
+      jwtToken: jwtToken,
+      nickname: nickname,
+      contact: contact,
+      profileImage: profileImage,
+      introduce,
+    };
+    res.send({ user: result });
   })(req, res, next);
 };
 
 const googleCallback = (req, res, next) => {
-  passport.authenticate("google", { failureRedirect: "/" }, (err, user, token) => {
+  passport.authenticate("google", { failureRedirect: "/" }, (err, user) => {
     if (err) return next(err);
-    const { accessToken } = token;
-    res.send({ jwtToken: accessToken });
+    const { userId, nickname, contact, profileImage, introduce } = user;
+    const jwtToken = jwt.sign({ userId: userId }, "secret-secret-key");
+    result = {
+      jwtToken: jwtToken,
+      nickname: nickname,
+      contact: contact,
+      profileImage: profileImage,
+      introduce,
+    };
+    res.send({ user: result });
   })(req, res, next);
 };
 
 const naverCallback = (req, res, next) => {
-  passport.authenticate("naver", { failureRedirect: "/" }, (err, user, token) => {
+  passport.authenticate("naver", { failureRedirect: "/" }, (err, user) => {
     if (err) return next(err);
-    const { accessToken } = token;
-    res.send({ jwtToken: accessToken });
+    const { userId, nickname, contact, profileImage, introduce } = user;
+    const jwtToken = jwt.sign({ userId: userId }, "secret-secret-key");
+    result = {
+      jwtToken: jwtToken,
+      nickname: nickname,
+      contact: contact,
+      profileImage: profileImage,
+      introduce,
+    };
+    res.send({ user: result });
   })(req, res, next);
 };
 
 module.exports = {
-  updateNickCon,
-  findUserCon,
-  updateProfileCon,
+  updateUser,
   kakaoCallback,
   googleCallback,
   naverCallback,

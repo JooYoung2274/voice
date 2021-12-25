@@ -3,8 +3,7 @@ const passport = require("passport");
 const jwt = require("jsonwebtoken");
 const { needLogin, notNeedLogin } = require("../middleware/auth-middleware");
 const {
-  updateNickCon,
-  findUserCon,
+  updateUser,
   updateProfileCon,
   kakaoCallback,
   googleCallback,
@@ -25,7 +24,5 @@ router.get("/naver", passport.authenticate("naver"));
 
 router.get("/naver/callback", naverCallback);
 
-router.post("/nickname", needLogin, updateNickCon);
-router.get("/me", needLogin, findUserCon);
-router.post("/me/:userId", needLogin, uploader.single("profileImgage"), updateProfileCon);
+router.post("/profile/:userId", uploader.single("profileImage"), updateUser);
 module.exports = router;
