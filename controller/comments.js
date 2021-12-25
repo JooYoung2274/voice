@@ -2,21 +2,22 @@ const commentService = require("../services/comments");
 
 const commentPost = async (req, res, next) => {
   try {
-    const { trackId: newTrackId } = req.params;
+    const { trackId } = req.params;
     // comment validate만들기
-    const { comment: newComment } = req.body;
-    const { userId: loginUserId, nickname: loginNickname } = res.locals.user;
-    if (!newComment || !newTrackId) {
+    const { comment } = req.body;
+    const { userId, nickname } = res.locals.user;
+    // validate 만들어야할거같은데
+    if (!comment || !trackId) {
       res.sendStatus(400);
       return;
     }
-    const processedComment = await commentService.createComment({
-      newComment,
-      newTrackId,
-      loginUserId,
-      loginNickname,
+    const result = await commentService.createComment({
+      comment,
+      trackId,
+      userId,
+      nickname,
     });
-    return res.status(200).json({ comment: processedComment });
+    return res.status(200).json({ comment: result });
   } catch (error) {
     console.log(error);
     next(error);
@@ -25,29 +26,29 @@ const commentPost = async (req, res, next) => {
 
 const commentPut = async (req, res, next) => {
   try {
-    const { trackId: newTrackId, commentId: newCommentId } = req.params;
+    const { trackId, commentId } = req.params;
     //comment validate만들기
-    const { comment: newComment } = req.body;
-    const { userId: loginUserId, nickname: loginNickname } = res.locals.user;
+    const { comment } = req.body;
+    const { userId, nickname } = res.locals.user;
     // middleware로 처리
-    if (!newComment || !newTrackId || !newCommentId) {
+    if (!comment || !trackId || !commentId) {
       res.sendStatus(400);
       return;
     }
     // updateComment에 들어가는 객체도 class화 해서 만들자
-    const { createdAt, userId: commentUserId } = await commentService.findComment({ newCommentId });
-    if (loginUserId !== commentUserId) {
+    const { createdAt, userId: commentUserId } = await commentService.findComment({ commentId });
+    if (userId !== commentUserId) {
       res.sendStatus(400);
       return;
     }
-    const processedComment = await commentService.updateComment({
-      newCommentId,
-      newComment,
-      loginNickname,
+    const result = await commentService.updateComment({
+      commentId,
+      comment,
+      nickname,
       createdAt,
-      newTrackId,
+      trackId,
     });
-    return res.status(200).json({ comment: processedComment });
+    return res.status(200).json({ comment: result });
   } catch (error) {
     console.log(error);
     next(error);
@@ -56,16 +57,16 @@ const commentPut = async (req, res, next) => {
 
 const commentDelete = async (req, res, next) => {
   try {
-    const { trackId: newTrackId, commentId: newCommentId } = req.params;
-    const { userId: loginUserId } = res.locals.user;
-    const { userId: commentUserId } = await commentService.findComment({ newCommentId });
+    const { trackId, commentId } = req.params;
+    const { userId } = res.locals.user;
+    const { userId: commentUserId } = await commentService.findComment({ commentId });
 
     // 비교로직 utils에 만들자 throw error
-    if (loginUserId !== commentUserId) {
+    if (userId !== commentUserId) {
       res.sendStatus(400);
       return;
     }
-    await commentService.deleteComment({ newTrackId, newCommentId });
+    await commentService.deleteComment({ trackId, commentId });
     return res.sendStatus(200);
   } catch (error) {
     console.log(error);
