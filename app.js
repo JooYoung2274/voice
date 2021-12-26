@@ -6,6 +6,7 @@ const { sequelize } = require("./models");
 const session = require("express-session");
 const passportConfig = require("./passport");
 const passport = require("passport");
+const { logHandler, errorHandler } = require("./middleware/errorHandler");
 
 app.use(
   session({
@@ -42,16 +43,6 @@ sequelize
 
 app.use(logHandler);
 app.use(errorHandler);
-
-function logHandler(err, req, res, next) {
-  console.error("[" + new Date() + "]\n" + err.stack);
-  next(err);
-}
-
-function errorHandler(err, req, res, next) {
-  res.status(err.status || 500);
-  res.send(err.message || "Error!!");
-}
 
 app.listen(port, () => {
   console.log(`listening at http://localhost:${port}`);
