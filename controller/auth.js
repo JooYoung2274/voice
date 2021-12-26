@@ -15,7 +15,14 @@ const updateUser = async (req, res, next) => {
         await userService.updateUser({ userId, nickname, contact, introduce });
       }
       const result = await userService.getUser({ nickname });
-      res.status(200).send({ user: result });
+      const user = {
+        nickname: result.nickname,
+        contact: result.contact,
+        email: result.email,
+        introduce: result.introduce,
+        profileImage: result.profileImage,
+      };
+      res.status(200).send({ user: user });
       return;
     } else {
       res.status(400).send({});
