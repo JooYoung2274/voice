@@ -13,7 +13,8 @@ module.exports = (sequelize, DataTypes) => {
       Track.hasMany(models.Comments, { foreignKey: "trackId" });
       Track.hasMany(models.Likes, { foreignKey: "trackId" });
       Track.belongsTo(models.Users, { foreignKey: "userId" });
-      Track.belongsTo(models.Category, { foreignKey: "categoryId" });
+      Track.belongsTo(models.Category, { foreignKey: "category" });
+      Track.belongsTo(models.TrackThumbnail, { foreignKey: "trackThumbnailUrl" });
     }
   }
   Track.init(
@@ -24,30 +25,27 @@ module.exports = (sequelize, DataTypes) => {
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      userId: {
-        allowNull: false,
-        type: Sequelize.INTEGER,
-      },
       trackUrl: {
         allowNull: false,
         type: Sequelize.STRING,
       },
-      thumbnailUrl: {
+      trackThumbnailUrl: {
         allowNull: false,
         type: Sequelize.STRING,
       },
-      createdAt: {
+      category: {
         allowNull: false,
-        type: Sequelize.DATE,
+        type: Sequelize.STRING,
       },
-      updatedAt: {
+      userId: {
         allowNull: false,
-        type: Sequelize.DATE,
+        type: Sequelize.INTEGER,
       },
     },
     {
       sequelize,
       modelName: "Track",
+      timestamps: false,
     },
   );
   return Track;

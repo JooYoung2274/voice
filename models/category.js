@@ -9,33 +9,22 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      Category.hasMany(models.Track, { foreignKey: "categoryId" });
+      Category.hasMany(models.Track, { foreignKey: "category" });
+      Category.hasMany(models.TrackTag, { foreignKey: "category" });
     }
   }
   Category.init(
     {
-      categoryId: {
-        allowNull: false,
-        autoIncrement: true,
-        primaryKey: true,
-        type: Sequelize.INTEGER,
-      },
       category: {
         allowNull: false,
+        primaryKey: true,
         type: Sequelize.STRING,
-      },
-      createdAt: {
-        allowNull: false,
-        type: Sequelize.DATE,
-      },
-      updatedAt: {
-        allowNull: false,
-        type: Sequelize.DATE,
       },
     },
     {
       sequelize,
       modelName: "Category",
+      timestamps: false,
     },
   );
   return Category;

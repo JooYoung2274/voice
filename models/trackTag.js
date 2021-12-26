@@ -10,7 +10,8 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       TrackTag.belongsTo(models.Track, { foreignKey: "trackId" });
-      TrackTag.belongsTo(models.Tag, { foreignKey: "tagId" });
+      TrackTag.belongsTo(models.Tag, { foreignKey: "tag" });
+      TrackTag.belongsTo(models.Category, { foreignKey: "category" });
     }
   }
   TrackTag.init(
@@ -21,30 +22,23 @@ module.exports = (sequelize, DataTypes) => {
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      tagId: {
+      tag: {
         allowNull: false,
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING,
       },
       trackId: {
         allowNull: false,
         type: Sequelize.INTEGER,
       },
-      categoryId: {
+      category: {
         allowNull: false,
-        type: Sequelize.INTEGER,
-      },
-      createdAt: {
-        allowNull: false,
-        type: Sequelize.DATE,
-      },
-      updatedAt: {
-        allowNull: false,
-        type: Sequelize.DATE,
+        type: Sequelize.STRING,
       },
     },
     {
       sequelize,
       modelName: "TrackTag",
+      timestamps: false,
     },
   );
   return TrackTag;
