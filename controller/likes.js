@@ -2,12 +2,12 @@ const likeService = require("../services/likes");
 
 const likePost = async (req, res, next) => {
   try {
-    const { trackId: newTrackId } = req.params;
-    const { userId: loginUserId } = res.locals.user;
-    const processedLike = await likeService.clickLike({ newTrackId, loginUserId });
-    return res.status(200).json({ like: processedLike });
+    const { trackId } = req.params;
+    const { userId } = res.locals.user;
+    const result = await likeService.createOrDeleteLike({ trackId, userId });
+    return res.status(200).json({ like: result });
   } catch (error) {
-    console.log(error);
+    error.status = 400;
     next(error);
   }
 };
