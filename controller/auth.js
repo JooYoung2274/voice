@@ -1,48 +1,89 @@
 const userService = require("../services/auth");
+const passport = require("passport");
+const jwt = require("jsonwebtoken");
 
-//nickname update
-const updateNickCon = async (req, res, next) => {
+const updateUser = async (req, res, next) => {
   try {
-    const { userId } = res.locals.user;
-    const { nickname } = req.body;
-    const nickcheck = await userService.findNick(nickname);
-    if (!nickcheck) {
-      await userService.updateNick(userId, nickname);
-      return res.sendStatus(200);
-    } else if (nickcheck.userId === userId) {
-      return res.sendStatus(400);
-    }
-  } catch (error) {
-    console.log(error);
-    next(error);
-  }
-};
-//user info
-const findUserCon = async (req, res, next) => {
-  try {
-    const { userId } = res.locals.user;
-    const userOne = await userService.findUser(userId);
-    if (!userOne) {
-      res.sendStatus(404);
+    const { userId: userId } = res.locals.user;
+    const { nickname, contact, introduce } = req.body;
+    const userOne = await userService.getUser({ nickname });
+    if (!userOne || userOne.userId === userId) {
+      if (req.file !== undefined) {
+        const { filename: filename } = req.file;
+        await userService.updateUser({ userId, filename, nickname, contact, introduce });
+      } else {
+        await userService.updateUser({ userId, nickname, contact, introduce });
+      }
+      const result = await userService.getUser({ nickname });
+      const user = {
+        nickname: result.nickname,
+        contact: result.contact,
+        email: result.email,
+        introduce: result.introduce,
+        profileImage: result.profileImage,
+      };
+      res.status(200).send({ user: user });
       return;
+    } else {
+      res.status(400).send({});
     }
-    res.status(200).send({ user: userOne });
   } catch (error) {
     console.log(error);
     next(error);
   }
 };
 
-const updateProfileCon = async (req, res, next) => {
-  try {
-    const { userId } = res.locals.user;
-    const { filename } = req.file;
-    await userService.updateProfile(userId, filename);
-    res.sendStatus(200);
-  } catch (error) {
-    console.log(error);
-    next(error);
-  }
+const kakaoCallback = (req, res, next) => {
+  passport.authenticate("kakao", { failureRedirect: "/" }, (err, user) => {
+    if (err) return next(err);
+    const { userId, nickname, contact, profileImage, introduce } = user;
+    const jwtToken = jwt.sign({ userId: userId }, process.env.JWT_SECRET);
+    result = {
+      jwtToken: jwtToken,
+      nickname: nickname,
+      contact: contact,
+      profileImage: profileImage,
+      introduce,
+    };
+    res.send({ user: result });
+  })(req, res, next);
 };
 
-module.exports = { updateNickCon, findUserCon, updateProfileCon };
+const googleCallback = (req, res, next) => {
+  passport.authenticate("google", { failureRedirect: "/" }, (err, user) => {
+    if (err) return next(err);
+    const { userId, nickname, contact, profileImage, introduce } = user;
+    const jwtToken = jwt.sign({ userId: userId }, process.env.JWT_SECRET);
+    result = {
+      jwtToken: jwtToken,
+      nickname: nickname,
+      contact: contact,
+      profileImage: profileImage,
+      introduce,
+    };
+    res.send({ user: result });
+  })(req, res, next);
+};
+
+const naverCallback = (req, res, next) => {
+  passport.authenticate("naver", { failureRedirect: "/" }, (err, user) => {
+    if (err) return next(err);
+    const { userId, nickname, contact, profileImage, introduce } = user;
+    const jwtToken = jwt.sign({ userId: userId }, process.env.JWT_SECRET);
+    result = {
+      jwtToken: jwtToken,
+      nickname: nickname,
+      contact: contact,
+      profileImage: profileImage,
+      introduce,
+    };
+    res.send({ user: result });
+  })(req, res, next);
+};
+
+module.exports = {
+  updateUser,
+  kakaoCallback,
+  googleCallback,
+  naverCallback,
+};
