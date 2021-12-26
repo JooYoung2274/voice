@@ -27,7 +27,6 @@ const findCommentByCommentId = async ({ commentId }) => {
     const { dataValues: result } = comment;
     return result;
   } catch (error) {
-    // console.log(error);
     throw error;
   }
 };

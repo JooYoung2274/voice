@@ -40,14 +40,6 @@ sequelize
     console.error("DB실패");
   });
 
-app.use((req, res, next) => {
-  res.sendStatus(404);
-});
-// app.use((error, req, res, next) => {
-//   console.error(error);
-//   res.sendStatus(500);
-// });
-
 app.use(logHandler);
 app.use(errorHandler);
 
