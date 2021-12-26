@@ -1,124 +1,101 @@
-const { Track } = require("../models/index");
-const { TrackTag } = require("../models/index");
-const { Category } = require("../models/index");
-const { Users } = require("../models");
-const { Likes } = require("../models/index");
-const { Tag } = require("../models/index");
+const { Track, TrackTag, Tag, Category, Users, Likes } = require("../models");
 
-const createTrack = async ({ categoryId, tagId, newThumbnailUrl, newTrackUrl, loginUserId }) => {
+const createTrack = async ({ category, tag, trackThumbnailUrl, trackUrlName, userId }) => {
   const createdTrack = await Track.create({
-    categoryId: categoryId,
-    thumbnailUrl: newThumbnailUrl,
-    trackUrl: newTrackUrl,
-    userId: loginUserId,
+    category: category,
+    trackThumbnailUrl: trackThumbnailUrl,
+    trackUrl: trackUrlName,
+    userId: userId,
   });
-
-  for (let i = 0; i < tagId.length; i++) {
-    if (tagId[i]) {
+  for (let i = 0; i < tag.length; i++) {
+    if (tag[i]) {
       await TrackTag.create({
         trackId: createdTrack.trackId,
-        categoryId: categoryId,
-        tagId: tagId[i],
+        tag: tag[i],
+        category: category,
       });
     }
   }
-
-  return createdTrack.trackId;
-};
-
-const deleteTrack = async ({ newTrackId }) => {
-  await Track.destroy({ where: { trackId: newTrackId } });
   return;
 };
 
-const getTracks = async ({ userId }) => {
-  const tracks = await Track.findAll({
-    attributes: ["trackId", "categoryId", "thumbnailUrl", "trackUrl", "userId"],
-    where: { userId: userId },
-  });
-  if (!tracks) {
-    return;
-  }
-
-  let categoryArray = [];
-  for (let i = 0; i < tracks.length; i++) {
-    const { trackId, categoryId, thumbnailUrl, trackUrl, userId } = tracks[i];
-
-    const findedCategory = await Category.findOne({
-      attributes: ["category"],
-      where: { categoryId: categoryId },
-    });
-    const category = findedCategory.category;
-
-    const findedNickname = await Users.findOne({
-      attributes: ["nickname"],
-      where: { userId: userId },
-    });
-    const nickname = findedNickname.nickname;
-
-    const findedTagid = await TrackTag.findOne({
-      attributes: ["tagId"],
-      where: { trackId: trackId, categoryId: categoryId },
-    });
-    const tagId = findedTagid.tagId;
-
-    const findedTag = await Tag.findOne({
-      attributes: ["tag"],
-      where: { tagId: tagId },
-    });
-    const tag = findedTag.tag;
-
-    const searchedCategory = { trackId, category, tag, thumbnailUrl, trackUrl, nickname };
-    categoryArray.push(searchedCategory);
-  }
-  return categoryArray;
+const deletTrackByTrackId = async ({ trackId }) => {
+  await Track.destroy({ where: { trackId: trackId } });
+  return;
 };
 
-const getTrack = async ({ newTrackId, likes }) => {
+const updateTrackByTrackId = async ({
+  trackId,
+  tag,
+  category,
+  trackUrlName,
+  trackThumbnailUrl,
+}) => {
+  const updateTrack = await Track.update(
+    { category: category, trackUrl: trackUrlName, trackThumbnailUrl: trackThumbnailUrl },
+    { where: { trackId: trackId } },
+  );
+  return updateTrack;
+};
+
+const getTracksByUserId = async ({ userId, myPage }) => {
+  if (myPage) {
+    const tracks = await Track.findAll({
+      attributes: ["trackId", "category", "trackThumbnailUrl", "trackUrl", "userId"],
+      include: [
+        { model: TrackTag, attributes: ["tag"] },
+        { model: Users, attributes: ["nickname"] },
+      ],
+      where: { userId: userId },
+    });
+
+    // sequelize subquery 로 해야할듯
+    const likes = await Likes.findAll({
+      attributes: ["trackId"],
+      where: { userId: userId },
+    });
+    let likesArray = [];
+    for (let i = 0; i < likes.length; i++) {
+      const likesTracks = await Track.findAll({
+        attributes: ["trackId", "category", "trackThumbnailUrl", "trackUrl", "userId"],
+        include: [
+          { model: TrackTag, attributes: ["tag"] },
+          { model: Users, attributes: ["nickname"] },
+        ],
+        where: { trackId: likes[i].trackId },
+      });
+      likesArray.push(likesTracks);
+    }
+    return { tracks, likesArray };
+  }
+
+  const result = await Track.findAll({
+    attributes: ["trackId", "category", "trackThumbnailUrl", "trackUrl", "userId"],
+    include: [
+      { model: TrackTag, attributes: ["tag"] },
+      { model: Users, attributes: ["nickname"] },
+    ],
+    where: { userId: userId },
+  });
+
+  return result;
+};
+
+const getTrackByTrackId = async ({ trackId, likes }) => {
   const findedTrack = await Track.findOne({
-    attributes: ["trackId", "categoryId", "thumbnailUrl", "trackUrl"],
+    attributes: ["trackId", "category", "trackThumbnailUrl", "trackUrl", "userId"],
     include: [
       {
         model: TrackTag,
-        attributes: ["tagId"],
-        include: [
-          {
-            model: Tag,
-            attributes: ["tag"],
-          },
-        ],
-      },
-      {
-        model: Category,
-        attributes: ["category"],
-      },
-      {
-        model: Users,
-        attributes: ["nickname"],
+        attributes: ["tag"],
       },
     ],
-    where: { trackId: newTrackId },
+    where: { trackId: trackId },
   });
-
   if (!findedTrack) {
     return;
   }
-
-  const { trackId, categoryId, thumbnailUrl, trackUrl } = findedTrack;
-  const { nickname } = findedTrack.User;
-  const { category } = findedTrack.Category;
-  const categoryArray = { categoryId: categoryId, category: category };
-
-  let tagArray = [];
-  for (let i = 0; i < findedTrack.TrackTags.length; i++) {
-    const { tagId } = findedTrack.TrackTags[i];
-    const { tag } = findedTrack.TrackTags[i].Tag;
-    tagArray.push({ tagId: tagId, tag: tag });
-  }
-
-  const array = { trackId, nickname, likes, thumbnailUrl, trackUrl, tagArray, categoryArray };
-
-  return array;
+  return findedTrack;
 };
 
 const getPlainTrack = async ({ newTrackId }) => {
@@ -137,79 +114,77 @@ const getPlainTrack = async ({ newTrackId }) => {
   }
 };
 
-const getSearchedTracks = async (findedTracks, likes) => {
+const getTracksByLikes = async ({ findedTrackIds }) => {
   let tracks = [];
-  for (let i = 0; i < findedTracks.length; i++) {
+  for (let i = 0; i < findedTrackIds.length; i++) {
     const findedTrack = await Track.findOne({
-      attributes: ["trackId", "categoryId", "thumbnailUrl", "trackUrl", "userId"],
-      where: { trackId: findedTracks[i] },
+      attributes: ["trackId", "category", "trackThumbnailUrl", "trackUrl", "userId"],
+      where: { trackId: findedTrackIds[i] },
+      include: [
+        { model: TrackTag, attributes: ["tag"] },
+        { model: Users, attributes: ["nickname"] },
+      ],
     });
-    const { trackId, categoryId, thumbnailUrl, trackUrl, userId } = findedTrack;
-
-    const findedCategory = await Category.findOne({
-      attributes: ["category"],
-      where: { categoryId: categoryId },
-    });
-    const category = findedCategory.category;
-
-    const findedNickname = await Users.findOne({
-      attributes: ["nickname"],
-      where: { userId: userId },
-    });
-    const nickname = findedNickname.nickname;
-
-    const findedTagid = await TrackTag.findOne({
-      attributes: ["tagId"],
-      where: { trackId: trackId, categoryId: categoryId },
-    });
-    const tagId = findedTagid.tagId;
-
-    const findedTag = await Tag.findOne({
-      attributes: ["tag"],
-      where: { tagId: tagId },
-    });
-    const tag = findedTag.tag;
-    const like = likes[i];
-    const track = { trackId, category, thumbnailUrl, trackUrl, nickname, tag, like };
-    tracks.push(track);
+    tracks.push(findedTrack);
   }
   return tracks;
 };
 
-const getMainTracks = async () => {
-  let tracksArray = [];
+const getTracksByCategory = async ({ category }) => {
+  const findedTracks = await Track.findAll({
+    attributes: ["trackId", "category", "trackThumbnailUrl", "trackUrl", "userId"],
+    where: { category: category },
+    order: [["category", "ASC"]],
+    include: [
+      { model: TrackTag, attributes: ["tag"] },
+      { model: Users, attributes: ["nickname"] },
+    ],
+  });
 
-  for (let i = 1; i < 9; i++) {
-    const findedTracks = await Track.findAll({
-      attributes: ["trackId", "categoryId", "thumbnailUrl", "trackUrl", "userId"],
-      where: { categoryId: i },
-      order: [["categoryId", "DESC"]],
-    });
-    if (!findedTracks) {
-      return;
+  return findedTracks;
+};
+
+const getTracks = async () => {
+  const findedTracks = await Track.findAll({
+    attributes: ["trackId", "category", "trackThumbnailUrl", "trackUrl", "userId"],
+    order: [["category", "ASC"]],
+    include: [
+      { model: TrackTag, attributes: ["tag"] },
+      { model: Users, attributes: ["nickname"] },
+    ],
+  });
+
+  // 카테고리 별로 어떻게 뽑아내지..
+  let result = [[], [], [], [], [], [], []];
+
+  for (let i = 0; i < findedTracks.length; i++) {
+    switch (findedTracks[i].category) {
+      case "ASMR":
+        result[0].push(findedTracks[i]);
+        break;
+      case "나레이션":
+        result[1].push(findedTracks[i]);
+        break;
+      case "더빙":
+        result[2].push(findedTracks[i]);
+        break;
+      case "라디오":
+        result[3].push(findedTracks[i]);
+        break;
+      case "성대모사":
+        result[4].push(findedTracks[i]);
+        break;
+      case "일상언어":
+        result[5].push(findedTracks[i]);
+        break;
+      case "효과음":
+        result[6].push(findedTracks[i]);
+        break;
+      default:
+        break;
     }
-    let categoryArray = [];
-
-    for (let j = 0; j < findedTracks.length; j++) {
-      const { trackId, categoryId, thumbnailUrl, trackUrl, userId } = findedTracks[j];
-      const findedCategory = await Category.findOne({
-        attributes: ["category"],
-        where: { categoryId: categoryId },
-      });
-      const category = findedCategory.category;
-
-      const findedNickname = await Users.findOne({
-        attributes: ["nickname"],
-        where: { userId: userId },
-      });
-      const nickname = findedNickname.nickname;
-
-      const track = { trackId, category, thumbnailUrl, trackUrl, nickname };
-      categoryArray.push(track);
-    }
-    tracksArray.push(categoryArray);
   }
-  return tracksArray;
+  return result;
 };
 
 const getLikeTrack = async () => {
@@ -297,11 +272,13 @@ const getLikeTrack = async () => {
 
 module.exports = {
   createTrack,
-  deleteTrack,
-  getTracks,
-  getTrack,
+  deletTrackByTrackId,
+  getTracksByUserId,
+  getTrackByTrackId,
   getPlainTrack,
-  getMainTracks,
-  getSearchedTracks,
+  getTracks,
+  getTracksByLikes,
   getLikeTrack,
+  getTracksByCategory,
+  updateTrackByTrackId,
 };

@@ -1,18 +1,10 @@
-const { format } = require("express/lib/response");
+const { Tag, TrackTag } = require("../models");
+
 const sequelize = require("sequelize");
 const Op = sequelize.Op;
 
-const { Tag } = require("../models/index");
-const { TrackTag } = require("../models/index");
-const { Track } = require("../models/track");
-
-// const createModel = async (tagId, trackId) => {
-//   await TrackTag.create({ tagId: tagId, trackId: trackId });
-//   return;
-// };
-
-const getTagId = async ({ tag }) => {
-  let tagId = [];
+const getTagIdByTag = async ({ tag }) => {
+  let result = [];
   for (let i = 0; i < 3; i++) {
     const findedTag = await Tag.findOne({
       attributes: ["tagId"],
@@ -21,17 +13,15 @@ const getTagId = async ({ tag }) => {
     if (!findedTag) {
       continue;
     }
-    tagId.push(findedTag.tagId);
+    result.push(findedTag.tagId);
   }
-
   if (!tagId) {
     return;
   }
-
-  return tagId;
+  return result;
 };
 
-const getTagIds = async (tag1, tag2, tag3) => {
+const getTagIdsByTags = async ({ tag1, tag2, tag3 }) => {
   const findedTag = await Tag.findAll({
     attributes: ["tagId"],
     where: {
@@ -40,36 +30,33 @@ const getTagIds = async (tag1, tag2, tag3) => {
       },
     },
   });
-
   if (!findedTag) {
     return;
   }
-
-  let tagIdArray = [];
+  let result = [];
   for (let i = 0; i < findedTag.length; i++) {
-    tagIdArray.push(findedTag[i].tagId);
+    result.push(findedTag[i].tagId);
   }
-
-  return tagIdArray;
+  return result;
 };
 
-const getTrackTag = async (findedTags, categoryId) => {
-  let tracksArray = [];
-  for (let i = 0; i < findedTags.length; i++) {
-    const findedTracks = await TrackTag.findAll({
-      attributes: ["trackId"],
-      where: { tagId: findedTags[i], categoryId: categoryId },
-    });
-
-    if (!findedTracks.length) {
-      continue;
-    } else {
-      for (let j = 0; j < findedTracks.length; j++) {
-        tracksArray.push(findedTracks[j].trackId);
-      }
-    }
+const getTrackIdsByTag = async ({ tag, category }) => {
+  const findedTracks = await TrackTag.findAll({
+    attributes: ["trackId"],
+    where: {
+      tag: {
+        [Op.or]: [tag[0], tag[1], tag[2]],
+      },
+      category: category,
+    },
+  });
+  let tags = [];
+  for (let i = 0; i < findedTracks.length; i++) {
+    tags.push(findedTracks[i].trackId);
   }
-  return tracksArray;
+  const set = new Set(tags);
+  const result = [...set];
+  return result;
 };
 
-module.exports = { getTagIds, getTrackTag, getTagId };
+module.exports = { getTagIdsByTags, getTrackIdsByTag, getTagIdByTag };
