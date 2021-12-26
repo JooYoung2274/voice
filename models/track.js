@@ -40,7 +40,7 @@ module.exports = (sequelize, DataTypes) => {
       userId: {
         allowNull: false,
         type: Sequelize.INTEGER,
-
+      },
       createdAt: {
         type: "TIMESTAMP",
         defaultValue: sequelize.literal("CURRENT_TIMESTAMP"),
@@ -48,14 +48,13 @@ module.exports = (sequelize, DataTypes) => {
       },
       updatedAt: {
         type: "TIMESTAMP",
-        defaultValue: sequelize.literal("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"),
+        defaultValue: sequelize.literal("CURRENT_TIMESTAMP"),
         allowNull: false,
       },
     },
     {
       sequelize,
       modelName: "Track",
-      timestamps: false,
     },
   );
   return Track;

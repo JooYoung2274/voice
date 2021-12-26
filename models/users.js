@@ -69,13 +69,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       sequelize,
-      timestamps: false,
-      underscored: false, //_사용 여부
-      modelName: "Users", //js에서사용
-      tableName: "Users", //db에서 사용
-      paranoid: false,
-      charset: "utf8",
-      collate: "utf8_general_ci",
+      modelName: "Users",
     },
   );
   return Users;
