@@ -41,7 +41,7 @@ const trackDelete = async (req, res, next) => {
       res.sendStatus(400);
       return;
     }
-    await trackService.deletTrackByTrackId({ trackId });
+    await trackService.deleteTrackByTrackId({ trackId });
     res.sendStatus(200);
   } catch (error) {
     console.log(error);
@@ -97,6 +97,7 @@ const trackUpdate = async (req, res, next) => {
       return;
     }
     const trackUrlName = req.files.trackFile[0].filename;
+    // trackTag 에서 삭제, 생성
     const findedTrack = await trackService.getTrackByTrackId({ trackId, likes });
 
     if (findedTrack.userId !== userId) {
