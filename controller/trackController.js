@@ -1,37 +1,26 @@
-const trackModel = require("../services/track");
-const tagModel = require("../services/tag");
-const categoryModel = require("../services/category");
-const userService = require("../services/auth");
-const likeService = require("../services/likes");
+const trackService = require("../services/track");
+const listInfoService = require("../services/listinfo");
+const tagService = require("../services/tag");
 
 const trackUploads = async (req, res, next) => {
   try {
-    const { category: newCategory, tag1, tag2, tag3 } = req.body;
-    const { thumbnailUrl, trackUrl } = req.files;
+    const { category, tag1, tag2, tag3, trackThumbnailUrl } = req.body;
+    const { trackFile } = req.files;
+    const { userId } = res.locals.user;
     const tag = [tag1, tag2, tag3];
-    if (!thumbnailUrl || !trackUrl) {
+
+    if (!trackFile || !trackThumbnailUrl || !category || !tag) {
       res.sendStatus(400);
       return;
     }
-    const newThumbnailUrl = req.files.thumbnailUrl[0].filename;
-    const newTrackUrl = req.files.trackUrl[0].filename;
-    const { userId: loginUserId } = res.locals.user;
+    const trackUrlName = req.files.trackFile[0].filename;
 
-    const categoryId = await categoryModel.getCategoryId({ newCategory });
-
-    const tagId = await tagModel.getTagId({ tag });
-
-    if (!categoryId || !tagId) {
-      res.sendStatus(400);
-      return;
-    }
-
-    await trackModel.createTrack({
-      categoryId,
-      tagId,
-      newThumbnailUrl,
-      newTrackUrl,
-      loginUserId,
+    await trackService.createTrack({
+      category,
+      tag,
+      trackThumbnailUrl,
+      trackUrlName,
+      userId,
     });
 
     res.sendStatus(200);
@@ -43,18 +32,16 @@ const trackUploads = async (req, res, next) => {
 
 const trackDelete = async (req, res, next) => {
   try {
-    const { trackId: newTrackId } = req.params;
+    const { trackId } = req.params;
     const { userId } = res.locals.user;
 
-    const user = await userService.findUser({ userId });
-    const track = await trackModel.getTrack({ newTrackId });
+    const track = await trackService.getTrackByTrackId({ trackId });
 
-    if (!track || user.userId !== track.userId) {
+    if (!track || userId !== track.userId) {
       res.sendStatus(400);
       return;
     }
-
-    await trackModel.deleteTrack({ newTrackId });
+    await trackService.deletTrackByTrackId({ trackId });
     res.sendStatus(200);
   } catch (error) {
     console.log(error);
@@ -64,17 +51,15 @@ const trackDelete = async (req, res, next) => {
 
 const trackPage = async (req, res, next) => {
   try {
-    const { trackId: newTrackId } = req.params;
+    const { trackId } = req.params;
     const { userId } = res.locals.user;
-    const likes = await likeService.findLikes({ newTrackId });
-    const user = await userService.findUser({ userId });
-    const track = await trackModel.getTrack({ newTrackId, likes });
 
-    if (!track || user.userId !== track.userId) {
+    const track = await trackService.getTrackByTrackId({ trackId });
+
+    if (!track || userId !== track.userId) {
       res.sendStatus(400);
       return;
     }
-
     res.status(200).json({ track });
   } catch (error) {
     console.log(error);
@@ -82,4 +67,56 @@ const trackPage = async (req, res, next) => {
   }
 };
 
-module.exports = { trackUploads, trackDelete, trackPage };
+const listInfoGet = async (req, res, next) => {
+  try {
+    const category = await listInfoService.getCategories();
+    const tag = await listInfoService.getTags();
+    const trackThumbnail = await listInfoService.getTrackThumbnails();
+
+    if (!category || !tag || !trackThumbnail) {
+      res.sendStatus(400);
+      return;
+    }
+    res.status(200).json({ category, tag, trackThumbnail });
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+};
+
+const trackUpdate = async (req, res, next) => {
+  try {
+    const { category, tag1, tag2, tag3, trackThumbnailUrl } = req.body;
+    const { trackId } = req.params;
+    const { trackFile } = req.files;
+    const { userId } = res.locals.user;
+    const tag = [tag1, tag2, tag3];
+
+    if (!trackFile || !trackThumbnailUrl || !category || !tag) {
+      res.sendStatus(400);
+      return;
+    }
+    const trackUrlName = req.files.trackFile[0].filename;
+    const findedTrack = await trackService.getTrackByTrackId({ trackId, likes });
+
+    if (findedTrack.userId !== userId) {
+      res.sendStatus(400);
+      return;
+    }
+
+    const track = await trackService.updateTrackByTrackId({
+      trackId,
+      tag,
+      deleteTag,
+      category,
+      trackUrlName,
+      trackThumbnailUrl,
+    });
+    res.status(200).json({ track });
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+};
+
+module.exports = { trackUploads, trackDelete, trackPage, listInfoGet, trackUpdate };

@@ -8,7 +8,6 @@ const needLogin = (req, res, next) => {
     return;
   }
   const [tokenType, tokenValue] = authorization.split(" ");
-  console.log(authorization);
   if (tokenType !== "Bearer") {
     res.sendStatus(401);
     return;
