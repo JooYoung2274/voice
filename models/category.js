@@ -24,18 +24,11 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         type: Sequelize.STRING,
       },
-      createdAt: {
-        allowNull: false,
-        type: Sequelize.DATE,
-      },
-      updatedAt: {
-        allowNull: false,
-        type: Sequelize.DATE,
-      },
     },
     {
       sequelize,
       modelName: "Category",
+      timestamps: false,
     },
   );
   return Category;
