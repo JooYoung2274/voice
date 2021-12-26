@@ -1,4 +1,4 @@
-const { Comments, Track } = require("../models");
+const { Comments, Track, Users } = require("../models");
 
 const findComments = async ({ newTrackId }) => {
   const findedComments = await Comments.findAll({
@@ -27,82 +27,75 @@ const findCommentByCommentId = async ({ commentId }) => {
     const { dataValues: result } = comment;
     return result;
   } catch (error) {
-    console.log(error);
-    return error;
+    // console.log(error);
+    throw error;
   }
 };
 
 const createComment = async ({ comment, trackId, userId, nickname }) => {
   try {
-    // 유효한 trackId가 아닐때
+    // pramas에 있는 trackId가 실제로 있는 track인지 확인작업
     const findedTrack = await Track.findOne({
       where: { trackId },
     });
     if (!findedTrack) {
-      throw new Error("유효한 trackId가 아닙니다.");
+      throw new Error("존재하지 않는 트랙입니다.");
     }
-    const {
-      comment: dbComment,
-      commentId,
-      createdAt,
-    } = await Comments.create({
+    // 댓글 만들기
+    const { commentId, createdAt } = await Comments.create({
       comment,
       trackId,
       userId,
     });
-    // comment는 db에 있는거 안쓰고 클라이언트가 준거 그대로 쓰는거 괜찮나?
+    // 클라이언트에게 줄 댓글 가공
     const result = {
       commentId,
       nickname,
-      comment: dbComment,
+      comment,
       createdAt,
     };
     return result;
   } catch (error) {
-    console.log(error);
-    return error;
+    throw error;
   }
 };
 
-const updateComment = async ({ comment, commentId, nickname, createdAt, trackId }) => {
+const updateComment = async ({ comment, commentId, userId, trackId, nickname }) => {
   try {
-    const {
-      dataValues: { trackId: commentTrackId, commentId: dbCommentId },
-    } = await Comments.findOne({ where: { commentId } });
-    // parameter거쳐서 온 trackId는 str이고 commentTrackId는 db에 int상태로 저장됨
-    if (Number(trackId) !== commentTrackId) {
-      throw new Error("댓글 수정에 유효하지 않은 api요청입니다");
+    // 댓글 업데이트
+    const updated = await Comments.update({ comment }, { where: { commentId, trackId, userId } });
+    if (!updated[0]) {
+      throw new Error("존재하지 않는 댓글이거나 트랙에 포함되지 않거나 댓글쓴사람이 아닙니다");
     }
-    await Comments.update({ comment }, { where: { commentId } });
+    // 댓글만 바뀌는 거니까 댓글만 주면 안되나? like처럼 like눌러도 다른건 안주는 것처럼 효과: 밑에있는 findOne제거가능
+    // userId,trackId를 통해 comment 있는지 없는지 확인하고 createdAt 뽑음
+    const { createdAt } = await Comments.findOne({
+      attributes: ["commentId", "createdAt"],
+      where: { commentId, trackId, userId },
+    });
+    // 업데이트된 후 클라이언트에게 줄 댓글 가공
     const result = {
-      commentId: dbCommentId,
+      commentId,
       nickname,
       comment,
-      createdAt: createdAt,
+      createdAt,
     };
     return result;
   } catch (error) {
-    console.log(error);
-    // throw Error(error)?
-    return error;
+    throw error;
   }
 };
 
-const deleteComment = async ({ trackId, commentId }) => {
+const deleteComment = async ({ userId, trackId, commentId }) => {
   try {
-    const {
-      dataValues: { trackId: commentTrackId },
-    } = await Comments.findOne({ where: { commentId } });
-    // parameter거쳐서 온 newTrackId는 str이고 commentTrackId는 db에 int상태로 저장됨
-    if (Number(trackId) !== commentTrackId) {
-      throw new Error("댓글 수정에 유효하지 않은 api요청입니다");
+    // delete 로직
+    const deleted = await Comments.destroy({ where: { commentId, trackId, userId } });
+    if (!deleted) {
+      throw new Error("존재하지 않는 댓글이거나 트랙에 포함되지 않거나 댓글쓴사람이 아닙니다");
     }
-    // 에러나면 왜 그냥 될까 여기 {commentId:commentId} 대신 {commentId}되면 에러는 나는데 그냥통과됨
-    await Comments.destroy({ where: { commentId } });
     return;
   } catch (error) {
-    console.log(error);
-    return error;
+    throw error;
   }
 };
 

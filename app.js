@@ -43,10 +43,23 @@ sequelize
 app.use((req, res, next) => {
   res.sendStatus(404);
 });
-app.use((error, req, res, next) => {
-  console.error(error);
-  res.sendStatus(500);
-});
+// app.use((error, req, res, next) => {
+//   console.error(error);
+//   res.sendStatus(500);
+// });
+
+app.use(logHandler);
+app.use(errorHandler);
+
+function logHandler(err, req, res, next) {
+  console.error("[" + new Date() + "]\n" + err.stack);
+  next(err);
+}
+
+function errorHandler(err, req, res, next) {
+  res.status(err.status || 500);
+  res.send(err.message || "Error!!");
+}
 
 app.listen(port, () => {
   console.log(`listening at http://localhost:${port}`);
