@@ -32,20 +32,7 @@ app.use(express.json());
 app.use("/api", router);
 app.use(express.static("uploads"));
 
-// sequelize
-//   .sync({ force: false })
-//   .then(() => {
-//     console.log("DB성공");
-//   })
-//   .catch((error) => {
-//     console.error("DB실패");
-//   });
-
 app.use(logHandler);
 app.use(errorHandler);
-
-// app.listen(port, () => {
-//   console.log(`listening at http://localhost:${port}`);
-// });
 
 module.exports = app;
