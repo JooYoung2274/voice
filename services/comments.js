@@ -1,4 +1,4 @@
-const { Comments, Track, Users } = require("../models");
+const { Comments, Track } = require("../models");
 
 const findComments = async ({ newTrackId }) => {
   const findedComments = await Comments.findAll({
@@ -14,21 +14,6 @@ const findComments = async ({ newTrackId }) => {
     comments.push(findedcomment);
   }
   return comments;
-};
-
-const findCommentByCommentId = async ({ commentId }) => {
-  try {
-    const comment = await Comments.findOne({
-      where: { commentId },
-    });
-    if (!comment) {
-      throw Error("존재하지 않는 댓글입니다");
-    }
-    const { dataValues: result } = comment;
-    return result;
-  } catch (error) {
-    throw error;
-  }
 };
 
 const createComment = async ({ comment, trackId, userId, nickname }) => {
@@ -101,7 +86,6 @@ const deleteComment = async ({ userId, trackId, commentId }) => {
 module.exports = {
   findComments,
   createComment,
-  findCommentByCommentId,
   updateComment,
   deleteComment,
 };
