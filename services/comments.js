@@ -1,9 +1,9 @@
 const { Comments, Track } = require("../models");
 
-const findComments = async ({ newTrackId }) => {
+const findCommentsByTrackId = async ({ trackId }) => {
   const findedComments = await Comments.findAll({
     attributes: ["commentId", "userId", "comment"],
-    where: { trackId: newTrackId },
+    where: { trackId: trackId },
     order: [["commentId", "DESC"]],
   });
 
@@ -84,7 +84,7 @@ const deleteComment = async ({ userId, trackId, commentId }) => {
 };
 
 module.exports = {
-  findComments,
+  findCommentsByTrackId,
   createComment,
   updateComment,
   deleteComment,

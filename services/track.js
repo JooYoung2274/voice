@@ -19,7 +19,7 @@ const createTrack = async ({ category, tag, trackThumbnailUrl, trackUrlName, use
   return;
 };
 
-const deletTrackByTrackId = async ({ trackId }) => {
+const deleteTrackByTrackId = async ({ trackId }) => {
   await Track.destroy({ where: { trackId: trackId } });
   return;
 };
@@ -153,10 +153,7 @@ const getTracks = async () => {
       { model: Users, attributes: ["nickname"] },
     ],
   });
-
-  // 카테고리 별로 어떻게 뽑아내지..
   let result = [[], [], [], [], [], [], []];
-
   for (let i = 0; i < findedTracks.length; i++) {
     switch (findedTracks[i].category) {
       case "ASMR":
@@ -272,7 +269,7 @@ const getLikeTrack = async () => {
 
 module.exports = {
   createTrack,
-  deletTrackByTrackId,
+  deleteTrackByTrackId,
   getTracksByUserId,
   getTrackByTrackId,
   getPlainTrack,

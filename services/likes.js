@@ -1,10 +1,10 @@
 const { Likes, Track, TrackTag, Category, Users, Tag } = require("../models");
 
-const returnLikeCntAndLike = async ({ trackId }) => {
+const returnLikeCntAndLike = async ({ trackId, like }) => {
   const likeCnt = await Likes.count({
     where: { trackId },
   });
-  return { likeCnt, like: true };
+  return { likeCnt, like };
 };
 
 const createOrDeleteLike = async ({ trackId, userId }) => {
@@ -27,20 +27,20 @@ const createOrDeleteLike = async ({ trackId, userId }) => {
       });
 
       // 클라이언트에게 줄 데이터 가공
-      const result = returnLikeCntAndLike({ trackId });
+      const result = returnLikeCntAndLike({ trackId, like: true });
       return result;
     }
 
     // 클라이언트에게 줄 데이터 가공
-    const result = returnLikeCntAndLike({ trackId });
+    const result = returnLikeCntAndLike({ trackId, like: false });
     return result;
   } catch (error) {
     throw error;
   }
 };
 
-const findLikes = async ({ newTrackId }) => {
-  const findedLikes = await Likes.count({ where: { trackId: newTrackId } });
+const findLikesByTrackId = async ({ trackId }) => {
+  const findedLikes = await Likes.count({ where: { trackId: trackId } });
   return findedLikes;
 };
 
@@ -113,4 +113,4 @@ const getTracks = async ({ userId }) => {
   return tracks;
 };
 
-module.exports = { createOrDeleteLike, findLikes, findLike, getTracks };
+module.exports = { createOrDeleteLike, findLikesByTrackId, findLike, getTracks };
