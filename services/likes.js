@@ -1,49 +1,41 @@
-const { Likes } = require("../models/index");
-const likeClass = require("../classes/likes");
-const { Track } = require("../models");
-const { TrackTag } = require("../models/index");
-const { Category } = require("../models/index");
-const { Users } = require("../models");
-const { Tag } = require("../models/index");
+const { Likes, Track, TrackTag, Category, Users, Tag } = require("../models");
 
-// const findLike = async ({ newTrackId, loginUserId }) => {
-//   try {
-//     const likeExist = await Likes.findOne({ where: { trackId: newTrackId, userId: loginUserId } });
-//     return likeExist;
-//   } catch (error) {
-//     console.log(error);
-//     return error;
-//   }
-// };
+const returnLikeCntAndLike = async ({ trackId }) => {
+  const likeCnt = await Likes.count({
+    where: { trackId },
+  });
+  return { likeCnt, like: true };
+};
 
-const clickLike = async ({ newTrackId, loginUserId }) => {
+const createOrDeleteLike = async ({ trackId, userId }) => {
   try {
-    // newTrackId는 string, loginUserId는 int값임
-    const likeExist = await Likes.findOne({ where: { trackId: newTrackId, userId: loginUserId } });
-    if (!likeExist) {
-      //   2개 선택하는거 맞나?
+    // 좋아요에서 일단 삭제
+    const deleted = await Likes.destroy({ where: { trackId, userId } });
+
+    // 삭제가 안되면 생성
+    if (!deleted) {
+      // 트랙 존재유무 먼저 확인
+      const findedTrack = await Track.findOne({ where: { trackId } });
+      if (!findedTrack) {
+        throw new Error("존재하지 않는 트랙입니다.");
+      }
+
+      // 좋아요 데이터 생성
       await Likes.create({
-        trackId: newTrackId,
-        userId: loginUserId,
+        trackId,
+        userId,
       });
-      // likeCnt 중복됨
-      const likeCnt = await Likes.count({
-        where: { trackId: newTrackId },
-      });
-      const likeObj = new likeClass.likeForm({ likeCnt, like: true });
-      return likeObj;
+
+      // 클라이언트에게 줄 데이터 가공
+      const result = returnLikeCntAndLike({ trackId });
+      return result;
     }
 
-    await Likes.destroy({ where: { trackId: newTrackId, userId: loginUserId } });
-    // likeCnt 중복됨
-    const likeCnt = await Likes.count({
-      where: { trackId: newTrackId },
-    });
-    const likeObj = new likeClass.likeForm({ likeCnt, like: false });
-    return likeObj;
+    // 클라이언트에게 줄 데이터 가공
+    const result = returnLikeCntAndLike({ trackId });
+    return result;
   } catch (error) {
-    console.log(error);
-    return error;
+    throw error;
   }
 };
 
@@ -121,4 +113,4 @@ const getTracks = async ({ userId }) => {
   return tracks;
 };
 
-module.exports = { clickLike, findLikes, findLike, getTracks };
+module.exports = { createOrDeleteLike, findLikes, findLike, getTracks };

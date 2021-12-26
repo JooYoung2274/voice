@@ -1,6 +1,4 @@
-const { Comments } = require("../models/index");
-const CommentClass = require("../classes/comments");
-const { Track } = require("../models/index");
+const { Comments, Track } = require("../models");
 
 const findComments = async ({ newTrackId }) => {
   const findedComments = await Comments.findAll({
@@ -18,95 +16,76 @@ const findComments = async ({ newTrackId }) => {
   return comments;
 };
 
-const findComment = async ({ newCommentId }) => {
+const createComment = async ({ comment, trackId, userId, nickname }) => {
   try {
-    const comment = await Comments.findOne({
-      where: { commentId: newCommentId },
-    });
-    if (!comment) {
-      throw Error("존재하지 않는 댓글입니다");
-    }
-    const { dataValues: commentData } = comment;
-    return commentData;
-  } catch (error) {
-    console.log(error);
-    return error;
-  }
-};
-
-const createComment = async ({ newComment, newTrackId, loginUserId, loginNickname }) => {
-  try {
-    // 유효한 trackId가 아닐때
+    // pramas에 있는 trackId가 실제로 있는 track인지 확인작업
     const findedTrack = await Track.findOne({
-      where: { trackId: newTrackId },
+      where: { trackId },
     });
     if (!findedTrack) {
-      throw new Error("유효한 trackId가 아닙니다.");
+      throw new Error("존재하지 않는 트랙입니다.");
     }
-    const { comment, commentId, createdAt } = await Comments.create({
-      comment: newComment,
-      trackId: newTrackId,
-      userId: loginUserId,
+    // 댓글 만들기
+    const { commentId, createdAt } = await Comments.create({
+      comment,
+      trackId,
+      userId,
     });
-    const commentObj = new CommentClass.CommentForm({
-      commentId: commentId,
-      nickname: loginNickname,
-      comment: comment,
-      createdAt: createdAt,
-    });
-    return commentObj;
+    // 클라이언트에게 줄 댓글 가공
+    const result = {
+      commentId,
+      nickname,
+      comment,
+      createdAt,
+    };
+    return result;
   } catch (error) {
-    console.log(error);
-    return error;
+    throw error;
   }
 };
 
-const updateComment = async ({
-  newComment,
-  newCommentId,
-  loginNickname,
-  createdAt,
-  newTrackId,
-}) => {
+const updateComment = async ({ comment, commentId, userId, trackId, nickname }) => {
   try {
-    const {
-      dataValues: { trackId: commentTrackId },
-    } = await Comments.findOne({ where: { commentId: newCommentId } });
-    // parameter거쳐서 온 newTrackId는 str이고 commentTrackId는 db에 int상태로 저장됨
-    if (Number(newTrackId) !== commentTrackId) {
-      throw new Error("댓글 수정에 유효하지 않은 api요청입니다");
+    // 댓글 업데이트
+    const updated = await Comments.update({ comment }, { where: { commentId, trackId, userId } });
+    if (!updated[0]) {
+      throw new Error("존재하지 않는 댓글이거나 트랙에 포함되지 않거나 댓글쓴사람이 아닙니다");
     }
-    await Comments.update({ comment: newComment }, { where: { commentId: newCommentId } });
-    const commentObj = new CommentClass.CommentForm({
-      commentId: newCommentId,
-      nickname: loginNickname,
-      comment: newComment,
-      createdAt: createdAt,
+    // 댓글만 바뀌는 거니까 댓글만 주면 안되나? like처럼 like눌러도 다른건 안주는 것처럼 효과: 밑에있는 findOne제거가능
+    // userId,trackId를 통해 comment 있는지 없는지 확인하고 createdAt 뽑음
+    const { createdAt } = await Comments.findOne({
+      attributes: ["commentId", "createdAt"],
+      where: { commentId, trackId, userId },
     });
-    return commentObj;
+    // 업데이트된 후 클라이언트에게 줄 댓글 가공
+    const result = {
+      commentId,
+      nickname,
+      comment,
+      createdAt,
+    };
+    return result;
   } catch (error) {
-    console.log(error);
-    // throw Error(error)?
-    return error;
+    throw error;
   }
 };
 
-const deleteComment = async ({ newTrackId, newCommentId }) => {
+const deleteComment = async ({ userId, trackId, commentId }) => {
   try {
-    const {
-      dataValues: { trackId: commentTrackId },
-    } = await Comments.findOne({ where: { commentId: newCommentId } });
-    // parameter거쳐서 온 newTrackId는 str이고 commentTrackId는 db에 int상태로 저장됨
-    if (Number(newTrackId) !== commentTrackId) {
-      throw new Error("댓글 수정에 유효하지 않은 api요청입니다");
+    // delete 로직
+    const deleted = await Comments.destroy({ where: { commentId, trackId, userId } });
+    if (!deleted) {
+      throw new Error("존재하지 않는 댓글이거나 트랙에 포함되지 않거나 댓글쓴사람이 아닙니다");
     }
-    // 에러나면 왜 그냥 될까 여기 {commentId:newCommentId} 대신 {newCommentId}되면 에러는 나는데 그냥통과됨
-    await Comments.destroy({ where: { commentId: newCommentId } });
     return;
   } catch (error) {
-    console.log(error);
-    return error;
+    throw error;
   }
 };
 
-module.exports = { findComments, createComment, findComment, updateComment, deleteComment };
+module.exports = {
+  findComments,
+  createComment,
+  updateComment,
+  deleteComment,
+};
