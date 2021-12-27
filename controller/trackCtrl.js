@@ -4,18 +4,19 @@ const tagService = require("../services/tag");
 
 const trackUploads = async (req, res, next) => {
   try {
-    const { category, tag1, tag2, tag3, trackThumbnailUrl } = req.body;
+    const { title, category, tag1, tag2, tag3, trackThumbnailUrl } = req.body;
     const { trackFile } = req.files;
     const { userId } = res.locals.user;
     const tag = [tag1, tag2, tag3];
 
-    if (!trackFile || !trackThumbnailUrl || !category || !tag) {
+    if (!trackFile || !trackThumbnailUrl || !category || !tag || !title) {
       res.sendStatus(400);
       return;
     }
     const trackUrlName = req.files.trackFile[0].filename;
 
     await trackService.createTrack({
+      title,
       category,
       tag,
       trackThumbnailUrl,
@@ -86,13 +87,13 @@ const listInfoGet = async (req, res, next) => {
 
 const trackUpdate = async (req, res, next) => {
   try {
-    const { category, tag1, tag2, tag3, trackThumbnailUrl } = req.body;
+    const { title, category, tag1, tag2, tag3, trackThumbnailUrl } = req.body;
     const { trackId } = req.params;
     const { trackFile } = req.files;
     const { userId } = res.locals.user;
     const tag = [tag1, tag2, tag3];
 
-    if (!trackFile || !trackThumbnailUrl || !category || !tag) {
+    if (!trackFile || !trackThumbnailUrl || !category || !tag || !title) {
       res.sendStatus(400);
       return;
     }
@@ -107,6 +108,7 @@ const trackUpdate = async (req, res, next) => {
 
     const track = await trackService.updateTrackByTrackId({
       trackId,
+      title,
       tag,
       deleteTag,
       category,

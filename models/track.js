@@ -33,6 +33,10 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         type: Sequelize.STRING,
       },
+      title: {
+        allowNull: false,
+        type: Sequelize.STRING,
+      },
       category: {
         allowNull: false,
         type: Sequelize.STRING,
