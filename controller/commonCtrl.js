@@ -47,6 +47,7 @@ const detailTrackGet = async (req, res, next) => {
 
 const mainTracksGet = async (req, res, next) => {
   try {
+    const x = "1";
     const { categoryTracks, totalTracks } = await trackModel.getTracks();
 
     if (!categoryTracks || !totalTracks) {
