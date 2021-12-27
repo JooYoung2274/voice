@@ -1,4 +1,6 @@
-const { Track, TrackTag, Tag, Category, Users, Like } = require("../models");
+const { Track, TrackTag, Tag, Category, Users, Likes, Comments } = require("../models");
+const sequelize = require("sequelize");
+const { Op, fn, col } = require("sequelize");
 
 const createTrack = async ({ category, tag, trackThumbnailUrl, trackUrlName, userId }) => {
   const createdTrack = await Track.create({
@@ -127,47 +129,62 @@ const getTracksByCategory = async ({ category }) => {
 
   return findedTracks;
 };
-
 const getTracks = async () => {
-  const findedTracks = await Track.findAll({
+  const totalTracks = await Track.findAll({
     attributes: ["trackId", "category", "trackThumbnailUrl", "trackUrl", "userId"],
-    order: [["category", "ASC"]],
+
     include: [
       { model: TrackTag, attributes: ["tag"] },
       { model: Users, attributes: ["nickname"] },
+      {
+        model: Likes,
+        attributes: [[sequelize.fn("COUNT", sequelize.col("Likes.trackId")), "likeCnt"]],
+      },
+      {
+        model: Comments,
+        attributes: [[sequelize.fn("COUNT", sequelize.col("Comments.trackId")), "commentCnt"]],
+      },
     ],
+    order: [["createdAt", "DESC"]],
+    group: ["Track.trackId", "TrackTags.trackTagId", "Likes.likeId", "Comments.commentId"],
   });
-  let result = [[], [], [], [], [], [], []];
-  for (let i = 0; i < findedTracks.length; i++) {
-    switch (findedTracks[i].category) {
+
+  let categoryTracks = [[], [], [], [], [], [], [], [], []];
+  for (let i = 0; i < totalTracks.length; i++) {
+    switch (totalTracks[i].category) {
+      case "자유 주제":
+        categoryTracks[0].push(totalTracks[i]);
+        break;
       case "ASMR":
-        result[0].push(findedTracks[i]);
+        categoryTracks[1].push(totalTracks[i]);
+        break;
+      case "힐링/응원":
+        categoryTracks[2].push(totalTracks[i]);
+        break;
+      case "노래":
+        categoryTracks[3].push(totalTracks[i]);
+        break;
+      case "외국어":
+        categoryTracks[4].push(totalTracks[i]);
         break;
       case "나레이션":
-        result[1].push(findedTracks[i]);
-        break;
-      case "더빙":
-        result[2].push(findedTracks[i]);
-        break;
-      case "라디오":
-        result[3].push(findedTracks[i]);
+        categoryTracks[5].push(totalTracks[i]);
         break;
       case "성대모사":
-        result[4].push(findedTracks[i]);
+        categoryTracks[6].push(totalTracks[i]);
         break;
-      case "일상언어":
-        result[5].push(findedTracks[i]);
+      case "유행어":
+        categoryTracks[7].push(totalTracks[i]);
         break;
       case "효과음":
-        result[6].push(findedTracks[i]);
+        categoryTracks[8].push(totalTracks[i]);
         break;
       default:
         break;
     }
   }
-  return result;
+  return { categoryTracks, totalTracks };
 };
-
 const getLikeTrack = async () => {
   const tracks = await Track.findAll({
     attributes: {
