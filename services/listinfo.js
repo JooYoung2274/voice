@@ -6,7 +6,7 @@ const getCategories = async () => {
   });
 
   if (!category) {
-    return;
+    throw customizedError("기본 카테고리 목록이 없습니다.", 400);
   }
   return category;
 };
@@ -17,7 +17,7 @@ const getTags = async () => {
   });
 
   if (!tags) {
-    return;
+    throw customizedError("기본 테그 목록이 없습니다.", 400);
   }
   return tags;
 };
@@ -28,7 +28,7 @@ const getTrackThumbnails = async () => {
   });
 
   if (!trackThumbnails) {
-    return;
+    throw customizedError("기본 이모티콘 목록이 없습니다.", 400);
   }
   return trackThumbnails;
 };
