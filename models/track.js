@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
       Track.hasMany(models.TrackTag, { foreignKey: "trackId" });
       Track.hasMany(models.Comment, { foreignKey: "trackId" });
       Track.hasMany(models.Like, { foreignKey: "trackId" });
-      Track.belongsTo(models.Users, { foreignKey: "userId", onDelete: "cascade" });
+      Track.belongsTo(models.User, { foreignKey: "userId", onDelete: "cascade" });
       Track.belongsTo(models.Category, { foreignKey: "category", onDelete: "cascade" });
       Track.belongsTo(models.TrackThumbnail, {
         foreignKey: "trackThumbnailUrl",

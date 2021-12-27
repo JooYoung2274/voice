@@ -46,11 +46,20 @@ const getTracksByUserId = async ({ userId, myPage }) => {
   if (myPage) {
     const tracks = await Track.findAll({
       attributes: ["title", "trackId", "category", "trackThumbnailUrl", "trackUrl", "userId"],
+      where: { userId: userId },
       include: [
         { model: TrackTag, attributes: ["tag"] },
         { model: User, attributes: ["nickname"] },
+        {
+          model: Like,
+          attributes: [[sequelize.fn("COUNT", sequelize.col("Likes.trackId")), "likeCnt"]],
+        },
+        {
+          model: Comment,
+          attributes: [[sequelize.fn("COUNT", sequelize.col("Comments.trackId")), "commentCnt"]],
+        },
       ],
-      where: { userId: userId },
+      group: ["Track.trackId", "TrackTags.trackTagId", "Likes.likeId", "Comments.commentId"],
     });
 
     // sequelize subquery 로 해야할듯
@@ -78,7 +87,16 @@ const getTracksByUserId = async ({ userId, myPage }) => {
     include: [
       { model: TrackTag, attributes: ["tag"] },
       { model: User, attributes: ["nickname"] },
+      {
+        model: Like,
+        attributes: [[sequelize.fn("COUNT", sequelize.col("Likes.trackId")), "likeCnt"]],
+      },
+      {
+        model: Comment,
+        attributes: [[sequelize.fn("COUNT", sequelize.col("Comments.trackId")), "commentCnt"]],
+      },
     ],
+    group: ["Track.trackId", "TrackTags.trackTagId", "Likes.likeId", "Comments.commentId"],
     where: { userId: userId },
   });
 
@@ -89,11 +107,18 @@ const getTrackByTrackId = async ({ trackId, likes }) => {
   const findedTrack = await Track.findOne({
     attributes: ["title", "trackId", "category", "trackThumbnailUrl", "trackUrl", "userId"],
     include: [
+      { model: TrackTag, attributes: ["tag"] },
+      { model: User, attributes: ["nickname"] },
       {
-        model: TrackTag,
-        attributes: ["tag"],
+        model: Like,
+        attributes: [[sequelize.fn("COUNT", sequelize.col("Likes.trackId")), "likeCnt"]],
+      },
+      {
+        model: Comment,
+        attributes: [[sequelize.fn("COUNT", sequelize.col("Comments.trackId")), "commentCnt"]],
       },
     ],
+    group: ["Track.trackId", "TrackTags.trackTagId", "Likes.likeId", "Comments.commentId"],
     where: { trackId: trackId },
   });
   if (!findedTrack) {
@@ -107,11 +132,21 @@ const getTracksByLikes = async ({ findedTrackIds }) => {
   for (let i = 0; i < findedTrackIds.length; i++) {
     const findedTrack = await Track.findOne({
       attributes: ["title", "trackId", "category", "trackThumbnailUrl", "trackUrl", "userId"],
+
       where: { trackId: findedTrackIds[i] },
       include: [
         { model: TrackTag, attributes: ["tag"] },
         { model: User, attributes: ["nickname"] },
+        {
+          model: Like,
+          attributes: [[sequelize.fn("COUNT", sequelize.col("Likes.trackId")), "likeCnt"]],
+        },
+        {
+          model: Comment,
+          attributes: [[sequelize.fn("COUNT", sequelize.col("Comments.trackId")), "commentCnt"]],
+        },
       ],
+      group: ["Track.trackId", "TrackTags.trackTagId", "Likes.likeId", "Comments.commentId"],
     });
     tracks.push(findedTrack);
   }
@@ -121,12 +156,12 @@ const getTracksByLikes = async ({ findedTrackIds }) => {
 const getTracksByCategory = async ({ category }) => {
   const findedTracks = await Track.findAll({
     attributes: ["title", "trackId", "category", "trackThumbnailUrl", "trackUrl", "userId"],
-    where: { category: category },
     order: [["category", "ASC"]],
     include: [
       { model: TrackTag, attributes: ["tag"] },
       { model: User, attributes: ["nickname"] },
     ],
+    where: { category: category },
   });
 
   return findedTracks;
