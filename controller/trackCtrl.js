@@ -1,6 +1,5 @@
 const trackService = require("../services/track");
 const listInfoService = require("../services/listinfo");
-const tagService = require("../services/tag");
 
 const trackUploads = async (req, res, next) => {
   try {
