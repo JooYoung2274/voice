@@ -2,8 +2,9 @@ const { Track, TrackTag, Tag, Category, Users, Likes, Comments } = require("../m
 const sequelize = require("sequelize");
 const { Op, fn, col } = require("sequelize");
 
-const createTrack = async ({ category, tag, trackThumbnailUrl, trackUrlName, userId }) => {
+const createTrack = async ({ title, category, tag, trackThumbnailUrl, trackUrlName, userId }) => {
   const createdTrack = await Track.create({
+    title: title,
     category: category,
     trackThumbnailUrl: trackThumbnailUrl,
     trackUrl: trackUrlName,
@@ -28,6 +29,7 @@ const deleteTrackByTrackId = async ({ trackId }) => {
 
 const updateTrackByTrackId = async ({
   trackId,
+  title,
   tag,
   category,
   trackUrlName,
@@ -43,7 +45,7 @@ const updateTrackByTrackId = async ({
 const getTracksByUserId = async ({ userId, myPage }) => {
   if (myPage) {
     const tracks = await Track.findAll({
-      attributes: ["trackId", "category", "trackThumbnailUrl", "trackUrl", "userId"],
+      attributes: ["title", "trackId", "category", "trackThumbnailUrl", "trackUrl", "userId"],
       include: [
         { model: TrackTag, attributes: ["tag"] },
         { model: Users, attributes: ["nickname"] },
@@ -59,7 +61,7 @@ const getTracksByUserId = async ({ userId, myPage }) => {
     let likesArray = [];
     for (let i = 0; i < likes.length; i++) {
       const likesTracks = await Track.findAll({
-        attributes: ["trackId", "category", "trackThumbnailUrl", "trackUrl", "userId"],
+        attributes: ["title", "trackId", "category", "trackThumbnailUrl", "trackUrl", "userId"],
         include: [
           { model: TrackTag, attributes: ["tag"] },
           { model: Users, attributes: ["nickname"] },
@@ -72,7 +74,7 @@ const getTracksByUserId = async ({ userId, myPage }) => {
   }
 
   const result = await Track.findAll({
-    attributes: ["trackId", "category", "trackThumbnailUrl", "trackUrl", "userId"],
+    attributes: ["title", "trackId", "category", "trackThumbnailUrl", "trackUrl", "userId"],
     include: [
       { model: TrackTag, attributes: ["tag"] },
       { model: Users, attributes: ["nickname"] },
@@ -85,7 +87,7 @@ const getTracksByUserId = async ({ userId, myPage }) => {
 
 const getTrackByTrackId = async ({ trackId, likes }) => {
   const findedTrack = await Track.findOne({
-    attributes: ["trackId", "category", "trackThumbnailUrl", "trackUrl", "userId"],
+    attributes: ["title", "trackId", "category", "trackThumbnailUrl", "trackUrl", "userId"],
     include: [
       {
         model: TrackTag,
@@ -104,7 +106,7 @@ const getTracksByLikes = async ({ findedTrackIds }) => {
   let tracks = [];
   for (let i = 0; i < findedTrackIds.length; i++) {
     const findedTrack = await Track.findOne({
-      attributes: ["trackId", "category", "trackThumbnailUrl", "trackUrl", "userId"],
+      attributes: ["title", "trackId", "category", "trackThumbnailUrl", "trackUrl", "userId"],
       where: { trackId: findedTrackIds[i] },
       include: [
         { model: TrackTag, attributes: ["tag"] },
@@ -118,7 +120,7 @@ const getTracksByLikes = async ({ findedTrackIds }) => {
 
 const getTracksByCategory = async ({ category }) => {
   const findedTracks = await Track.findAll({
-    attributes: ["trackId", "category", "trackThumbnailUrl", "trackUrl", "userId"],
+    attributes: ["title", "trackId", "category", "trackThumbnailUrl", "trackUrl", "userId"],
     where: { category: category },
     order: [["category", "ASC"]],
     include: [
@@ -131,7 +133,7 @@ const getTracksByCategory = async ({ category }) => {
 };
 const getTracks = async () => {
   const totalTracks = await Track.findAll({
-    attributes: ["trackId", "category", "trackThumbnailUrl", "trackUrl", "userId"],
+    attributes: ["title", "trackId", "category", "trackThumbnailUrl", "trackUrl", "userId"],
 
     include: [
       { model: TrackTag, attributes: ["tag"] },
