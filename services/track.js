@@ -1,4 +1,4 @@
-const { Track, TrackTag, Tag, Category, Users, Like, Comment } = require("../models");
+const { Track, TrackTag, Tag, Category, User, Like, Comment } = require("../models");
 const sequelize = require("sequelize");
 const { Op, fn, col } = require("sequelize");
 
@@ -48,7 +48,7 @@ const getTracksByUserId = async ({ userId, myPage }) => {
       attributes: ["title", "trackId", "category", "trackThumbnailUrl", "trackUrl", "userId"],
       include: [
         { model: TrackTag, attributes: ["tag"] },
-        { model: Users, attributes: ["nickname"] },
+        { model: User, attributes: ["nickname"] },
       ],
       where: { userId: userId },
     });
@@ -64,7 +64,7 @@ const getTracksByUserId = async ({ userId, myPage }) => {
         attributes: ["title", "trackId", "category", "trackThumbnailUrl", "trackUrl", "userId"],
         include: [
           { model: TrackTag, attributes: ["tag"] },
-          { model: Users, attributes: ["nickname"] },
+          { model: User, attributes: ["nickname"] },
         ],
         where: { trackId: likes[i].trackId },
       });
@@ -77,7 +77,7 @@ const getTracksByUserId = async ({ userId, myPage }) => {
     attributes: ["title", "trackId", "category", "trackThumbnailUrl", "trackUrl", "userId"],
     include: [
       { model: TrackTag, attributes: ["tag"] },
-      { model: Users, attributes: ["nickname"] },
+      { model: User, attributes: ["nickname"] },
     ],
     where: { userId: userId },
   });
@@ -110,7 +110,7 @@ const getTracksByLikes = async ({ findedTrackIds }) => {
       where: { trackId: findedTrackIds[i] },
       include: [
         { model: TrackTag, attributes: ["tag"] },
-        { model: Users, attributes: ["nickname"] },
+        { model: User, attributes: ["nickname"] },
       ],
     });
     tracks.push(findedTrack);
@@ -125,7 +125,7 @@ const getTracksByCategory = async ({ category }) => {
     order: [["category", "ASC"]],
     include: [
       { model: TrackTag, attributes: ["tag"] },
-      { model: Users, attributes: ["nickname"] },
+      { model: User, attributes: ["nickname"] },
     ],
   });
 
@@ -136,7 +136,7 @@ const getTracks = async () => {
     attributes: ["title", "trackId", "category", "trackThumbnailUrl", "trackUrl", "userId"],
     include: [
       { model: TrackTag, attributes: ["tag"] },
-      { model: Users, attributes: ["nickname"] },
+      { model: User, attributes: ["nickname"] },
       {
         model: Like,
         attributes: [[sequelize.fn("COUNT", sequelize.col("Likes.trackId")), "likeCnt"]],
