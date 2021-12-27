@@ -2,59 +2,44 @@
 const Sequelize = require("sequelize");
 const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
-  class Users extends Model {
+  class Track extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      models.Users.hasMany(models.Comments, {
-        foreignKey: "userId",
-        sourceKey: "userId",
-        onDelete: "cascade",
-      });
-      models.Users.hasMany(models.Track, {
-        foreignKey: "userId",
-        sourceKey: "userId",
-        onDelete: "cascade",
-      });
-      models.Users.hasMany(models.Likes, {
-        foreignKey: "userId",
-        sourceKey: "userId",
-        onDelete: "cascade",
-      });
+      Track.hasMany(models.TrackTag, { foreignKey: "trackId" });
+      Track.hasMany(models.Comments, { foreignKey: "trackId" });
+      Track.hasMany(models.Likes, { foreignKey: "trackId" });
+      Track.belongsTo(models.Users, { foreignKey: "userId" });
+      Track.belongsTo(models.Category, { foreignKey: "category" });
+      Track.belongsTo(models.TrackThumbnail, { foreignKey: "trackThumbnailUrl" });
     }
   }
-  Users.init(
+  Track.init(
     {
-      userId: {
+      trackId: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      snsId: {
+      trackUrl: {
+        allowNull: false,
         type: Sequelize.STRING,
       },
-      nickname: {
+      trackThumbnailUrl: {
+        allowNull: false,
         type: Sequelize.STRING,
       },
-      flatformType: {
+      category: {
+        allowNull: false,
         type: Sequelize.STRING,
       },
-      profileImage: {
-        type: Sequelize.STRING,
-      },
-      nickUnChanged: {
-        type: Sequelize.BOOLEAN,
-        defaultValue: true,
-      },
-      contact: {
-        type: Sequelize.STRING,
-      },
-      introduce: {
-        type: Sequelize.STRING,
+      userId: {
+        allowNull: false,
+        type: Sequelize.INTEGER,
       },
       createdAt: {
         type: "TIMESTAMP",
@@ -69,8 +54,8 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       sequelize,
-      modelName: "Users",
+      modelName: "Track",
     },
   );
-  return Users;
+  return Track;
 };
