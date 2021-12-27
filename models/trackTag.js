@@ -9,9 +9,9 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      TrackTag.belongsTo(models.Track, { foreignKey: "trackId" });
-      TrackTag.belongsTo(models.Tag, { foreignKey: "tag" });
-      TrackTag.belongsTo(models.Category, { foreignKey: "category" });
+      TrackTag.belongsTo(models.Track, { foreignKey: "trackId", onDelete: "cascade" });
+      TrackTag.belongsTo(models.Tag, { foreignKey: "tag", onDelete: "cascade" });
+      TrackTag.belongsTo(models.Category, { foreignKey: "category", onDelete: "cascade" });
     }
   }
   TrackTag.init(
