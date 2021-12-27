@@ -33,10 +33,6 @@ const detailTrackGet = async (req, res, next) => {
     const track = await trackModel.getTrackByTrackId({ trackId, likes });
     const comments = await commentService.findCommentsByTrackId({ trackId });
 
-    if (!track) {
-      res.sendStatus(400);
-      return;
-    }
     res.status(200).json({ track, comments });
   } catch (error) {
     console.log(error);
@@ -46,13 +42,8 @@ const detailTrackGet = async (req, res, next) => {
 
 const mainTracksGet = async (req, res, next) => {
   try {
-    const x = "1";
     const { categoryTracks, totalTracks } = await trackModel.getTracks();
 
-    if (!categoryTracks || !totalTracks) {
-      res.sendStatus(400);
-      return;
-    }
     res.status(200).json({ categoryTracks, totalTracks });
   } catch (error) {
     console.log(error);
@@ -64,10 +55,7 @@ const categorySelect = async (req, res, next) => {
   try {
     const { category, tag1, tag2, tag3 } = req.query;
     const tag = [tag1, tag2, tag3];
-    if (!category) {
-      res.sendStatus(400);
-      return;
-    }
+
     if (tag1 !== "") {
       const findedTrackIds = await trackTagModel.getTrackIdsByTag({ tag, category });
       // console.log(findedTrackIds.length);

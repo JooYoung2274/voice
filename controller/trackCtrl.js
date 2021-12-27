@@ -8,18 +8,12 @@ const trackUploads = async (req, res, next) => {
     const { userId } = res.locals.user;
     const tag = [tag1, tag2, tag3];
 
-    if (!trackFile || !trackThumbnailUrl || !category || !tag || !title) {
-      res.sendStatus(400);
-      return;
-    }
-    const trackUrlName = req.files.trackFile[0].filename;
-
     await trackService.createTrack({
       title,
       category,
       tag,
       trackThumbnailUrl,
-      trackUrlName,
+      trackFile,
       userId,
     });
 
@@ -37,9 +31,8 @@ const trackDelete = async (req, res, next) => {
 
     const track = await trackService.getTrackByTrackId({ trackId });
 
-    if (!track || userId !== track.userId) {
-      res.sendStatus(400);
-      return;
+    if (userId !== track.userId) {
+      throw customizedError("권한이 없습니다.", 400);
     }
     await trackService.deleteTrackByTrackId({ trackId });
     res.sendStatus(200);
@@ -56,9 +49,8 @@ const trackPage = async (req, res, next) => {
 
     const track = await trackService.getTrackByTrackId({ trackId });
 
-    if (!track || userId !== track.userId) {
-      res.sendStatus(400);
-      return;
+    if (userId !== track.userId) {
+      throw customizedError("권한이 없습니다.", 400);
     }
     res.status(200).json({ track });
   } catch (error) {
@@ -73,10 +65,6 @@ const listInfoGet = async (req, res, next) => {
     const tag = await listInfoService.getTags();
     const trackThumbnail = await listInfoService.getTrackThumbnails();
 
-    if (!category || !tag || !trackThumbnail) {
-      res.sendStatus(400);
-      return;
-    }
     res.status(200).json({ category, tag, trackThumbnail });
   } catch (error) {
     console.log(error);
@@ -92,17 +80,11 @@ const trackUpdate = async (req, res, next) => {
     const { userId } = res.locals.user;
     const tag = [tag1, tag2, tag3];
 
-    if (!trackFile || !trackThumbnailUrl || !category || !tag || !title) {
-      res.sendStatus(400);
-      return;
-    }
-    const trackUrlName = req.files.trackFile[0].filename;
     // trackTag 에서 삭제, 생성
     const findedTrack = await trackService.getTrackByTrackId({ trackId, likes });
 
     if (findedTrack.userId !== userId) {
-      res.sendStatus(400);
-      return;
+      throw customizedError("권한이 없습니다.", 400);
     }
 
     const track = await trackService.updateTrackByTrackId({
@@ -111,9 +93,10 @@ const trackUpdate = async (req, res, next) => {
       tag,
       deleteTag,
       category,
-      trackUrlName,
+      trackFile,
       trackThumbnailUrl,
     });
+
     res.status(200).json({ track });
   } catch (error) {
     console.log(error);
