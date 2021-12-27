@@ -47,13 +47,13 @@ const detailTrackGet = async (req, res, next) => {
 
 const mainTracksGet = async (req, res, next) => {
   try {
-    const tracks = await trackModel.getTracks();
+    const { categoryTracks, totalTracks } = await trackModel.getTracks();
 
-    if (!tracks) {
+    if (!categoryTracks || !totalTracks) {
       res.sendStatus(400);
       return;
     }
-    res.status(200).json({ tracks });
+    res.status(200).json({ categoryTracks, totalTracks });
   } catch (error) {
     console.log(error);
     next(error);
