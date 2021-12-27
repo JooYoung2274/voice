@@ -1,4 +1,4 @@
-const likeService = require("../services/likes");
+const likeService = require("../services/like");
 
 const likePost = async (req, res, next) => {
   try {

@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const commonController = require("../controller/commonController");
+const commonController = require("../controller/commonCtrl");
 const { notNeedLogin } = require("../middleware/auth-middleware");
 
 router.get("/", commonController.mainTracksGet);

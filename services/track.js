@@ -1,4 +1,4 @@
-const { Track, TrackTag, Tag, Category, Users, Likes } = require("../models");
+const { Track, TrackTag, Tag, Category, Users, Like } = require("../models");
 
 const createTrack = async ({ category, tag, trackThumbnailUrl, trackUrlName, userId }) => {
   const createdTrack = await Track.create({
@@ -50,7 +50,7 @@ const getTracksByUserId = async ({ userId, myPage }) => {
     });
 
     // sequelize subquery 로 해야할듯
-    const likes = await Likes.findAll({
+    const likes = await Like.findAll({
       attributes: ["trackId"],
       where: { userId: userId },
     });
@@ -96,22 +96,6 @@ const getTrackByTrackId = async ({ trackId, likes }) => {
     return;
   }
   return findedTrack;
-};
-
-const getPlainTrack = async ({ newTrackId }) => {
-  try {
-    const findedTrack = await Track.findOne({
-      where: { trackId: newTrackId },
-    });
-    if (!findedTrack) {
-      throw new Error("존재하지 않는 트랙입니다.");
-    }
-    const { dataValues: trackData } = findedTrack;
-    return trackData;
-  } catch (error) {
-    console.log(error);
-    return error;
-  }
 };
 
 const getTracksByLikes = async ({ findedTrackIds }) => {
@@ -191,7 +175,7 @@ const getLikeTrack = async () => {
         [
           sequelize.literal(`(
         SELECT COUNT(*)
-        FROM likes AS home
+        FROM like AS home
         WHERE
             home.trackId = track.trackId
       )`),
@@ -272,7 +256,6 @@ module.exports = {
   deleteTrackByTrackId,
   getTracksByUserId,
   getTrackByTrackId,
-  getPlainTrack,
   getTracks,
   getTracksByLikes,
   getLikeTrack,

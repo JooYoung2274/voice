@@ -8,7 +8,7 @@ const {
   kakaoCallback,
   googleCallback,
   naverCallback,
-} = require("../controller/auth");
+} = require("../controller/authCtrl");
 const uploader = require("../middleware/uploader");
 const router = express.Router();
 
