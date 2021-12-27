@@ -1,7 +1,10 @@
-const { Track, TrackTag, Tag, Category, Users, Likes } = require("../models");
+const { Track, TrackTag, Tag, Category, User, Like, Comment } = require("../models");
+const sequelize = require("sequelize");
+const { Op, fn, col } = require("sequelize");
 
-const createTrack = async ({ category, tag, trackThumbnailUrl, trackUrlName, userId }) => {
+const createTrack = async ({ title, category, tag, trackThumbnailUrl, trackUrlName, userId }) => {
   const createdTrack = await Track.create({
+    title: title,
     category: category,
     trackThumbnailUrl: trackThumbnailUrl,
     trackUrl: trackUrlName,
@@ -26,6 +29,7 @@ const deleteTrackByTrackId = async ({ trackId }) => {
 
 const updateTrackByTrackId = async ({
   trackId,
+  title,
   tag,
   category,
   trackUrlName,
@@ -41,26 +45,35 @@ const updateTrackByTrackId = async ({
 const getTracksByUserId = async ({ userId, myPage }) => {
   if (myPage) {
     const tracks = await Track.findAll({
-      attributes: ["trackId", "category", "trackThumbnailUrl", "trackUrl", "userId"],
+      attributes: ["title", "trackId", "category", "trackThumbnailUrl", "trackUrl", "userId"],
+      where: { userId: userId },
       include: [
         { model: TrackTag, attributes: ["tag"] },
-        { model: Users, attributes: ["nickname"] },
+        { model: User, attributes: ["nickname"] },
+        {
+          model: Like,
+          attributes: [[sequelize.fn("COUNT", sequelize.col("Likes.trackId")), "likeCnt"]],
+        },
+        {
+          model: Comment,
+          attributes: [[sequelize.fn("COUNT", sequelize.col("Comments.trackId")), "commentCnt"]],
+        },
       ],
-      where: { userId: userId },
+      group: ["Track.trackId", "TrackTags.trackTagId", "Likes.likeId", "Comments.commentId"],
     });
 
     // sequelize subquery 로 해야할듯
-    const likes = await Likes.findAll({
+    const likes = await Like.findAll({
       attributes: ["trackId"],
       where: { userId: userId },
     });
     let likesArray = [];
     for (let i = 0; i < likes.length; i++) {
       const likesTracks = await Track.findAll({
-        attributes: ["trackId", "category", "trackThumbnailUrl", "trackUrl", "userId"],
+        attributes: ["title", "trackId", "category", "trackThumbnailUrl", "trackUrl", "userId"],
         include: [
           { model: TrackTag, attributes: ["tag"] },
-          { model: Users, attributes: ["nickname"] },
+          { model: User, attributes: ["nickname"] },
         ],
         where: { trackId: likes[i].trackId },
       });
@@ -70,11 +83,20 @@ const getTracksByUserId = async ({ userId, myPage }) => {
   }
 
   const result = await Track.findAll({
-    attributes: ["trackId", "category", "trackThumbnailUrl", "trackUrl", "userId"],
+    attributes: ["title", "trackId", "category", "trackThumbnailUrl", "trackUrl", "userId"],
     include: [
       { model: TrackTag, attributes: ["tag"] },
-      { model: Users, attributes: ["nickname"] },
+      { model: User, attributes: ["nickname"] },
+      {
+        model: Like,
+        attributes: [[sequelize.fn("COUNT", sequelize.col("Likes.trackId")), "likeCnt"]],
+      },
+      {
+        model: Comment,
+        attributes: [[sequelize.fn("COUNT", sequelize.col("Comments.trackId")), "commentCnt"]],
+      },
     ],
+    group: ["Track.trackId", "TrackTags.trackTagId", "Likes.likeId", "Comments.commentId"],
     where: { userId: userId },
   });
 
@@ -83,13 +105,20 @@ const getTracksByUserId = async ({ userId, myPage }) => {
 
 const getTrackByTrackId = async ({ trackId, likes }) => {
   const findedTrack = await Track.findOne({
-    attributes: ["trackId", "category", "trackThumbnailUrl", "trackUrl", "userId"],
+    attributes: ["title", "trackId", "category", "trackThumbnailUrl", "trackUrl", "userId"],
     include: [
+      { model: TrackTag, attributes: ["tag"] },
+      { model: User, attributes: ["nickname"] },
       {
-        model: TrackTag,
-        attributes: ["tag"],
+        model: Like,
+        attributes: [[sequelize.fn("COUNT", sequelize.col("Likes.trackId")), "likeCnt"]],
+      },
+      {
+        model: Comment,
+        attributes: [[sequelize.fn("COUNT", sequelize.col("Comments.trackId")), "commentCnt"]],
       },
     ],
+    group: ["Track.trackId", "TrackTags.trackTagId", "Likes.likeId", "Comments.commentId"],
     where: { trackId: trackId },
   });
   if (!findedTrack) {
@@ -98,32 +127,26 @@ const getTrackByTrackId = async ({ trackId, likes }) => {
   return findedTrack;
 };
 
-const getPlainTrack = async ({ newTrackId }) => {
-  try {
-    const findedTrack = await Track.findOne({
-      where: { trackId: newTrackId },
-    });
-    if (!findedTrack) {
-      throw new Error("존재하지 않는 트랙입니다.");
-    }
-    const { dataValues: trackData } = findedTrack;
-    return trackData;
-  } catch (error) {
-    console.log(error);
-    return error;
-  }
-};
-
 const getTracksByLikes = async ({ findedTrackIds }) => {
   let tracks = [];
   for (let i = 0; i < findedTrackIds.length; i++) {
     const findedTrack = await Track.findOne({
-      attributes: ["trackId", "category", "trackThumbnailUrl", "trackUrl", "userId"],
+      attributes: ["title", "trackId", "category", "trackThumbnailUrl", "trackUrl", "userId"],
+
       where: { trackId: findedTrackIds[i] },
       include: [
         { model: TrackTag, attributes: ["tag"] },
-        { model: Users, attributes: ["nickname"] },
+        { model: User, attributes: ["nickname"] },
+        {
+          model: Like,
+          attributes: [[sequelize.fn("COUNT", sequelize.col("Likes.trackId")), "likeCnt"]],
+        },
+        {
+          model: Comment,
+          attributes: [[sequelize.fn("COUNT", sequelize.col("Comments.trackId")), "commentCnt"]],
+        },
       ],
+      group: ["Track.trackId", "TrackTags.trackTagId", "Likes.likeId", "Comments.commentId"],
     });
     tracks.push(findedTrack);
   }
@@ -132,58 +155,76 @@ const getTracksByLikes = async ({ findedTrackIds }) => {
 
 const getTracksByCategory = async ({ category }) => {
   const findedTracks = await Track.findAll({
-    attributes: ["trackId", "category", "trackThumbnailUrl", "trackUrl", "userId"],
-    where: { category: category },
+    attributes: ["title", "trackId", "category", "trackThumbnailUrl", "trackUrl", "userId"],
     order: [["category", "ASC"]],
     include: [
       { model: TrackTag, attributes: ["tag"] },
-      { model: Users, attributes: ["nickname"] },
+      { model: User, attributes: ["nickname"] },
     ],
+    where: { category: category },
   });
 
   return findedTracks;
 };
-
 const getTracks = async () => {
-  const findedTracks = await Track.findAll({
-    attributes: ["trackId", "category", "trackThumbnailUrl", "trackUrl", "userId"],
-    order: [["category", "ASC"]],
+  const totalTracks = await Track.findAll({
+    attributes: ["title", "trackId", "category", "trackThumbnailUrl", "trackUrl", "userId"],
     include: [
       { model: TrackTag, attributes: ["tag"] },
-      { model: Users, attributes: ["nickname"] },
+      { model: User, attributes: ["nickname"] },
+      {
+        model: Like,
+        attributes: [[sequelize.fn("COUNT", sequelize.col("Likes.trackId")), "likeCnt"]],
+      },
+      {
+        model: Comment,
+        attributes: [[sequelize.fn("COUNT", sequelize.col("Comments.trackId")), "commentCnt"]],
+      },
     ],
+    order: [["createdAt", "DESC"]],
+    group: ["Track.trackId", "TrackTags.trackTagId", "Likes.likeId", "Comments.commentId"],
   });
-  let result = [[], [], [], [], [], [], []];
-  for (let i = 0; i < findedTracks.length; i++) {
-    switch (findedTracks[i].category) {
+
+  if (!totalTracks) {
+    return;
+  }
+
+  let categoryTracks = [[], [], [], [], [], [], [], [], []];
+  for (let i = 0; i < totalTracks.length; i++) {
+    switch (totalTracks[i].category) {
+      case "자유 주제":
+        categoryTracks[0].push(totalTracks[i]);
+        break;
       case "ASMR":
-        result[0].push(findedTracks[i]);
+        categoryTracks[1].push(totalTracks[i]);
+        break;
+      case "힐링/응원":
+        categoryTracks[2].push(totalTracks[i]);
+        break;
+      case "노래":
+        categoryTracks[3].push(totalTracks[i]);
+        break;
+      case "외국어":
+        categoryTracks[4].push(totalTracks[i]);
         break;
       case "나레이션":
-        result[1].push(findedTracks[i]);
-        break;
-      case "더빙":
-        result[2].push(findedTracks[i]);
-        break;
-      case "라디오":
-        result[3].push(findedTracks[i]);
+        categoryTracks[5].push(totalTracks[i]);
         break;
       case "성대모사":
-        result[4].push(findedTracks[i]);
+        categoryTracks[6].push(totalTracks[i]);
         break;
-      case "일상언어":
-        result[5].push(findedTracks[i]);
+      case "유행어":
+        categoryTracks[7].push(totalTracks[i]);
         break;
       case "효과음":
-        result[6].push(findedTracks[i]);
+        categoryTracks[8].push(totalTracks[i]);
         break;
       default:
         break;
     }
   }
-  return result;
+  return { categoryTracks, totalTracks };
 };
-
 const getLikeTrack = async () => {
   const tracks = await Track.findAll({
     attributes: {
@@ -191,7 +232,7 @@ const getLikeTrack = async () => {
         [
           sequelize.literal(`(
         SELECT COUNT(*)
-        FROM likes AS home
+        FROM like AS home
         WHERE
             home.trackId = track.trackId
       )`),
@@ -272,7 +313,6 @@ module.exports = {
   deleteTrackByTrackId,
   getTracksByUserId,
   getTrackByTrackId,
-  getPlainTrack,
   getTracks,
   getTracksByLikes,
   getLikeTrack,

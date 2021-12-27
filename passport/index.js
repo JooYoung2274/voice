@@ -2,7 +2,7 @@ const passport = require("passport");
 const naverStrategy = require("passport-naver").Strategy;
 const kakaoStrategy = require("passport-kakao").Strategy;
 const googleStrategy = require("passport-google-oauth20").Strategy;
-const { Users } = require("../models");
+const { User } = require("../models");
 const userService = require("../services/auth");
 const randomstring = require("randomstring");
 const newNickname = randomstring.generate({ length: 15 });
@@ -14,18 +14,18 @@ module.exports = (app) => {
       {
         clientID: process.env.NAVER_CLIENT_ID,
         clientSecret: process.env.NAVER_CLIENT_SECRET,
-        callbackURL: "/api/auth/naver/callback",
+        callbackURL: "http://localhost:3000/api/auth/naver/callback",
       },
       async (accessToken, refreshToken, profile, done) => {
         console.log("*********naver profile*********", profile);
         try {
-          const exUser = await Users.findOne({
+          const exUser = await User.findOne({
             where: { snsId: profile.id, flatformType: profile.provider },
           });
           if (exUser) {
             done(null, exUser);
           } else {
-            const newUser = await Users.create({
+            const newUser = await User.create({
               nickname: newNickname,
               flatformType: profile.provider,
               snsId: profile.id,
@@ -45,18 +45,18 @@ module.exports = (app) => {
     new kakaoStrategy(
       {
         clientID: process.env.KAKAO_CLIENT_ID,
-        callbackURL: "/api/auth/kakao/callback",
+        callbackURL: "http://localhost:3000/api/auth/kakao/callback",
       },
       async (accessToken, refreshToken, profile, done) => {
         console.log("*********kakao profile*********", profile);
         try {
-          const exUser = await Users.findOne({
+          const exUser = await User.findOne({
             where: { snsId: profile.id, flatformType: profile.provider },
           });
           if (exUser) {
             done(null, exUser);
           } else {
-            const newUser = await Users.create({
+            const newUser = await User.create({
               nickname: newNickname,
               flatformType: profile.provider,
               snsId: profile.id,
@@ -75,18 +75,18 @@ module.exports = (app) => {
       {
         clientID: process.env.GOOGLE_CLIENT_ID,
         clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-        callbackURL: "/api/auth/google/callback",
+        callbackURL: "http://localhost:3000/api/auth/google/callback",
       },
       async (accessToken, refreshToken, profile, done) => {
         console.log("*********google profile*********", profile);
         try {
-          const exUser = await Users.findOne({
+          const exUser = await User.findOne({
             where: { snsId: profile.id, flatformType: profile.provider },
           });
           if (exUser) {
             done(null, exUser);
           } else {
-            const newUser = await Users.create({
+            const newUser = await User.create({
               nickname: newNickname,
               flatformType: profile.provider,
               snsId: profile.id,

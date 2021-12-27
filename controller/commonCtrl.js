@@ -1,8 +1,7 @@
 const trackModel = require("../services/track");
-const tagModel = require("../services/tag");
 const trackTagModel = require("../services/tag");
-const commentService = require("../services/comments");
-const likeService = require("../services/likes");
+const commentService = require("../services/comment");
+const likeService = require("../services/like");
 
 const myTracksGet = async (req, res, next) => {
   try {
@@ -47,13 +46,14 @@ const detailTrackGet = async (req, res, next) => {
 
 const mainTracksGet = async (req, res, next) => {
   try {
-    const tracks = await trackModel.getTracks();
+    const x = "1";
+    const { categoryTracks, totalTracks } = await trackModel.getTracks();
 
-    if (!tracks) {
+    if (!categoryTracks || !totalTracks) {
       res.sendStatus(400);
       return;
     }
-    res.status(200).json({ tracks });
+    res.status(200).json({ categoryTracks, totalTracks });
   } catch (error) {
     console.log(error);
     next(error);

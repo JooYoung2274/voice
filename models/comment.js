@@ -2,34 +2,28 @@
 const Sequelize = require("sequelize");
 const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
-  class Likes extends Model {
+  class Comment extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      Likes.belongsTo(models.Users, { foreignKey: "userId", onDelete: "cascade" });
-      Likes.belongsTo(models.Track, { foreignKey: "trackId", onDelete: "cascade" });
+      Comment.belongsTo(models.User, { foreignKey: "userId", onDelete: "cascade" });
+      Comment.belongsTo(models.Track, { foreignKey: "trackId", onDelete: "cascade" });
     }
   }
-  Likes.init(
+  Comment.init(
     {
-      likeId: {
+      commentId: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      createdAt: {
-        type: "TIMESTAMP",
-        defaultValue: sequelize.literal("CURRENT_TIMESTAMP"),
+      comment: {
         allowNull: false,
-      },
-      updatedAt: {
-        type: "TIMESTAMP",
-        defaultValue: sequelize.literal("CURRENT_TIMESTAMP"),
-        allowNull: false,
+        type: Sequelize.STRING,
       },
       userId: {
         allowNull: false,
@@ -42,8 +36,9 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       sequelize,
-      modelName: "Likes",
+      modelName: "Comment",
+      timestamps: true,
     },
   );
-  return Likes;
+  return Comment;
 };

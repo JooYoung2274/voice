@@ -10,11 +10,14 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       Track.hasMany(models.TrackTag, { foreignKey: "trackId" });
-      Track.hasMany(models.Comments, { foreignKey: "trackId" });
-      Track.hasMany(models.Likes, { foreignKey: "trackId" });
-      Track.belongsTo(models.Users, { foreignKey: "userId" });
-      Track.belongsTo(models.Category, { foreignKey: "category" });
-      Track.belongsTo(models.TrackThumbnail, { foreignKey: "trackThumbnailUrl" });
+      Track.hasMany(models.Comment, { foreignKey: "trackId" });
+      Track.hasMany(models.Like, { foreignKey: "trackId" });
+      Track.belongsTo(models.User, { foreignKey: "userId", onDelete: "cascade" });
+      Track.belongsTo(models.Category, { foreignKey: "category", onDelete: "cascade" });
+      Track.belongsTo(models.TrackThumbnail, {
+        foreignKey: "trackThumbnailUrl",
+        onDelete: "cascade",
+      });
     }
   }
   Track.init(
@@ -30,6 +33,10 @@ module.exports = (sequelize, DataTypes) => {
         type: Sequelize.STRING,
       },
       trackThumbnailUrl: {
+        allowNull: false,
+        type: Sequelize.STRING,
+      },
+      title: {
         allowNull: false,
         type: Sequelize.STRING,
       },

@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const { Users } = require("../models");
+const { User } = require("../models");
 //로그인 필수
 const needLogin = (req, res, next) => {
   const { authorization } = req.headers;
@@ -15,7 +15,7 @@ const needLogin = (req, res, next) => {
 
   try {
     const { userId } = jwt.verify(tokenValue, "secret-secret-key");
-    Users.findOne({ where: { userId: userId } }).then((user) => {
+    User.findOne({ where: { userId: userId } }).then((user) => {
       // async가 없으므로 await은 안됨. sequelize는 기본적으로 promise이므로  then
       res.locals.user = user;
       next();
@@ -38,7 +38,7 @@ const notNeedLogin = (req, res, next) => {
       return;
     }
     const { userId } = jwt.verify(tokenValue, "secret-secret-key");
-    Users.findOne({ where: { userId: userId } }).then((user) => {
+    User.findOne({ where: { userId: userId } }).then((user) => {
       // async가 없으므로 await은 안됨. sequelize는 기본적으로 promise이므로  then
       res.locals.user = user;
       next();
