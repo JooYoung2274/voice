@@ -1,39 +1,29 @@
 const { Track, Comment, Users, TrackTag } = require("../models");
 const { Op } = require("sequelize");
-const { and, or, like, not } = Op;
+const { or, like } = Op;
 
+// //keyword로 track 가져오는 서비스함수
 // const getTracksByKeywordTEST = async ({ keyword }) => {
 //   try {
-//     //   공백이 2개이상 존재하면 하나의 공백으로 변환
+//     //   공백이 2개이상 존재하면 하나의 공백으로 변환(아직 더 생각해봐야함)
 //     // keyword = keyword.replace(/\s\s+/gi, " ");
 
-//     const questionSearchCondition = [{ title: { [like]: `%${keyword}%` } }];
-
-//     // 방법1 유저의 닉네임으로 한번더 track을 find한다.
-//     const results1 = await Users.findAll({
-//       attributes: ["nickname"],
-//       where: {
-//         nickname: { [like]: `%${keyword}%` },
+//     const trackSearchCondition = [
+//       { title: { [like]: `%${keyword}%` } },
+//       {
+//         "$User.nickname$": { [like]: `%${keyword}%` },
 //       },
-//     });
+//     ];
 
-//     // 방법2 track을 통해서 한번에 찾는다.
 //     const results = await Track.findAll({
+//       where: {
+//         [or]: trackSearchCondition,
+//       },
 //       attributes: ["trackId", "category", "trackThumbnailUrl", "trackUrl", "userId"],
 //       include: [
 //         { model: TrackTag, attributes: ["tag"] },
-//         { model: Users, attributes: ["nickname"] },
+//         { model: Users, as: "User", attributes: ["nickname"] },
 //       ],
-//       where: {
-//         [or]: [
-//           {
-//             title: { [like]: `%${keyword}%` },
-//           },
-//           {
-//             //nickname자리
-//           },
-//         ],
-//       },
 //     });
 
 //     return results;
@@ -41,38 +31,25 @@ const { and, or, like, not } = Op;
 //     throw error;
 //   }
 // };
-// const getTracksByKeyword = async ({ keyword }) => {
-//   try {
-//     const results = await Comment.findAll({
-//       attributes: ["commentId", "createdAt"],
-//       include: [{ model: Users, attributes: ["nickname"] }],
-//       where: {
-//         comment: {
-//           [Op.like]: "%" + keyword + "%",
-//         },
-//       },
-//     });
 
-//     return results;
-//   } catch (error) {
-//     throw error;
-//   }
-// };
+//keyword로 comments가져오는 함수
 const getTracksByKeyword = async ({ keyword }) => {
   try {
+    // keyword = keyword.replace(/\s\s+/gi, " ");
+
     const results = await Comment.findAll({
-      attributes: ["commentId", "createdAt"],
-      include: [{ model: Users, attributes: ["nickname"] }],
       where: {
         [or]: [
           {
             comment: { [like]: `%${keyword}%` },
           },
           {
-            "$Users.nickname$": `%${keyword}%`,
+            "$User.nickname$": { [like]: `%${keyword}%` },
           },
         ],
       },
+      attributes: ["commentId", "createdAt"],
+      include: [{ model: Users, as: "User", attributes: ["nickname"] }],
     });
 
     return results;
