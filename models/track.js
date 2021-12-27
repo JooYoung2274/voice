@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       Track.hasMany(models.TrackTag, { foreignKey: "trackId" });
       Track.hasMany(models.Comment, { foreignKey: "trackId" });
-      Track.hasMany(models.Likes, { foreignKey: "trackId" });
+      Track.hasMany(models.Like, { foreignKey: "trackId" });
       Track.belongsTo(models.Users, { foreignKey: "userId" });
       Track.belongsTo(models.Category, { foreignKey: "category" });
       Track.belongsTo(models.TrackThumbnail, { foreignKey: "trackThumbnailUrl" });

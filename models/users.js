@@ -19,7 +19,7 @@ module.exports = (sequelize, DataTypes) => {
         sourceKey: "userId",
         onDelete: "cascade",
       });
-      models.Users.hasMany(models.Likes, {
+      models.Users.hasMany(models.Like, {
         foreignKey: "userId",
         sourceKey: "userId",
         onDelete: "cascade",

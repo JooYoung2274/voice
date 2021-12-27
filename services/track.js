@@ -1,4 +1,4 @@
-const { Track, TrackTag, Tag, Category, Users, Likes } = require("../models");
+const { Track, TrackTag, Tag, Category, Users, Like } = require("../models");
 
 const createTrack = async ({ category, tag, trackThumbnailUrl, trackUrlName, userId }) => {
   const createdTrack = await Track.create({
@@ -50,7 +50,7 @@ const getTracksByUserId = async ({ userId, myPage }) => {
     });
 
     // sequelize subquery 로 해야할듯
-    const likes = await Likes.findAll({
+    const likes = await Like.findAll({
       attributes: ["trackId"],
       where: { userId: userId },
     });
@@ -175,7 +175,7 @@ const getLikeTrack = async () => {
         [
           sequelize.literal(`(
         SELECT COUNT(*)
-        FROM likes AS home
+        FROM like AS home
         WHERE
             home.trackId = track.trackId
       )`),

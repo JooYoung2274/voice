@@ -1,7 +1,7 @@
-const { Likes, Track, TrackTag, Category, Users, Tag } = require("../models");
+const { Like, Track, TrackTag, Category, Users, Tag } = require("../models");
 
 const returnLikeCntAndLike = async ({ trackId, like }) => {
-  const likeCnt = await Likes.count({
+  const likeCnt = await Like.count({
     where: { trackId },
   });
   return { likeCnt, like };
@@ -10,7 +10,7 @@ const returnLikeCntAndLike = async ({ trackId, like }) => {
 const createOrDeleteLike = async ({ trackId, userId }) => {
   try {
     // 좋아요에서 일단 삭제
-    const deleted = await Likes.destroy({ where: { trackId, userId } });
+    const deleted = await Like.destroy({ where: { trackId, userId } });
 
     // 삭제가 안되면 생성
     if (!deleted) {
@@ -21,7 +21,7 @@ const createOrDeleteLike = async ({ trackId, userId }) => {
       }
 
       // 좋아요 데이터 생성
-      await Likes.create({
+      await Like.create({
         trackId,
         userId,
       });
@@ -40,21 +40,21 @@ const createOrDeleteLike = async ({ trackId, userId }) => {
 };
 
 const findLikesByTrackId = async ({ trackId }) => {
-  const findedLikes = await Likes.count({ where: { trackId: trackId } });
+  const findedLikes = await Like.count({ where: { trackId: trackId } });
   return findedLikes;
 };
 
 const findLike = async ({ findedTracks }) => {
   let array = [];
   for (let i = 0; i < findedTracks.length; i++) {
-    const findedLikes = await Likes.count({ where: { trackId: findedTracks[i] } });
+    const findedLikes = await Like.count({ where: { trackId: findedTracks[i] } });
     array.push(findedLikes);
   }
   return array;
 };
 
 const getTracks = async ({ userId }) => {
-  const likes = await Likes.findAll({
+  const likes = await Like.findAll({
     attributes: ["trackId"],
     where: { userId: userId },
   });
