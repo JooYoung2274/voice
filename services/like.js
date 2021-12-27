@@ -1,4 +1,4 @@
-const { Like, Track, TrackTag, Category, Users, Tag } = require("../models");
+const { Like, Track, TrackTag, Category, User, Tag } = require("../models");
 const { customizedError } = require("../utils/error");
 
 const returnLikeCntAndLike = async ({ trackId, like }) => {
@@ -80,7 +80,7 @@ const getTracks = async ({ userId }) => {
     });
     const category = findedCategory.category;
 
-    const findedNickname = await Users.findOne({
+    const findedNickname = await User.findOne({
       attributes: ["nickname"],
       where: { userId: userId },
     });

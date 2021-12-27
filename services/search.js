@@ -1,4 +1,4 @@
-const { Track, Users, TrackTag } = require("../models");
+const { Track, User, TrackTag } = require("../models");
 const { Op } = require("sequelize");
 const { or, like } = Op;
 
@@ -22,7 +22,7 @@ const getTracksByKeyword = async ({ keyword }) => {
       attributes: ["trackId", "category", "trackThumbnailUrl", "trackUrl", "userId"],
       include: [
         { model: TrackTag, attributes: ["tag"] },
-        { model: Users, as: "User", attributes: ["nickname"] },
+        { model: User, as: "User", attributes: ["nickname"] },
       ],
     });
 
@@ -49,7 +49,7 @@ const getTracksByKeyword = async ({ keyword }) => {
 //         ],
 //       },
 //       attributes: ["commentId", "createdAt"],
-//       include: [{ model: Users, as: "User", attributes: ["nickname"] }],
+//       include: [{ model: User, as: "User", attributes: ["nickname"] }],
 //     });
 
 //     return results;
