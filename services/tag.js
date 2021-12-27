@@ -22,4 +22,4 @@ const getTrackIdsByTag = async ({ tag, category }) => {
   return result;
 };
 
-module.exports = { getTagIdsByTags, getTrackIdsByTag, getTagIdByTag };
+module.exports = { getTrackIdsByTag };

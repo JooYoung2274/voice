@@ -1,4 +1,4 @@
-const { Track, TrackTag, Tag, Category, Users, Likes, Comments } = require("../models");
+const { Track, TrackTag, Tag, Category, Users, Like, Comment } = require("../models");
 const sequelize = require("sequelize");
 const { Op, fn, col } = require("sequelize");
 
@@ -134,22 +134,25 @@ const getTracksByCategory = async ({ category }) => {
 const getTracks = async () => {
   const totalTracks = await Track.findAll({
     attributes: ["title", "trackId", "category", "trackThumbnailUrl", "trackUrl", "userId"],
-
     include: [
       { model: TrackTag, attributes: ["tag"] },
       { model: Users, attributes: ["nickname"] },
       {
-        model: Likes,
+        model: Like,
         attributes: [[sequelize.fn("COUNT", sequelize.col("Likes.trackId")), "likeCnt"]],
       },
       {
-        model: Comments,
+        model: Comment,
         attributes: [[sequelize.fn("COUNT", sequelize.col("Comments.trackId")), "commentCnt"]],
       },
     ],
     order: [["createdAt", "DESC"]],
     group: ["Track.trackId", "TrackTags.trackTagId", "Likes.likeId", "Comments.commentId"],
   });
+
+  if (!totalTracks) {
+    return;
+  }
 
   let categoryTracks = [[], [], [], [], [], [], [], [], []];
   for (let i = 0; i < totalTracks.length; i++) {
