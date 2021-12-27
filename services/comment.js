@@ -27,15 +27,12 @@ const createComment = async ({ comment, trackId, userId, nickname }) => {
       throw customizedError("존재하지 않는 트랙입니다.", 400);
     }
     // 댓글 만들기
-    const a = await Comment.create({
+    const { commentId, createdAt } = await Comment.create({
       comment,
       trackId,
       userId,
     });
-    console.log(a);
-    const { commentId, createdAt } = a;
     // 클라이언트에게 줄 댓글 가공
-    console.log(createdAt);
     const result = {
       commentId,
       nickname,
@@ -53,7 +50,10 @@ const updateComment = async ({ comment, commentId, userId, trackId, nickname }) 
     // 댓글 업데이트
     const updated = await Comment.update({ comment }, { where: { commentId, trackId, userId } });
     if (!updated[0]) {
-      throw new Error("존재하지 않는 댓글이거나 트랙에 포함되지 않거나 댓글쓴사람이 아닙니다");
+      throw customizedError(
+        "존재하지 않는 댓글이거나 트랙에 포함되지 않거나 댓글쓴사람이 아닙니다",
+        400,
+      );
     }
     // 댓글만 바뀌는 거니까 댓글만 주면 안되나? like처럼 like눌러도 다른건 안주는 것처럼 효과: 밑에있는 findOne제거가능
     // userId,trackId를 통해 comment 있는지 없는지 확인하고 createdAt 뽑음
@@ -79,7 +79,10 @@ const deleteComment = async ({ userId, trackId, commentId }) => {
     // delete 로직
     const deleted = await Comment.destroy({ where: { commentId, trackId, userId } });
     if (!deleted) {
-      throw new Error("존재하지 않는 댓글이거나 트랙에 포함되지 않거나 댓글쓴사람이 아닙니다");
+      throw customizedError(
+        "존재하지 않는 댓글이거나 트랙에 포함되지 않거나 댓글쓴사람이 아닙니다",
+        400,
+      );
     }
     return;
   } catch (error) {

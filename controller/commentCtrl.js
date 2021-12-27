@@ -43,7 +43,6 @@ const commentPut = async (req, res, next) => {
     });
     return res.status(200).json({ comment: result });
   } catch (error) {
-    error.status = 400;
     next(error);
   }
 };
@@ -61,7 +60,6 @@ const commentDelete = async (req, res, next) => {
     await commentService.deleteComment({ userId, trackId, commentId });
     return res.sendStatus(200);
   } catch (error) {
-    error.status = 400;
     next(error);
   }
 };

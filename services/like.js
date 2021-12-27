@@ -1,4 +1,5 @@
 const { Like, Track, TrackTag, Category, Users, Tag } = require("../models");
+const { customizedError } = require("../utils/error");
 
 const returnLikeCntAndLike = async ({ trackId, like }) => {
   const likeCnt = await Like.count({
@@ -17,7 +18,7 @@ const createOrDeleteLike = async ({ trackId, userId }) => {
       // 트랙 존재유무 먼저 확인
       const findedTrack = await Track.findOne({ where: { trackId } });
       if (!findedTrack) {
-        throw new Error("존재하지 않는 트랙입니다.");
+        throw customizedError("존재하지 않는 트랙입니다.", 400);
       }
 
       // 좋아요 데이터 생성
