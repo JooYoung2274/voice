@@ -5,6 +5,7 @@ const commentRouter = require("./comment.js");
 const likeRouter = require("./like.js");
 const AuthRouter = require("./auth");
 const listInfoRouter = require("./listinfo");
+const searchRouter = require("./search");
 const router = express.Router();
 
 router.use("/tracks", trackRouter);
@@ -13,5 +14,6 @@ router.use("/tracks", commentRouter);
 router.use("/tracks", likeRouter);
 router.use("/auth", AuthRouter);
 router.use("/listinfo", listInfoRouter);
+router.use("/search", searchRouter);
 
 module.exports = router;
