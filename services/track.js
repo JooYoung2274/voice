@@ -98,22 +98,6 @@ const getTrackByTrackId = async ({ trackId, likes }) => {
   return findedTrack;
 };
 
-const getPlainTrack = async ({ newTrackId }) => {
-  try {
-    const findedTrack = await Track.findOne({
-      where: { trackId: newTrackId },
-    });
-    if (!findedTrack) {
-      throw new Error("존재하지 않는 트랙입니다.");
-    }
-    const { dataValues: trackData } = findedTrack;
-    return trackData;
-  } catch (error) {
-    console.log(error);
-    return error;
-  }
-};
-
 const getTracksByLikes = async ({ findedTrackIds }) => {
   let tracks = [];
   for (let i = 0; i < findedTrackIds.length; i++) {
@@ -272,7 +256,6 @@ module.exports = {
   deleteTrackByTrackId,
   getTracksByUserId,
   getTrackByTrackId,
-  getPlainTrack,
   getTracks,
   getTracksByLikes,
   getLikeTrack,

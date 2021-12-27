@@ -2,18 +2,18 @@
 const Sequelize = require("sequelize");
 const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
-  class Comments extends Model {
+  class Comment extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      Comments.belongsTo(models.Users, { foreignKey: "userId", onDelete: "cascade" });
-      Comments.belongsTo(models.Track, { foreignKey: "trackId", onDelete: "cascade" });
+      Comment.belongsTo(models.Users, { foreignKey: "userId", onDelete: "cascade" });
+      Comment.belongsTo(models.Track, { foreignKey: "trackId", onDelete: "cascade" });
     }
   }
-  Comments.init(
+  Comment.init(
     {
       commentId: {
         allowNull: false,
@@ -24,16 +24,6 @@ module.exports = (sequelize, DataTypes) => {
       comment: {
         allowNull: false,
         type: Sequelize.STRING,
-      },
-      createdAt: {
-        type: "TIMESTAMP",
-        defaultValue: sequelize.literal("CURRENT_TIMESTAMP"),
-        allowNull: false,
-      },
-      updatedAt: {
-        type: "TIMESTAMP",
-        defaultValue: sequelize.literal("CURRENT_TIMESTAMP"),
-        allowNull: false,
       },
       userId: {
         allowNull: false,
@@ -46,8 +36,9 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       sequelize,
-      modelName: "Comments",
+      modelName: "Comment",
+      timestamps: true,
     },
   );
-  return Comments;
+  return Comment;
 };
