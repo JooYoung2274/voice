@@ -4,12 +4,12 @@ const { User } = require("../models");
 const needLogin = (req, res, next) => {
   const { authorization } = req.headers;
   if (!authorization) {
-    res.sendStatus(401);
+    throw customizedError("토큰이 유효하지 않습니다.", 401);
     return;
   }
   const [tokenType, tokenValue] = authorization.split(" ");
   if (tokenType !== "Bearer") {
-    res.sendStatus(401);
+    throw customizedError("토큰이 유효하지 않습니다.", 401);
     return;
   }
 
@@ -34,8 +34,7 @@ const notNeedLogin = (req, res, next) => {
     const [tokenType, tokenValue] = authorization.split(" ");
 
     if (tokenType !== "Bearer") {
-      res.sendStatus(401);
-      return;
+      throw customizedError("토큰이 유효하지 않습니다.", 401);
     }
     const { userId } = jwt.verify(tokenValue, "secret-secret-key");
     User.findOne({ where: { userId: userId } }).then((user) => {
