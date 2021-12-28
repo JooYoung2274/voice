@@ -40,7 +40,7 @@ module.exports = {
         trackThumbnailUrl: "http://54.180.82.210/thumbnail11.png",
       },
       {
-        trackThumbnailUrl: "http://54.180.82.210/thumbnail.png",
+        trackThumbnailUrl: "http://54.180.82.210/thumbnail12.png",
       },
     ]);
   },
