@@ -5,8 +5,8 @@ const passportConfig = require("./passport");
 const swaggerUi = require("swagger-ui-express");
 const swaggerFile = require("./swagger-output");
 const dotenv = require("dotenv");
-const { logHandler, errorHandler } = require("./middleware/errorHandler");
 const cors = require("cors");
+const { logHandler, errorHandler } = require("./middleware/errorHandler");
 
 app.use(cors());
 

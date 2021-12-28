@@ -14,7 +14,7 @@ module.exports = (app) => {
       {
         clientID: process.env.NAVER_CLIENT_ID,
         clientSecret: process.env.NAVER_CLIENT_SECRET,
-        callbackURL: "http://localhost:3000/api/auth/naver/callback",
+        callbackURL: process.env.DOMAIN + "/api/auth/naver/callback",
       },
       async (accessToken, refreshToken, profile, done) => {
         console.log("*********naver profile*********", profile);
@@ -45,7 +45,7 @@ module.exports = (app) => {
     new kakaoStrategy(
       {
         clientID: process.env.KAKAO_CLIENT_ID,
-        callbackURL: "http://localhost:3000/api/auth/kakao/callback",
+        callbackURL: process.env.DOMAIN + "/api/auth/kakao/callback",
       },
       async (accessToken, refreshToken, profile, done) => {
         console.log("*********kakao profile*********", profile);
@@ -75,7 +75,7 @@ module.exports = (app) => {
       {
         clientID: process.env.GOOGLE_CLIENT_ID,
         clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-        callbackURL: "http://localhost:3000/api/auth/google/callback",
+        callbackURL: process.env.DOMAIN + "/api/auth/google/callback",
       },
       async (accessToken, refreshToken, profile, done) => {
         console.log("*********google profile*********", profile);
