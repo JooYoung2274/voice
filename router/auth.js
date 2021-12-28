@@ -9,7 +9,8 @@ const {
   googleCallback,
   naverCallback,
 } = require("../controller/authCtrl");
-const uploader = require("../middleware/uploader");
+const multer = require("../middleware/imageUploader");
+const imageUploader = multer.single("profileImage");
 const router = express.Router();
 
 router.get("/kakao", passport.authenticate("kakao"));
@@ -24,5 +25,5 @@ router.get("/naver", passport.authenticate("naver"));
 
 router.get("/naver/callback", naverCallback);
 
-router.post("/profile", uploader.single("profileImage"), needLogin, updateUser);
+router.post("/profile", imageUploader, needLogin, updateUser);
 module.exports = router;

@@ -1,17 +1,17 @@
 const { Track, TrackTag, Tag, Category, User, Like, Comment } = require("../models");
 const sequelize = require("sequelize");
 const { Op, fn, col } = require("sequelize");
+const customizedError = require("../utils/error");
 
-const createTrack = async ({ title, category, tag, trackThumbnailUrl, trackFile, userId }) => {
-  if (!trackFile || !trackThumbnailUrl || !category || !tag || !title || !userId) {
+const createTrack = async ({ title, category, tag, trackThumbnailUrl, filename, userId }) => {
+  if (!trackThumbnailUrl || !category || !tag || !title || !userId || !filename) {
     throw customizedError("녹음파일이 존재하지 않습니다.", 400);
   }
-  const trackUrlName = req.files.trackFile[0].filename;
   const createdTrack = await Track.create({
     title: title,
     category: category,
     trackThumbnailUrl: trackThumbnailUrl,
-    trackUrl: trackUrlName,
+    trackUrl: filename,
     userId: userId,
   });
   for (let i = 0; i < tag.length; i++) {
@@ -35,21 +35,12 @@ const deleteTrackByTrackId = async ({ trackId }) => {
   return;
 };
 
-const updateTrackByTrackId = async ({
-  trackId,
-  title,
-  tag,
-  category,
-  trackFile,
-  trackThumbnailUrl,
-}) => {
-  if (!trackFile || !trackThumbnailUrl || !category || !tag.length || !title || !trackId) {
+const updateTrackByTrackId = async ({ trackId, title, tag, category, trackThumbnailUrl }) => {
+  if (!trackThumbnailUrl || !category || !tag.length || !title || !trackId) {
     throw customizedError("권한이 없습니다.", 400);
   }
-
-  const trackUrlName = req.files.trackFile[0].filename;
   const updateTrack = await Track.update(
-    { category: category, trackUrl: trackUrlName, trackThumbnailUrl: trackThumbnailUrl },
+    { category: category, trackThumbnailUrl: trackThumbnailUrl },
     { where: { trackId: trackId } },
   );
   return updateTrack;
@@ -126,7 +117,7 @@ const getTracksByUserId = async ({ userId, myPage }) => {
   return result;
 };
 
-const getTrackByTrackId = async ({ trackId, likes }) => {
+const getTrackByTrackId = async ({ trackId, userId, likes }) => {
   const findedTrack = await Track.findOne({
     attributes: ["title", "trackId", "category", "trackThumbnailUrl", "trackUrl", "userId"],
     include: [
@@ -148,6 +139,11 @@ const getTrackByTrackId = async ({ trackId, likes }) => {
   if (!findedTrack) {
     throw customizedError("존재하지 않는 트랙입니다.", 400);
   }
+
+  if (userId !== findedTrack.userId) {
+    throw customizedError("권한이 없습니다.", 400);
+  }
+
   return findedTrack;
 };
 
