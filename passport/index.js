@@ -5,7 +5,7 @@ const googleStrategy = require("passport-google-oauth20").Strategy;
 const { User } = require("../models");
 const userService = require("../services/auth");
 const randomstring = require("randomstring");
-const newNickname = randomstring.generate({ length: 15 });
+let newNickname = "";
 
 module.exports = (app) => {
   app.use(passport.initialize());
@@ -25,6 +25,7 @@ module.exports = (app) => {
           if (exUser) {
             done(null, exUser);
           } else {
+            newNickname = randomstring.generate({ length: 15 });
             const newUser = await User.create({
               nickname: newNickname,
               flatformType: profile.provider,
@@ -56,6 +57,7 @@ module.exports = (app) => {
           if (exUser) {
             done(null, exUser);
           } else {
+            randomstring.generate({ length: 15 });
             const newUser = await User.create({
               nickname: newNickname,
               flatformType: profile.provider,
@@ -86,6 +88,7 @@ module.exports = (app) => {
           if (exUser) {
             done(null, exUser);
           } else {
+            randomstring.generate({ length: 15 });
             const newUser = await User.create({
               nickname: newNickname,
               flatformType: profile.provider,
