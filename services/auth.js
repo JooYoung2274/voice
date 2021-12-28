@@ -3,9 +3,10 @@ const { customizedError } = require("../utils/error");
 
 const updateUser = async ({ userId, filename, nickname, contact, introduce }) => {
   try {
+    const profileImage = `http://54.180.82.210/${filename}`;
     await User.update(
       {
-        profileImage: filename,
+        profileImage: profileImage,
         nickname: nickname,
         contact: contact,
         introduce: introduce,
@@ -16,7 +17,7 @@ const updateUser = async ({ userId, filename, nickname, contact, introduce }) =>
       nickname: nickname,
       contact: contact,
       introduce: introduce,
-      profileImage: filename,
+      profileImage: profileImage,
     };
     return result;
   } catch (error) {

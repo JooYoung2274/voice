@@ -30,6 +30,7 @@ module.exports = (app) => {
               nickname: newNickname,
               flatformType: profile.provider,
               snsId: profile.id,
+              profileImage: "http://54.180.82.210/one_and_only_voice_profile_basic_image.png",
             });
             done(null, newUser, {
               accessToken,
@@ -57,11 +58,12 @@ module.exports = (app) => {
           if (exUser) {
             done(null, exUser);
           } else {
-            randomstring.generate({ length: 15 });
+            newNickname = randomstring.generate({ length: 15 });
             const newUser = await User.create({
               nickname: newNickname,
               flatformType: profile.provider,
               snsId: profile.id,
+              profileImage: "http://54.180.82.210/one_and_only_voice_profile_basic_image.png",
             });
             done(null, newUser);
           }
@@ -88,11 +90,12 @@ module.exports = (app) => {
           if (exUser) {
             done(null, exUser);
           } else {
-            randomstring.generate({ length: 15 });
+            newNickname = randomstring.generate({ length: 15 });
             const newUser = await User.create({
               nickname: newNickname,
               flatformType: profile.provider,
               snsId: profile.id,
+              profileImage: "http://54.180.82.210/one_and_only_voice_profile_basic_image.png",
             });
             done(null, newUser);
           }
