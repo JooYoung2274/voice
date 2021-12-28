@@ -118,7 +118,7 @@ const getTracksByUserId = async ({ userId, myPage }) => {
   return result;
 };
 
-const getTrackByTrackId = async ({ trackId, userId, likes }) => {
+const getTrackByTrackId = async ({ trackId, userId, likes, test }) => {
   const findedTrack = await Track.findOne({
     attributes: ["title", "trackId", "category", "trackThumbnailUrl", "trackUrl", "userId"],
     include: [
@@ -139,6 +139,9 @@ const getTrackByTrackId = async ({ trackId, userId, likes }) => {
 
   if (!findedTrack) {
     throw customizedError("존재하지 않는 트랙입니다.", 400);
+  }
+  if (!userId && test) {
+    return findedTrack;
   }
 
   if (userId !== findedTrack.userId) {

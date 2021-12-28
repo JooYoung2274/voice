@@ -29,8 +29,9 @@ const myTracksGet = async (req, res, next) => {
 const detailTrackGet = async (req, res, next) => {
   try {
     const { trackId } = req.params;
+    const test = true;
     const likes = await likeService.findLikesByTrackId({ trackId });
-    const track = await trackModel.getTrackByTrackId({ trackId, likes });
+    const track = await trackModel.getTrackByTrackId({ trackId, test, likes });
     const comments = await commentService.findCommentsByTrackId({ trackId });
 
     res.status(200).json({ track, comments });
