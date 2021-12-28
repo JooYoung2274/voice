@@ -1,7 +1,7 @@
 const { Track, TrackTag, Tag, Category, User, Like, Comment } = require("../models");
 const sequelize = require("sequelize");
 const { Op, fn, col } = require("sequelize");
-const customizedError = require("../utils/error");
+const { customizedError } = require("../utils/error");
 
 const createTrack = async ({ title, category, tag, trackThumbnailUrl, filename, userId }) => {
   if (!trackThumbnailUrl || !category || !tag || !title || !userId || !filename) {
@@ -11,7 +11,7 @@ const createTrack = async ({ title, category, tag, trackThumbnailUrl, filename, 
     title: title,
     category: category,
     trackThumbnailUrl: trackThumbnailUrl,
-    trackUrl: filename,
+    trackUrl: "http://54.180.82.210/" + filename,
     userId: userId,
   });
   for (let i = 0; i < tag.length; i++) {
@@ -39,6 +39,7 @@ const updateTrackByTrackId = async ({ trackId, title, tag, category, trackThumbn
   if (!trackThumbnailUrl || !category || !tag.length || !title || !trackId) {
     throw customizedError("권한이 없습니다.", 400);
   }
+  // http://54.180.82.210/
   const updateTrack = await Track.update(
     { category: category, trackThumbnailUrl: trackThumbnailUrl },
     { where: { trackId: trackId } },
@@ -117,7 +118,7 @@ const getTracksByUserId = async ({ userId, myPage }) => {
   return result;
 };
 
-const getTrackByTrackId = async ({ trackId, userId, likes }) => {
+const getTrackByTrackId = async ({ trackId, userId, likes, test }) => {
   const findedTrack = await Track.findOne({
     attributes: ["title", "trackId", "category", "trackThumbnailUrl", "trackUrl", "userId"],
     include: [
@@ -138,6 +139,9 @@ const getTrackByTrackId = async ({ trackId, userId, likes }) => {
 
   if (!findedTrack) {
     throw customizedError("존재하지 않는 트랙입니다.", 400);
+  }
+  if (!userId && test) {
+    return findedTrack;
   }
 
   if (userId !== findedTrack.userId) {
