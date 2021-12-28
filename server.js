@@ -2,7 +2,7 @@ const { connectDB } = require("./services/index");
 const http = require("http");
 const app = require("./app.js");
 
-const port = 3000;
+const port = process.env.PORT;
 
 const server = http.createServer(app);
 

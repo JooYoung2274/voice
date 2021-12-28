@@ -5,7 +5,7 @@ const googleStrategy = require("passport-google-oauth20").Strategy;
 const { User } = require("../models");
 const userService = require("../services/auth");
 const randomstring = require("randomstring");
-const newNickname = randomstring.generate({ length: 15 });
+let newNickname = "";
 
 module.exports = (app) => {
   app.use(passport.initialize());
@@ -14,7 +14,7 @@ module.exports = (app) => {
       {
         clientID: process.env.NAVER_CLIENT_ID,
         clientSecret: process.env.NAVER_CLIENT_SECRET,
-        callbackURL: "http://localhost:3000/api/auth/naver/callback",
+        callbackURL: process.env.DOMAIN + "/api/auth/naver/callback",
       },
       async (accessToken, refreshToken, profile, done) => {
         console.log("*********naver profile*********", profile);
@@ -25,10 +25,12 @@ module.exports = (app) => {
           if (exUser) {
             done(null, exUser);
           } else {
+            newNickname = randomstring.generate({ length: 15 });
             const newUser = await User.create({
               nickname: newNickname,
               flatformType: profile.provider,
               snsId: profile.id,
+              profileImage: "http://54.180.82.210/one_and_only_voice_profile_basic_image.png",
             });
             done(null, newUser, {
               accessToken,
@@ -45,7 +47,7 @@ module.exports = (app) => {
     new kakaoStrategy(
       {
         clientID: process.env.KAKAO_CLIENT_ID,
-        callbackURL: "http://localhost:3000/api/auth/kakao/callback",
+        callbackURL: process.env.DOMAIN + "/api/auth/kakao/callback",
       },
       async (accessToken, refreshToken, profile, done) => {
         console.log("*********kakao profile*********", profile);
@@ -56,10 +58,12 @@ module.exports = (app) => {
           if (exUser) {
             done(null, exUser);
           } else {
+            newNickname = randomstring.generate({ length: 15 });
             const newUser = await User.create({
               nickname: newNickname,
               flatformType: profile.provider,
               snsId: profile.id,
+              profileImage: "http://54.180.82.210/one_and_only_voice_profile_basic_image.png",
             });
             done(null, newUser);
           }
@@ -75,7 +79,7 @@ module.exports = (app) => {
       {
         clientID: process.env.GOOGLE_CLIENT_ID,
         clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-        callbackURL: "http://localhost:3000/api/auth/google/callback",
+        callbackURL: process.env.DOMAIN + "/api/auth/google/callback",
       },
       async (accessToken, refreshToken, profile, done) => {
         console.log("*********google profile*********", profile);
@@ -86,10 +90,12 @@ module.exports = (app) => {
           if (exUser) {
             done(null, exUser);
           } else {
+            newNickname = randomstring.generate({ length: 15 });
             const newUser = await User.create({
               nickname: newNickname,
               flatformType: profile.provider,
               snsId: profile.id,
+              profileImage: "http://54.180.82.210/one_and_only_voice_profile_basic_image.png",
             });
             done(null, newUser);
           }

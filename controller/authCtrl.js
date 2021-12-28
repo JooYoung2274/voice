@@ -6,27 +6,11 @@ const updateUser = async (req, res, next) => {
   try {
     const { userId: userId } = res.locals.user;
     const { nickname, contact, introduce } = req.body;
-    const userOne = await userService.getUser({ nickname });
-    if (!userOne || userOne.userId === userId) {
-      if (req.file !== undefined) {
-        const { filename: filename } = req.file;
-        await userService.updateUser({ userId, filename, nickname, contact, introduce });
-      } else {
-        await userService.updateUser({ userId, nickname, contact, introduce });
-      }
-      const result = await userService.getUser({ nickname });
-      const user = {
-        nickname: result.nickname,
-        contact: result.contact,
-        email: result.email,
-        introduce: result.introduce,
-        profileImage: result.profileImage,
-      };
-      res.status(200).send({ user: user });
-      return;
-    } else {
-      res.status(400).send({});
-    }
+    const { filename } = req.file;
+    await userService.getUser({ nickname, userId });
+    const result = await userService.updateUser({ userId, filename, nickname, contact, introduce });
+    res.status(200).send({ user: result });
+    return;
   } catch (error) {
     console.log(error);
     next(error);

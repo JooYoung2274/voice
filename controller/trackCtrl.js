@@ -4,22 +4,16 @@ const listInfoService = require("../services/listinfo");
 const trackUploads = async (req, res, next) => {
   try {
     const { title, category, tag1, tag2, tag3, trackThumbnailUrl } = req.body;
-    const { trackFile } = req.files;
+    const { filename } = req.file;
     const { userId } = res.locals.user;
     const tag = [tag1, tag2, tag3];
-
-    if (!trackFile || !trackThumbnailUrl || !category || !tag || !title) {
-      res.sendStatus(400);
-      return;
-    }
-    const trackUrlName = req.files.trackFile[0].filename;
 
     await trackService.createTrack({
       title,
       category,
       tag,
       trackThumbnailUrl,
-      trackUrlName,
+      filename,
       userId,
     });
 
@@ -34,13 +28,7 @@ const trackDelete = async (req, res, next) => {
   try {
     const { trackId } = req.params;
     const { userId } = res.locals.user;
-
-    const track = await trackService.getTrackByTrackId({ trackId });
-
-    if (!track || userId !== track.userId) {
-      res.sendStatus(400);
-      return;
-    }
+    await trackService.getTrackByTrackId({ trackId, userId });
     await trackService.deleteTrackByTrackId({ trackId });
     res.sendStatus(200);
   } catch (error) {
@@ -53,13 +41,7 @@ const trackPage = async (req, res, next) => {
   try {
     const { trackId } = req.params;
     const { userId } = res.locals.user;
-
-    const track = await trackService.getTrackByTrackId({ trackId });
-
-    if (!track || userId !== track.userId) {
-      res.sendStatus(400);
-      return;
-    }
+    const track = await trackService.getTrackByTrackId({ trackId, userId });
     res.status(200).json({ track });
   } catch (error) {
     console.log(error);
@@ -73,10 +55,6 @@ const listInfoGet = async (req, res, next) => {
     const tag = await listInfoService.getTags();
     const trackThumbnail = await listInfoService.getTrackThumbnails();
 
-    if (!category || !tag || !trackThumbnail) {
-      res.sendStatus(400);
-      return;
-    }
     res.status(200).json({ category, tag, trackThumbnail });
   } catch (error) {
     console.log(error);
@@ -88,22 +66,11 @@ const trackUpdate = async (req, res, next) => {
   try {
     const { title, category, tag1, tag2, tag3, trackThumbnailUrl } = req.body;
     const { trackId } = req.params;
-    const { trackFile } = req.files;
     const { userId } = res.locals.user;
     const tag = [tag1, tag2, tag3];
 
-    if (!trackFile || !trackThumbnailUrl || !category || !tag || !title) {
-      res.sendStatus(400);
-      return;
-    }
-    const trackUrlName = req.files.trackFile[0].filename;
     // trackTag 에서 삭제, 생성
-    const findedTrack = await trackService.getTrackByTrackId({ trackId, likes });
-
-    if (findedTrack.userId !== userId) {
-      res.sendStatus(400);
-      return;
-    }
+    const findedTrack = await trackService.getTrackByTrackId({ trackId, userId, likes });
 
     const track = await trackService.updateTrackByTrackId({
       trackId,
@@ -111,9 +78,9 @@ const trackUpdate = async (req, res, next) => {
       tag,
       deleteTag,
       category,
-      trackUrlName,
       trackThumbnailUrl,
     });
+
     res.status(200).json({ track });
   } catch (error) {
     console.log(error);

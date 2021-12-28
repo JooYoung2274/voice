@@ -1,13 +1,17 @@
 const { Track, TrackTag, Tag, Category, User, Like, Comment } = require("../models");
 const sequelize = require("sequelize");
 const { Op, fn, col } = require("sequelize");
+const customizedError = require("../utils/error");
 
-const createTrack = async ({ title, category, tag, trackThumbnailUrl, trackUrlName, userId }) => {
+const createTrack = async ({ title, category, tag, trackThumbnailUrl, filename, userId }) => {
+  if (!trackThumbnailUrl || !category || !tag || !title || !userId || !filename) {
+    throw customizedError("녹음파일이 존재하지 않습니다.", 400);
+  }
   const createdTrack = await Track.create({
     title: title,
     category: category,
     trackThumbnailUrl: trackThumbnailUrl,
-    trackUrl: trackUrlName,
+    trackUrl: filename,
     userId: userId,
   });
   for (let i = 0; i < tag.length; i++) {
@@ -23,20 +27,20 @@ const createTrack = async ({ title, category, tag, trackThumbnailUrl, trackUrlNa
 };
 
 const deleteTrackByTrackId = async ({ trackId }) => {
-  await Track.destroy({ where: { trackId: trackId } });
+  const result = await Track.destroy({ where: { trackId: trackId } });
+
+  if (!result) {
+    throw customizedError("존재하지 않는 트랙입니다.", 400);
+  }
   return;
 };
 
-const updateTrackByTrackId = async ({
-  trackId,
-  title,
-  tag,
-  category,
-  trackUrlName,
-  trackThumbnailUrl,
-}) => {
+const updateTrackByTrackId = async ({ trackId, title, tag, category, trackThumbnailUrl }) => {
+  if (!trackThumbnailUrl || !category || !tag.length || !title || !trackId) {
+    throw customizedError("권한이 없습니다.", 400);
+  }
   const updateTrack = await Track.update(
-    { category: category, trackUrl: trackUrlName, trackThumbnailUrl: trackThumbnailUrl },
+    { category: category, trackThumbnailUrl: trackThumbnailUrl },
     { where: { trackId: trackId } },
   );
   return updateTrack;
@@ -67,6 +71,11 @@ const getTracksByUserId = async ({ userId, myPage }) => {
       attributes: ["trackId"],
       where: { userId: userId },
     });
+
+    if (!tracks || !likes) {
+      throw customizedError("존재하지 않는 트랙입니다.", 400);
+    }
+
     let likesArray = [];
     for (let i = 0; i < likes.length; i++) {
       const likesTracks = await Track.findAll({
@@ -79,6 +88,7 @@ const getTracksByUserId = async ({ userId, myPage }) => {
       });
       likesArray.push(likesTracks);
     }
+
     return { tracks, likesArray };
   }
 
@@ -100,10 +110,14 @@ const getTracksByUserId = async ({ userId, myPage }) => {
     where: { userId: userId },
   });
 
+  if (!result) {
+    throw customizedError("존재하지 않는 트랙입니다.", 400);
+  }
+
   return result;
 };
 
-const getTrackByTrackId = async ({ trackId, likes }) => {
+const getTrackByTrackId = async ({ trackId, userId, likes }) => {
   const findedTrack = await Track.findOne({
     attributes: ["title", "trackId", "category", "trackThumbnailUrl", "trackUrl", "userId"],
     include: [
@@ -121,9 +135,15 @@ const getTrackByTrackId = async ({ trackId, likes }) => {
     group: ["Track.trackId", "TrackTags.trackTagId", "Likes.likeId", "Comments.commentId"],
     where: { trackId: trackId },
   });
+
   if (!findedTrack) {
-    return;
+    throw customizedError("존재하지 않는 트랙입니다.", 400);
   }
+
+  if (userId !== findedTrack.userId) {
+    throw customizedError("권한이 없습니다.", 400);
+  }
+
   return findedTrack;
 };
 
@@ -150,6 +170,11 @@ const getTracksByLikes = async ({ findedTrackIds }) => {
     });
     tracks.push(findedTrack);
   }
+
+  if (!tracks.length) {
+    throw customizedError("존재하지 않는 트랙입니다.", 400);
+  }
+
   return tracks;
 };
 
@@ -163,7 +188,9 @@ const getTracksByCategory = async ({ category }) => {
     ],
     where: { category: category },
   });
-
+  if (!findedTracks) {
+    throw customizedError("존재하지 않는 트랙입니다.", 400);
+  }
   return findedTracks;
 };
 const getTracks = async () => {
@@ -186,7 +213,7 @@ const getTracks = async () => {
   });
 
   if (!totalTracks) {
-    return;
+    throw customizedError("존재하지 않는 트랙입니다.", 400);
   }
 
   let categoryTracks = [[], [], [], [], [], [], [], [], []];

@@ -13,6 +13,11 @@ const getTrackIdsByTag = async ({ tag, category }) => {
       category: category,
     },
   });
+
+  if (!findedTracks) {
+    throw customizedError("존재하지 않는 트랙입니다.", 400);
+  }
+
   let tags = [];
   for (let i = 0; i < findedTracks.length; i++) {
     tags.push(findedTracks[i].trackId);
