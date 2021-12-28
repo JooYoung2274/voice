@@ -26,25 +26,24 @@ const myTracksGet = async (req, res, next) => {
   }
 };
 
-const detailTrackGet = async (req, res, next) => {
-  try {
-    const { trackId } = req.params;
-    const test = true;
-    const likes = await likeService.findLikesByTrackId({ trackId });
-    const track = await trackModel.getTrackByTrackId({ trackId, test, likes });
-    const comments = await commentService.findCommentsByTrackId({ trackId });
+// const detailTrackGet = async (req, res, next) => {
+//   try {
+//     const { trackId } = req.params;
+//     const test = true;
+//     const likes = await likeService.findLikesByTrackId({ trackId });
+//     const track = await trackModel.getTrackByTrackId({ trackId, test, likes });
+//     const comments = await commentService.findCommentsByTrackId({ trackId });
 
-    res.status(200).json({ track, comments });
-  } catch (error) {
-    console.log(error);
-    next(error);
-  }
-};
+//     res.status(200).json({ track, comments });
+//   } catch (error) {
+//     console.log(error);
+//     next(error);
+//   }
+// };
 
 const mainTracksGet = async (req, res, next) => {
   try {
     const { categoryTracks, totalTracks } = await trackModel.getTracks();
-
     res.status(200).json({ categoryTracks, totalTracks });
   } catch (error) {
     console.log(error);
@@ -75,4 +74,4 @@ const categorySelect = async (req, res, next) => {
   }
 };
 
-module.exports = { myTracksGet, detailTrackGet, mainTracksGet, categorySelect };
+module.exports = { myTracksGet, mainTracksGet, categorySelect };
