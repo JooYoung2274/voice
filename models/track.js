@@ -15,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
       Track.belongsTo(models.User, { foreignKey: "userId", onDelete: "cascade" });
       Track.belongsTo(models.Category, { foreignKey: "category", onDelete: "cascade" });
       Track.belongsTo(models.TrackThumbnail, {
-        foreignKey: "trackThumbnailUrl",
+        foreignKey: "trackThumbnailUrlFace",
         onDelete: "cascade",
       });
     }
@@ -32,7 +32,7 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         type: Sequelize.STRING,
       },
-      trackThumbnailUrl: {
+      trackThumbnailUrlFace: {
         allowNull: false,
         type: Sequelize.STRING,
       },
