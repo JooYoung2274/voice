@@ -17,11 +17,13 @@
   },
   "homepage": "https://github.com/team-voice-project/backend#readme",
   "dependencies": {
+    "aws-sdk": "^2.1048.0",
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",
     "express": "^4.17.2",
     "jsonwebtoken": "^8.5.1",
     "multer": "^1.4.4",
+    "multer-s3": "^2.10.0",
     "mysql2": "^2.3.3",
     "passport": "^0.5.2",
     "passport-google-oauth20": "^2.0.0",
