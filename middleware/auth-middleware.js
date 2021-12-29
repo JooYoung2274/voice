@@ -13,6 +13,7 @@ const needLogin = (req, res, next) => {
 
   try {
     const { userId } = jwt.verify(tokenValue, process.env.JWT_SECRET);
+    console.log(userId + "????????");
     User.findOne({ where: { userId: userId } }).then((user) => {
       // async가 없으므로 await은 안됨. sequelize는 기본적으로 promise이므로  then
       res.locals.user = user;
