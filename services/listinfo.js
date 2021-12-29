@@ -24,7 +24,7 @@ const getTags = async () => {
 
 const getTrackThumbnails = async () => {
   const trackThumbnails = await TrackThumbnail.findAll({
-    attributes: ["trackThumbnailUrl"],
+    attributes: ["trackThumbnailUrlFace", "trackThumbnailUrlFull"],
   });
 
   if (!trackThumbnails) {

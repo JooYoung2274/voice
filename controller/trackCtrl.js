@@ -3,21 +3,20 @@ const listInfoService = require("../services/listinfo");
 
 const trackUploads = async (req, res, next) => {
   try {
-    const { title, category, tag1, tag2, tag3, trackThumbnailUrl } = req.body;
+    const { title, category, tag1, tag2, tag3, trackThumbnailUrlFace } = req.body;
     const { filename } = req.file;
     const { userId } = res.locals.user;
     const tag = [tag1, tag2, tag3];
 
-    await trackService.createTrack({
+    const trackId = await trackService.createTrack({
       title,
       category,
       tag,
-      trackThumbnailUrl,
+      trackThumbnailUrlFace,
       filename,
       userId,
     });
-
-    res.sendStatus(200);
+    res.status(200).json({ trackId });
   } catch (error) {
     console.log(error);
     next(error);
@@ -64,21 +63,18 @@ const listInfoGet = async (req, res, next) => {
 
 const trackUpdate = async (req, res, next) => {
   try {
-    const { title, category, tag1, tag2, tag3, trackThumbnailUrl } = req.body;
+    const { title, category, tag1, tag2, tag3, trackThumbnailUrlFace } = req.body;
     const { trackId } = req.params;
     const { userId } = res.locals.user;
     const tag = [tag1, tag2, tag3];
-
-    // trackTag 에서 삭제, 생성
-    const findedTrack = await trackService.getTrackByTrackId({ trackId, userId, likes });
 
     const track = await trackService.updateTrackByTrackId({
       trackId,
       title,
       tag,
-      deleteTag,
       category,
-      trackThumbnailUrl,
+      trackThumbnailUrlFace,
+      userId,
     });
 
     res.status(200).json({ track });
