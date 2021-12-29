@@ -32,30 +32,4 @@ const getTracksByKeyword = async ({ keyword }) => {
   }
 };
 
-// //keyword로 comments가져오는 함수
-// const getTracksByKeyword = async ({ keyword }) => {
-//   try {
-//     // keyword = keyword.replace(/\s\s+/gi, " ");
-
-//     const results = await Comment.findAll({
-//       where: {
-//         [or]: [
-//           {
-//             comment: { [like]: `%${keyword}%` },
-//           },
-//           {
-//             "$User.nickname$": { [like]: `%${keyword}%` },
-//           },
-//         ],
-//       },
-//       attributes: ["commentId", "createdAt"],
-//       include: [{ model: User, as: "User", attributes: ["nickname"] }],
-//     });
-
-//     return results;
-//   } catch (error) {
-//     throw error;
-//   }
-// };
-
 module.exports = { getTracksByKeyword };
