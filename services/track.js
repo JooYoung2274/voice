@@ -47,7 +47,7 @@ const updateTrackByTrackId = async ({
   userId,
 }) => {
   if (!trackThumbnailUrlFace || !category || !tag.length || !title || !trackId) {
-    throw customizedError("권한이 없습니다.", 400);
+    throw customizedError("잘못된 접근입니다.", 400);
   }
 
   const track = await Track.findOne({ where: { trackId: trackId } });
@@ -62,7 +62,9 @@ const updateTrackByTrackId = async ({
 
   await TrackTag.destroy({ where: { trackId: trackId } });
   for (let i = 0; i < tag.length; i++) {
-    await TrackTag.create({ tag: tag[i], trackId: trackId, category: category });
+    if (tag[i] !== "") {
+      await TrackTag.create({ tag: tag[i], trackId: trackId, category: category });
+    }
   }
   return result;
 };
@@ -70,7 +72,7 @@ const updateTrackByTrackId = async ({
 const getTracksByUserId = async ({ userId, myPage }) => {
   if (myPage) {
     const tracks = await Track.findAll({
-      attributes: ["title", "trackId", "category", "trackUrl", "userId"],
+      attributes: ["title", "trackId", "category", "trackUrl", "userId", "createdAt"],
       where: { userId: userId },
       include: [
         { model: TrackThumbnail, attributes: ["trackThumbnailUrlFace", "trackThumbnailUrlFull"] },
@@ -86,7 +88,8 @@ const getTracksByUserId = async ({ userId, myPage }) => {
             "commentId",
             "userId",
             "comment",
-            [sequelize.fn("COUNT", sequelize.col("Comments.trackId")), "commentCnt"],
+            "createdAt",
+            [(sequelize.fn("COUNT", sequelize.col("Comments.trackId")), "commentCnt")],
           ],
           include: [{ model: User, attributes: ["nickname"] }],
         },
@@ -107,7 +110,7 @@ const getTracksByUserId = async ({ userId, myPage }) => {
     let likesArray = [];
     for (let i = 0; i < likes.length; i++) {
       const likesTracks = await Track.findAll({
-        attributes: ["title", "trackId", "category", "trackUrl", "userId"],
+        attributes: ["title", "trackId", "category", "trackUrl", "userId", "createdAt"],
         include: [
           { model: TrackThumbnail, attributes: ["trackThumbnailUrlFace", "trackThumbnailUrlFull"] },
           { model: TrackTag, attributes: ["tag"] },
@@ -122,6 +125,7 @@ const getTracksByUserId = async ({ userId, myPage }) => {
               "commentId",
               "userId",
               "comment",
+              "createdAt",
               [sequelize.fn("COUNT", sequelize.col("Comments.trackId")), "commentCnt"],
             ],
             include: [{ model: User, attributes: ["nickname"] }],
@@ -137,7 +141,7 @@ const getTracksByUserId = async ({ userId, myPage }) => {
   }
 
   const result = await Track.findAll({
-    attributes: ["title", "trackId", "category", "trackUrl", "userId"],
+    attributes: ["title", "trackId", "category", "trackUrl", "userId", "createdAt"],
     include: [
       { model: TrackThumbnail, attributes: ["trackThumbnailUrlFace", "trackThumbnailUrlFull"] },
       { model: TrackTag, attributes: ["tag"] },
@@ -152,6 +156,7 @@ const getTracksByUserId = async ({ userId, myPage }) => {
           "commentId",
           "userId",
           "comment",
+          "createdAt",
           [sequelize.fn("COUNT", sequelize.col("Comments.trackId")), "commentCnt"],
         ],
         include: [{ model: User, attributes: ["nickname"] }],
@@ -170,7 +175,7 @@ const getTracksByUserId = async ({ userId, myPage }) => {
 
 const getTrackByTrackId = async ({ trackId, userId }) => {
   const findedTrack = await Track.findOne({
-    attributes: ["title", "trackId", "category", "trackUrl", "userId"],
+    attributes: ["title", "trackId", "category", "trackUrl", "userId", "createdAt"],
     include: [
       { model: TrackThumbnail, attributes: ["trackThumbnailUrlFace", "trackThumbnailUrlFull"] },
       { model: TrackTag, attributes: ["tag"] },
@@ -185,6 +190,7 @@ const getTrackByTrackId = async ({ trackId, userId }) => {
           "commentId",
           "userId",
           "comment",
+          "createdAt",
           [sequelize.fn("COUNT", sequelize.col("Comments.trackId")), "commentCnt"],
         ],
         include: [{ model: User, attributes: ["nickname"] }],
@@ -209,7 +215,7 @@ const getTracksByLikes = async ({ findedTrackIds }) => {
   let tracks = [];
   for (let i = 0; i < findedTrackIds.length; i++) {
     const findedTrack = await Track.findOne({
-      attributes: ["title", "trackId", "category", "trackUrl", "userId"],
+      attributes: ["title", "trackId", "category", "trackUrl", "userId", "createdAt"],
 
       where: { trackId: findedTrackIds[i] },
       include: [
@@ -226,6 +232,7 @@ const getTracksByLikes = async ({ findedTrackIds }) => {
             "commentId",
             "userId",
             "comment",
+            "createdAt",
             [sequelize.fn("COUNT", sequelize.col("Comments.trackId")), "commentCnt"],
           ],
           include: [{ model: User, attributes: ["nickname"] }],
@@ -245,7 +252,7 @@ const getTracksByLikes = async ({ findedTrackIds }) => {
 
 const getTracksByCategory = async ({ category }) => {
   const findedTracks = await Track.findAll({
-    attributes: ["title", "trackId", "category", "trackUrl", "userId"],
+    attributes: ["title", "trackId", "category", "trackUrl", "userId", "createdAt"],
     order: [["category", "ASC"]],
     include: [
       { model: TrackThumbnail, attributes: ["trackThumbnailUrlFace", "trackThumbnailUrlFull"] },
@@ -261,6 +268,7 @@ const getTracksByCategory = async ({ category }) => {
           "commentId",
           "userId",
           "comment",
+          "createdAt",
           [sequelize.fn("COUNT", sequelize.col("Comments.trackId")), "commentCnt"],
         ],
         include: [{ model: User, attributes: ["nickname"] }],
@@ -277,7 +285,7 @@ const getTracksByCategory = async ({ category }) => {
 
 const getTracks = async () => {
   const totalTracks = await Track.findAll({
-    attributes: ["title", "trackId", "category", "trackUrl", "userId"],
+    attributes: ["title", "trackId", "category", "trackUrl", "userId", "createdAt"],
     include: [
       { model: TrackThumbnail, attributes: ["trackThumbnailUrlFace", "trackThumbnailUrlFull"] },
       { model: TrackTag, attributes: ["tag"] },
@@ -296,6 +304,7 @@ const getTracks = async () => {
           "commentId",
           "userId",
           "comment",
+          "createdAt",
           [sequelize.fn("COUNT", sequelize.col("Comments.trackId")), "commentCnt"],
         ],
         include: [{ model: User, attributes: ["nickname"] }],
