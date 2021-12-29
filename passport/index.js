@@ -30,7 +30,7 @@ module.exports = (app) => {
               nickname: newNickname,
               flatformType: profile.provider,
               snsId: profile.id,
-              profileImage: "http://54.180.82.210/one_and_only_voice_profile_basic_image.png",
+              profileImage: "http://54.180.82.210/etc/profile.png",
             });
             done(null, newUser, {
               accessToken,
@@ -63,7 +63,7 @@ module.exports = (app) => {
               nickname: newNickname,
               flatformType: profile.provider,
               snsId: profile.id,
-              profileImage: "http://54.180.82.210/one_and_only_voice_profile_basic_image.png",
+              profileImage: "http://54.180.82.210/etc/profile.png",
             });
             done(null, newUser);
           }
@@ -95,7 +95,7 @@ module.exports = (app) => {
               nickname: newNickname,
               flatformType: profile.provider,
               snsId: profile.id,
-              profileImage: "http://54.180.82.210/one_and_only_voice_profile_basic_image.png",
+              profileImage: "http://54.180.82.210/etc/profile.png",
             });
             done(null, newUser);
           }
