@@ -1,4 +1,4 @@
-const { Comment, Track } = require("../models");
+const { Comment, Track, User } = require("../models");
 const { customizedError } = require("../utils/error");
 
 const findCommentsByTrackId = async ({ trackId }) => {
@@ -27,19 +27,20 @@ const createComment = async ({ comment, trackId, userId, nickname }) => {
       throw customizedError("존재하지 않는 트랙입니다.", 400);
     }
     // 댓글 만들기
-    const { commentId, createdAt } = await Comment.create({
+    await Comment.create({
       comment,
       trackId,
       userId,
     });
     // 클라이언트에게 줄 댓글 가공
-    const result = {
-      commentId,
-      nickname,
-      comment,
-      createdAt,
-    };
-    return result;
+    results = await Comment.findAll({
+      attributes: ["comment", "commentId", "createdAt", "userId"],
+      include: {
+        model: User,
+        attributes: ["nickname"],
+      },
+    });
+    return results;
   } catch (error) {
     throw error;
   }
@@ -84,7 +85,15 @@ const deleteComment = async ({ userId, trackId, commentId }) => {
         400,
       );
     }
-    return;
+    // 클라이언트에게 줄 댓글 가공
+    results = await Comment.findAll({
+      attributes: ["comment", "commentId", "createdAt", "userId"],
+      include: {
+        model: User,
+        attributes: ["nickname"],
+      },
+    });
+    return results;
   } catch (error) {
     throw error;
   }

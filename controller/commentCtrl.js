@@ -34,14 +34,14 @@ const commentPut = async (req, res, next) => {
     const { userId, nickname } = res.locals.user;
 
     // 댓글 수정하는 service 실행
-    const result = await commentService.updateComment({
+    const results = await commentService.updateComment({
       commentId,
       comment,
       userId,
       nickname,
       trackId,
     });
-    return res.status(200).json({ comment: result });
+    return res.status(200).json({ comment: results });
   } catch (error) {
     next(error);
   }
@@ -57,8 +57,8 @@ const commentDelete = async (req, res, next) => {
     const { userId } = res.locals.user;
 
     // 댓글 삭제하는 service 실행
-    await commentService.deleteComment({ userId, trackId, commentId });
-    return res.sendStatus(200);
+    const results = await commentService.deleteComment({ userId, trackId, commentId });
+    return res.status(200).json({ comment: results });
   } catch (error) {
     next(error);
   }
