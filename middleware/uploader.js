@@ -27,7 +27,16 @@ const imageFileFilter = (req, file, cb) => {
 const voiceFileFilter = (req, file, cb) => {
   let typeArray = file.mimetype.split("/");
   let fileType = typeArray[1];
-  if (fileType === "mp4" || fileType === "mp3" || fileType === "flac" || fileType === "wav") {
+  if (
+    fileType === "mp4" ||
+    fileType === "mp3" ||
+    fileType === "flac" ||
+    fileType === "wav" ||
+    fileType === "ogg" ||
+    fileType === "mpeg" ||
+    fileType === "x-m4a" ||
+    fileType === "webm"
+  ) {
     cb(null, true);
   } else {
     cb(customizedError("정해진 확장자 파일만 업로드 가능합니다.", 400));

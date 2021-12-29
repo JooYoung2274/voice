@@ -4,43 +4,40 @@ module.exports = {
   up: async (queryInterface, Sequelize) => {
     return queryInterface.bulkInsert("TrackThumbnails", [
       {
-        trackThumbnailUrl: "http://54.180.82.210/thumbnail.png",
+        trackThumbnailUrlFace: "http://54.180.82.210/trackThumbnail/OAO1_face.png",
+        trackThumbnailUrlFull: "http://54.180.82.210/trackThumbnail/OAO1_full.png",
       },
       {
-        trackThumbnailUrl: "http://54.180.82.210/thumbnail1.png",
+        trackThumbnailUrlFace: "http://54.180.82.210/trackThumbnail/OAO2_face.png",
+        trackThumbnailUrlFull: "http://54.180.82.210/trackThumbnail/OAO2_full.png",
       },
       {
-        trackThumbnailUrl: "http://54.180.82.210/thumbnail2.png",
+        trackThumbnailUrlFace: "http://54.180.82.210/trackThumbnail/OAO3_face.png",
+        trackThumbnailUrlFull: "http://54.180.82.210/trackThumbnail/OAO3_full.png",
       },
       {
-        trackThumbnailUrl: "http://54.180.82.210/thumbnail3.png",
+        trackThumbnailUrlFace: "http://54.180.82.210/trackThumbnail/OAO4_face.png",
+        trackThumbnailUrlFull: "http://54.180.82.210/trackThumbnail/OAO4_full.png",
       },
       {
-        trackThumbnailUrl: "http://54.180.82.210/thumbnail4.png",
+        trackThumbnailUrlFace: "http://54.180.82.210/trackThumbnail/OAO5_face.png",
+        trackThumbnailUrlFull: "http://54.180.82.210/trackThumbnail/OAO5_full.png",
       },
       {
-        trackThumbnailUrl: "http://54.180.82.210/thumbnail5.png",
+        trackThumbnailUrlFace: "http://54.180.82.210/trackThumbnail/OAO6_face.png",
+        trackThumbnailUrlFull: "http://54.180.82.210/trackThumbnail/OAO6_full.png",
       },
       {
-        trackThumbnailUrl: "http://54.180.82.210/thumbnail6.png",
+        trackThumbnailUrlFace: "http://54.180.82.210/trackThumbnail/OAO7_face.png",
+        trackThumbnailUrlFull: "http://54.180.82.210/trackThumbnail/OAO7_full.png",
       },
       {
-        trackThumbnailUrl: "http://54.180.82.210/thumbnail7.png",
+        trackThumbnailUrlFace: "http://54.180.82.210/trackThumbnail/OAO8_face.png",
+        trackThumbnailUrlFull: "http://54.180.82.210/trackThumbnail/OAO8_full.png",
       },
       {
-        trackThumbnailUrl: "http://54.180.82.210/thumbnail8.png",
-      },
-      {
-        trackThumbnailUrl: "http://54.180.82.210/thumbnail9.png",
-      },
-      {
-        trackThumbnailUrl: "http://54.180.82.210/thumbnail10.png",
-      },
-      {
-        trackThumbnailUrl: "http://54.180.82.210/thumbnail11.png",
-      },
-      {
-        trackThumbnailUrl: "http://54.180.82.210/thumbnail12.png",
+        trackThumbnailUrlFace: "http://54.180.82.210/trackThumbnail/OAO9_face.png",
+        trackThumbnailUrlFull: "http://54.180.82.210/trackThumbnail/OAO9_full.png",
       },
     ]);
   },
