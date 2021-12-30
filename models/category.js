@@ -33,6 +33,8 @@ module.exports = (sequelize, DataTypes) => {
       sequelize,
       modelName: "Category",
       timestamps: false,
+      charset: "utf8",
+      collate: "utf8_general_ci",
     },
   );
   return Category;
