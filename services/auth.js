@@ -27,9 +27,11 @@ const updateUser = async ({ userId, filename, nickname, contact, introduce }) =>
 //nickcheck
 const getUser = async ({ nickname, userId }) => {
   try {
-    const result = User.findOne({ where: { nickname: nickname } });
-    if (result.userId !== userId) {
-      throw customizedError("사용중인 닉네임입니다", 400);
+    const result = await User.findOne({ where: { nickname: nickname } });
+    if (result) {
+      if (result.userId !== userId) {
+        throw customizedError("사용중인 닉네임입니다", 400);
+      }
     }
     return result;
   } catch (error) {
