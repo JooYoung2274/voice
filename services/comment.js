@@ -17,7 +17,7 @@ const findCommentsByTrackId = async ({ trackId }) => {
   return comments;
 };
 
-const createComment = async ({ comment, trackId, userId, nickname }) => {
+const createComment = async ({ comment, trackId, userId }) => {
   try {
     // pramas에 있는 trackId가 실제로 있는 track인지 확인작업
     const findedTrack = await Track.findOne({
@@ -33,7 +33,7 @@ const createComment = async ({ comment, trackId, userId, nickname }) => {
       userId,
     });
     // 클라이언트에게 줄 댓글 가공
-    results = await Comment.findAll({
+    const result = await Comment.findOne({
       attributes: ["comment", "commentId", "createdAt", "userId"],
       include: {
         model: User,
@@ -41,7 +41,7 @@ const createComment = async ({ comment, trackId, userId, nickname }) => {
       },
       where: { trackId },
     });
-    return results;
+    return result;
   } catch (error) {
     throw error;
   }
