@@ -6,10 +6,15 @@ const updateUser = async (req, res, next) => {
   try {
     const { userId: userId } = res.locals.user;
     const { nickname, contact, introduce } = req.body;
-    const { filename } = req.file;
-    await userService.getUser({ nickname, userId });
-    const result = await userService.updateUser({ userId, filename, nickname, contact, introduce });
-    res.status(200).send({ user: result });
+    let filename = "";
+    const userOne = await userService.getUser({ nickname, userId });
+    if (!req.file) {
+      filename = userOne.profileImage.replace("http://13.125.215.6/", "");
+    } else {
+      filename = req.file.filename;
+    }
+    await userService.updateUser({ userId, filename, nickname, contact, introduce });
+    res.sendStatus(200);
     return;
   } catch (error) {
     next(error);
@@ -70,9 +75,19 @@ const naverCallback = (req, res, next) => {
   })(req, res, next);
 };
 
+const getUser = async (req, res, next) => {
+  try {
+    const { userId: userId } = res.locals.user;
+    const result = await userService.getUserByUserId({ userId });
+    res.status(200).send({ user: result });
+  } catch (error) {
+    next(error);
+  }
+};
 module.exports = {
   updateUser,
   kakaoCallback,
   googleCallback,
   naverCallback,
+  getUser,
 };
