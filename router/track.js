@@ -7,7 +7,7 @@ const trackUploader = voiceMulter.single("trackFile");
 
 router.get("/listinfo", trackController.listInfoGet);
 router.post("/", needLogin, trackUploader, trackController.trackUploads);
-router.get("/:trackId", needLogin, trackController.trackPage);
+router.get("/:trackId", trackController.trackPage);
 router.delete("/:trackId", needLogin, trackController.trackDelete);
 router.put("/:trackId", needLogin, trackController.trackUpdate);
 

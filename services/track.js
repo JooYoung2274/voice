@@ -23,7 +23,7 @@ const createTrack = async ({ title, category, tag, trackThumbnailUrlFace, filena
     title: title,
     category: category,
     trackThumbnailUrlFace: trackThumbnailUrlFace,
-    trackUrl: "http://54.180.82.210/" + filename,
+    trackUrl: "http://13.125.215.6/" + filename,
     userId: userId,
   });
   for (let i = 0; i < tag.length; i++) {
@@ -81,144 +81,48 @@ const updateTrackByTrackId = async ({
 };
 
 const getTracksByUserId = async ({ userId, myPage }) => {
-  if (myPage) {
-    const tracks = await Track.findAll({
-      attributes: ["title", "trackId", "category", "trackUrl", "userId", "createdAt"],
-      where: { userId: userId },
-      include: [
-        { model: TrackThumbnail, attributes: ["trackThumbnailUrlFace", "trackThumbnailUrlFull"] },
-        { model: TrackTag, attributes: ["tag"] },
-        { model: User, attributes: ["nickname"] },
-        {
-          model: Like,
-          attributes: [[sequelize.fn("COUNT", sequelize.col("Likes.trackId")), "likeCnt"]],
-        },
-        {
-          model: Comment,
-          attributes: [
-            "commentId",
-            "userId",
-            "comment",
-            "createdAt",
-            [(sequelize.fn("COUNT", sequelize.col("Comments.trackId")), "commentCnt")],
-          ],
-          include: [{ model: User, attributes: ["nickname"] }],
-        },
-      ],
-      group: ["Track.trackId", "TrackTags.trackTagId", "Likes.likeId", "Comments.commentId"],
-    });
+  // userId에 해당하는 모든 트랙 불러오기
+  let tracks = await Track.findAll({
+    where: { userId: userId },
+    ...trackBasicForm,
+  });
+  const results = await getTracksByOrdCreated({ tracks });
 
-    // sequelize subquery 로 해야할듯
+  // 해당 포트폴리오 User 정보 불러오기
+  const userDate = await User.findOne({ where: { userId: userId } });
+
+  if (myPage) {
     const likes = await Like.findAll({
       attributes: ["trackId"],
       where: { userId: userId },
     });
 
-    if (!tracks || !likes) {
-      throw customizedError("존재하지 않는 트랙입니다.", 400);
-    }
-
-    let likesArray = [];
+    tracks = [];
     for (let i = 0; i < likes.length; i++) {
-      const likesTracks = await Track.findAll({
-        attributes: ["title", "trackId", "category", "trackUrl", "userId", "createdAt"],
-        include: [
-          { model: TrackThumbnail, attributes: ["trackThumbnailUrlFace", "trackThumbnailUrlFull"] },
-          { model: TrackTag, attributes: ["tag"] },
-          { model: User, attributes: ["nickname"] },
-          {
-            model: Like,
-            attributes: [[sequelize.fn("COUNT", sequelize.col("Likes.trackId")), "likeCnt"]],
-          },
-          {
-            model: Comment,
-            attributes: [
-              "commentId",
-              "userId",
-              "comment",
-              "createdAt",
-              [sequelize.fn("COUNT", sequelize.col("Comments.trackId")), "commentCnt"],
-            ],
-            include: [{ model: User, attributes: ["nickname"] }],
-          },
-        ],
-        group: ["Track.trackId", "TrackTags.trackTagId", "Likes.likeId", "Comments.commentId"],
+      const likesTracks = await Track.findOne({
         where: { trackId: likes[i].trackId },
+        ...trackBasicForm,
       });
-      likesArray.push(likesTracks);
+      tracks.push(likesTracks);
     }
-
-    return { tracks, likesArray };
+    const likesArray = await getTracksByOrdCreated({ tracks });
+    return { results, likesArray, userDate };
   }
-
-  const result = await Track.findAll({
-    attributes: ["title", "trackId", "category", "trackUrl", "userId", "createdAt"],
-    include: [
-      { model: TrackThumbnail, attributes: ["trackThumbnailUrlFace", "trackThumbnailUrlFull"] },
-      { model: TrackTag, attributes: ["tag"] },
-      { model: User, attributes: ["nickname"] },
-      {
-        model: Like,
-        attributes: [[sequelize.fn("COUNT", sequelize.col("Likes.trackId")), "likeCnt"]],
-      },
-      {
-        model: Comment,
-        attributes: [
-          "commentId",
-          "userId",
-          "comment",
-          "createdAt",
-          [sequelize.fn("COUNT", sequelize.col("Comments.trackId")), "commentCnt"],
-        ],
-        include: [{ model: User, attributes: ["nickname"] }],
-      },
-    ],
-    group: ["Track.trackId", "TrackTags.trackTagId", "Likes.likeId", "Comments.commentId"],
-    where: { userId: userId },
-  });
-
-  if (!result) {
-    throw customizedError("존재하지 않는 트랙입니다.", 400);
+  if (!tracks || !likes || !userDate) {
+    throw customizedError("존재하지 않는 포트폴리오 페이지 입니다.", 400);
   }
-
-  return result;
+  return { results, userDate };
 };
 
-const getTrackByTrackId = async ({ trackId, userId }) => {
-  const findedTrack = await Track.findOne({
-    attributes: ["title", "trackId", "category", "trackUrl", "userId", "createdAt"],
-    include: [
-      { model: TrackThumbnail, attributes: ["trackThumbnailUrlFace", "trackThumbnailUrlFull"] },
-      { model: TrackTag, attributes: ["tag"] },
-      { model: User, attributes: ["nickname"] },
-      {
-        model: Like,
-        attributes: [[sequelize.fn("COUNT", sequelize.col("Likes.trackId")), "likeCnt"]],
-      },
-      {
-        model: Comment,
-        attributes: [
-          "commentId",
-          "userId",
-          "comment",
-          "createdAt",
-          [sequelize.fn("COUNT", sequelize.col("Comments.trackId")), "commentCnt"],
-        ],
-        include: [{ model: User, attributes: ["nickname"] }],
-      },
-    ],
-    group: ["Track.trackId", "TrackTags.trackTagId", "Likes.likeId", "Comments.commentId"],
+const getTrackByTrackId = async ({ trackId }) => {
+  const track = await Track.findOne({
+    ...trackBasicForm,
     where: { trackId: trackId },
   });
-
-  if (!findedTrack) {
+  if (!track) {
     throw customizedError("존재하지 않는 트랙입니다.", 400);
   }
-
-  if (userId !== findedTrack.userId) {
-    throw customizedError("권한이 없습니다.", 400);
-  }
-
+  const findedTrack = await insertLikeCnt(track);
   return findedTrack;
 };
 
@@ -282,8 +186,9 @@ const trackBasicForm = {
 
 //track에 likeCnt 넣는 함수
 const insertLikeCnt = (track) => {
-  const { Likes: likesArray } = track.dataValues;
+  const { Likes: likesArray, Comments: commentsArray } = track.dataValues;
   track.dataValues.Likes = { likeCnt: likesArray.length };
+  track.dataValues.CommentCnt = { commentCnt: commentsArray.length };
   return track;
 };
 

@@ -11,14 +11,17 @@ const myTracksGet = async (req, res, next) => {
 
     if (!user.userId || user.userId !== userId) {
       const myPage = false;
-      const tracks = await trackService.getTracksByUserId({ userId, myPage });
-      res.status(200).send({ tracks });
+      const { results, userDate } = await trackService.getTracksByUserId({ userId, myPage });
+      res.status(200).send({ results, userDate });
       return;
     }
     if (user.userId === userId) {
       const myPage = true;
-      const { tracks, likesArray } = await trackService.getTracksByUserId({ userId, myPage });
-      res.status(200).send({ tracks, likesArray });
+      const { results, likesArray, userDate } = await trackService.getTracksByUserId({
+        userId,
+        myPage,
+      });
+      res.status(200).send({ results, likesArray, userDate });
     }
   } catch (error) {
     next(error);

@@ -37,8 +37,7 @@ const trackDelete = async (req, res, next) => {
 const trackPage = async (req, res, next) => {
   try {
     const { trackId } = req.params;
-    const { userId } = res.locals.user;
-    const track = await trackService.getTrackByTrackId({ trackId, userId });
+    const track = await trackService.getTrackByTrackId({ trackId });
     res.status(200).json({ track });
   } catch (error) {
     next(error);
