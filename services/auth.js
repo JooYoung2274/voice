@@ -24,13 +24,7 @@ const updateUser = async ({ userId, filename, nickname, contact, introduce }) =>
       },
       { where: { userId: userId } },
     );
-    const result = {
-      nickname: nickname,
-      contact: contact,
-      introduce: introduce,
-      profileImage: profileImage,
-    };
-    return result;
+    return;
   } catch (error) {
     throw error;
   }
