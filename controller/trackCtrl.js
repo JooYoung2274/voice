@@ -18,7 +18,6 @@ const trackUploads = async (req, res, next) => {
     });
     res.status(200).json({ trackId });
   } catch (error) {
-    console.log(error);
     next(error);
   }
 };
@@ -31,7 +30,6 @@ const trackDelete = async (req, res, next) => {
     await trackService.deleteTrackByTrackId({ trackId });
     res.sendStatus(200);
   } catch (error) {
-    console.log(error);
     next(error);
   }
 };
@@ -43,7 +41,6 @@ const trackPage = async (req, res, next) => {
     const track = await trackService.getTrackByTrackId({ trackId, userId });
     res.status(200).json({ track });
   } catch (error) {
-    console.log(error);
     next(error);
   }
 };
@@ -56,7 +53,6 @@ const listInfoGet = async (req, res, next) => {
 
     res.status(200).json({ category, tag, trackThumbnail });
   } catch (error) {
-    console.log(error);
     next(error);
   }
 };
@@ -68,7 +64,7 @@ const trackUpdate = async (req, res, next) => {
     const { userId } = res.locals.user;
     const tag = [tag1, tag2, tag3];
 
-    const track = await trackService.updateTrackByTrackId({
+    await trackService.updateTrackByTrackId({
       trackId,
       title,
       tag,
@@ -77,9 +73,8 @@ const trackUpdate = async (req, res, next) => {
       userId,
     });
 
-    res.status(200).json({ track });
+    res.sendStatus(200);
   } catch (error) {
-    console.log(error);
     next(error);
   }
 };
