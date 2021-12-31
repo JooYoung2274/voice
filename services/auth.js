@@ -43,4 +43,19 @@ const getUser = async ({ nickname, userId }) => {
     throw error;
   }
 };
-module.exports = { updateUser, getUser };
+const getUserByUserId = async ({ userId }) => {
+  try {
+    const userOne = await User.findOne({ where: { userId: userId } });
+    const { nickname, contact, profileImage, introduce } = userOne;
+    const result = {
+      nickname: nickname,
+      contact: contact,
+      profileImage: profileImage,
+      introduce: introduce,
+    };
+    return result;
+  } catch (error) {
+    throw error;
+  }
+};
+module.exports = { updateUser, getUser, getUserByUserId };

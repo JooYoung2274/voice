@@ -69,9 +69,19 @@ const naverCallback = (req, res, next) => {
   })(req, res, next);
 };
 
+const getUser = async (req, res, next) => {
+  try {
+    const { userId: userId } = res.locals.user;
+    const result = await userService.getUserByUserId({ userId });
+    res.status(200).send({ user: result });
+  } catch (error) {
+    next(error);
+  }
+};
 module.exports = {
   updateUser,
   kakaoCallback,
   googleCallback,
   naverCallback,
+  getUser,
 };
