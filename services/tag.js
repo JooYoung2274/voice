@@ -4,27 +4,26 @@ const sequelize = require("sequelize");
 const Op = sequelize.Op;
 
 const getTrackIdsByTag = async ({ tag, category }) => {
-  const findedTracks = await TrackTag.findAll({
-    attributes: ["trackId"],
+  const findedTrackTags = await TrackTag.findAll({
+    attributes: ["trackId", "tag"],
     where: {
       tag: {
-        [Op.or]: [tag[0], tag[1], tag[2]],
+        [Op.or]: tag,
       },
-      category: category,
+      category,
     },
   });
-
-  if (!findedTracks) {
-    throw customizedError("존재하지 않는 트랙입니다.", 400);
-  }
-
-  let tags = [];
-  for (let i = 0; i < findedTracks.length; i++) {
-    tags.push(findedTracks[i].trackId);
-  }
-  const set = new Set(tags);
-  const result = [...set];
-  return result;
+  // const trackIds = {};
+  // for (const trackTag of findedTrackTags) {
+  //   const newTrackId = trackTag.dataValues.trackId;
+  //   trackIds = { ...trackIds };
+  //   if (!trackIds.newTrackId) {
+  //     trackIds.trackTag.dataValues.trackId = 0;
+  //   } else if (trackIds.trackId) {
+  //     trackIds.trackTag.dataValues.trackId += 1;
+  //   }
+  // }
+  return findedTrackTags;
 };
 
 module.exports = { getTrackIdsByTag };

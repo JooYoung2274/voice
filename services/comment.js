@@ -39,6 +39,7 @@ const createComment = async ({ comment, trackId, userId, nickname }) => {
         model: User,
         attributes: ["nickname"],
       },
+      where: { trackId },
     });
     return results;
   } catch (error) {
@@ -92,6 +93,7 @@ const deleteComment = async ({ userId, trackId, commentId }) => {
         model: User,
         attributes: ["nickname"],
       },
+      where: { trackId },
     });
     return results;
   } catch (error) {

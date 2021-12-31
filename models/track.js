@@ -48,20 +48,11 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         type: Sequelize.INTEGER,
       },
-      createdAt: {
-        type: "TIMESTAMP",
-        defaultValue: sequelize.literal("CURRENT_TIMESTAMP"),
-        allowNull: false,
-      },
-      updatedAt: {
-        type: "TIMESTAMP",
-        defaultValue: sequelize.literal("CURRENT_TIMESTAMP"),
-        allowNull: false,
-      },
     },
     {
       sequelize,
       modelName: "Track",
+      timestamps: true,
     },
   );
   return Track;

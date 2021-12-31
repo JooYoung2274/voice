@@ -11,6 +11,7 @@ const returnLikeCntAndLike = async ({ trackId, like }) => {
 const createOrDeleteLike = async ({ trackId, userId }) => {
   try {
     // 좋아요에서 일단 삭제
+
     const deleted = await Like.destroy({ where: { trackId, userId } });
 
     // 삭제가 안되면 생성
@@ -110,7 +111,6 @@ const getTracks = async ({ userId }) => {
     };
     tracks.push(tracked);
   }
-  console.log(tracks);
   return tracks;
 };
 
