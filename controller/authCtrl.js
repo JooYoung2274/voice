@@ -18,11 +18,13 @@ const updateUser = async (req, res, next) => {
 };
 
 const kakaoCallback = (req, res, next) => {
-  passport.authenticate("kakao", { failureRedirect: "/" }, (err, user) => {
+  passport.authenticate("kakao", { failureRedirect: "/" }, (err, user, info) => {
     if (err) return next(err);
     const { userId, nickname, contact, profileImage, introduce } = user;
+    const { firstLogin } = info;
     const jwtToken = jwt.sign({ userId: userId }, process.env.JWT_SECRET);
     result = {
+      firstLogin: firstLogin,
       jwtToken: jwtToken,
       nickname: nickname,
       contact: contact,
@@ -34,11 +36,13 @@ const kakaoCallback = (req, res, next) => {
 };
 
 const googleCallback = (req, res, next) => {
-  passport.authenticate("google", { failureRedirect: "/" }, (err, user) => {
+  passport.authenticate("google", { failureRedirect: "/" }, (err, user, info) => {
     if (err) return next(err);
     const { userId, nickname, contact, profileImage, introduce } = user;
+    const { firstLogin } = info;
     const jwtToken = jwt.sign({ userId: userId }, process.env.JWT_SECRET);
     result = {
+      firstLogin: firstLogin,
       jwtToken: jwtToken,
       nickname: nickname,
       contact: contact,
@@ -50,11 +54,13 @@ const googleCallback = (req, res, next) => {
 };
 
 const naverCallback = (req, res, next) => {
-  passport.authenticate("naver", { failureRedirect: "/" }, (err, user) => {
+  passport.authenticate("naver", { failureRedirect: "/" }, (err, user, info) => {
     if (err) return next(err);
     const { userId, nickname, contact, profileImage, introduce } = user;
+    const { firstLogin } = info;
     const jwtToken = jwt.sign({ userId: userId }, process.env.JWT_SECRET);
     result = {
+      firstLogin: firstLogin,
       jwtToken: jwtToken,
       nickname: nickname,
       contact: contact,
