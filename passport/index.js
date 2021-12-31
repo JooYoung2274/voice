@@ -23,18 +23,18 @@ module.exports = (app) => {
             where: { snsId: profile.id, flatformType: profile.provider },
           });
           if (exUser) {
-            done(null, exUser);
+            let firstLogin = false;
+            done(null, exUser, { firstLogin });
           } else {
             newNickname = randomstring.generate({ length: 15 });
             const newUser = await User.create({
               nickname: newNickname,
               flatformType: profile.provider,
               snsId: profile.id,
-              profileImage: "http://54.180.82.210/etc/profile.png",
+              profileImage: "http://13.125.215.6/etc/profile.png",
             });
-            done(null, newUser, {
-              accessToken,
-            });
+            let firstLogin = true;
+            done(null, newUser, { firstLogin });
           }
         } catch (error) {
           console.error(error);
@@ -56,7 +56,8 @@ module.exports = (app) => {
             where: { snsId: profile.id, flatformType: profile.provider },
           });
           if (exUser) {
-            done(null, exUser);
+            let firstLogin = false;
+            done(null, exUser, { firstLogin });
           } else {
             newNickname = randomstring.generate({ length: 15 });
             const newUser = await User.create({
@@ -65,7 +66,8 @@ module.exports = (app) => {
               snsId: profile.id,
               profileImage: "http://13.125.215.6/etc/profile.png",
             });
-            done(null, newUser);
+            let firstLogin = true;
+            done(null, newUser, { firstLogin });
           }
         } catch (error) {
           console.error(error);
@@ -88,7 +90,8 @@ module.exports = (app) => {
             where: { snsId: profile.id, flatformType: profile.provider },
           });
           if (exUser) {
-            done(null, exUser);
+            let firstLogin = false;
+            done(null, exUser, { firstLogin });
           } else {
             newNickname = randomstring.generate({ length: 15 });
             const newUser = await User.create({
@@ -97,7 +100,8 @@ module.exports = (app) => {
               snsId: profile.id,
               profileImage: "http://13.125.215.6/etc/profile.png",
             });
-            done(null, newUser);
+            let firstLogin = true;
+            done(null, newUser, { firstLogin });
           }
         } catch (error) {
           console.error(error);
