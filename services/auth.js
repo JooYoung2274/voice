@@ -30,7 +30,7 @@ const updateUser = async ({ userId, filename, nickname, contact, introduce }) =>
   }
 };
 //nickcheck
-const getUser = async ({ nickname, userId }) => {
+const getUserByNickname = async ({ nickname, userId }) => {
   try {
     const result = await User.findOne({ where: { nickname: nickname } });
     if (result) {
@@ -48,6 +48,7 @@ const getUserByUserId = async ({ userId }) => {
     const userOne = await User.findOne({ where: { userId: userId } });
     const { nickname, contact, profileImage, introduce } = userOne;
     const result = {
+      userId: userId,
       nickname: nickname,
       contact: contact,
       profileImage: profileImage,
@@ -58,4 +59,4 @@ const getUserByUserId = async ({ userId }) => {
     throw error;
   }
 };
-module.exports = { updateUser, getUser, getUserByUserId };
+module.exports = { updateUser, getUserByNickname, getUserByUserId };
