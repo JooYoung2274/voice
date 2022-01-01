@@ -33,13 +33,14 @@ const createComment = async ({ comment, trackId, userId }) => {
       userId,
     });
     // 클라이언트에게 줄 댓글 가공
-    const result = await Comment.findOne({
+    const result = await Comment.findAll({
       attributes: ["comment", "commentId", "createdAt", "userId"],
       include: {
         model: User,
         attributes: ["nickname"],
       },
       where: { trackId },
+      order: [["createdAt", "DESC"]],
     });
     return result;
   } catch (error) {

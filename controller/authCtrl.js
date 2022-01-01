@@ -7,9 +7,10 @@ const updateUser = async (req, res, next) => {
     const { userId: userId } = res.locals.user;
     const { nickname, contact, introduce } = req.body;
     let filename = "";
-    const userOne = await userService.getUser({ nickname, userId });
+    await userService.getUserByUserId({ nickname, userId });
     if (!req.file) {
-      filename = userOne.profileImage.replace("http://13.125.215.6/", "");
+      const exUserOne = await userService.getUserByUserId({ userId });
+      filename = exUserOne.profileImage.replace("http://13.125.215.6/", "");
     } else {
       filename = req.file.filename;
     }
