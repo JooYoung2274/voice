@@ -13,17 +13,24 @@ const getTrackIdsByTag = async ({ tag, category }) => {
       category,
     },
   });
-  // const trackIds = {};
-  // for (const trackTag of findedTrackTags) {
-  //   const newTrackId = trackTag.dataValues.trackId;
-  //   trackIds = { ...trackIds };
-  //   if (!trackIds.newTrackId) {
-  //     trackIds.trackTag.dataValues.trackId = 0;
-  //   } else if (trackIds.trackId) {
-  //     trackIds.trackTag.dataValues.trackId += 1;
-  //   }
-  // }
-  return findedTrackTags;
+  let tags = [];
+  for (let i = 0; i < findedTrackTags.length; i++) {
+    tags.push(findedTrackTags[i].trackId);
+  }
+  const set = new Set(tags);
+  const result = [...set];
+
+  return result;
 };
+// const trackIds = {};
+// for (const trackTag of findedTrackTags) {
+//   const newTrackId = trackTag.dataValues.trackId;
+//   trackIds = { ...trackIds };
+//   if (!trackIds.newTrackId) {
+//     trackIds.trackTag.dataValues.trackId = 0;
+//   } else if (trackIds.trackId) {
+//     trackIds.trackTag.dataValues.trackId += 1;
+//   }
+// }
 
 module.exports = { getTrackIdsByTag };

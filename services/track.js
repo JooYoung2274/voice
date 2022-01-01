@@ -89,7 +89,10 @@ const getTracksByUserId = async ({ userId, myPage }) => {
   const results = await getTracksByOrdCreated({ tracks });
 
   // 해당 포트폴리오 User 정보 불러오기
-  const userDate = await User.findOne({ where: { userId: userId } });
+  const userDate = await User.findOne({
+    attributes: ["userId", "nickname", "profileImage", "contact", "introduce"],
+    where: { userId: userId },
+  });
 
   if (myPage) {
     const likes = await Like.findAll({
@@ -108,7 +111,7 @@ const getTracksByUserId = async ({ userId, myPage }) => {
     const likesArray = await getTracksByOrdCreated({ tracks });
     return { results, likesArray, userDate };
   }
-  if (!tracks || !likes || !userDate) {
+  if (!tracks || !userDate) {
     throw customizedError("존재하지 않는 포트폴리오 페이지 입니다.", 400);
   }
   return { results, userDate };
@@ -195,7 +198,7 @@ const insertLikeCnt = (track) => {
 
 //track에 최신순 sort하는 함수
 const createdSort = (trackA, trackB) => {
-  return trackB.dataValues.createdAt - trackA.dataValues.createdAt;
+  return trackB.dataValues.trackId - trackA.dataValues.trackId;
 };
 
 //track에 1.좋아요순 2.최신순 sort하는 함수
@@ -265,7 +268,7 @@ const getTracksOrdLike = async ({ tracks }) => {
 const getTracksByOrdCreated = async ({ tracks }) => {
   tracks = tracks
     .map((track) => insertLikeCnt(track)) //likeCnt 넣어주기
-    .sort((trackA, trackB) => createdSort(trackA, trackB)); //likeCnt 내림차순 likeCnt같다면 createdAt최신순
+    .sort((trackA, trackB) => createdSort(trackA, trackB)); // trackId 최신순
   return tracks;
 };
 
@@ -273,7 +276,7 @@ const getTracksByOrdCreated = async ({ tracks }) => {
 const getTracksByOrdCreatedLimit = async ({ tracks }) => {
   tracks = tracks
     .map((track) => insertLikeCnt(track)) //likeCnt 넣어주기
-    .sort((trackA, trackB) => createdSort(trackA, trackB)) //likeCnt 내림차순 likeCnt같다면 createdAt최신순
+    .sort((trackA, trackB) => createdSort(trackA, trackB)) // trackId 최신순
     .slice(0, TRACKNUM);
   return tracks;
 };
@@ -297,10 +300,10 @@ const getTrackByTrackId2 = async ({ trackId }) => {
 };
 
 // trackTag들 안에 있는 trackId로 여러 트랙 뽑기
-const getTracksByTrackTags = async ({ trackTags }) => {
+const getTracksByTrackTags = async ({ trackIds }) => {
   const results = [];
-  for (let i = 0; i < trackTags.length; i++) {
-    const track = await getTrackByTrackId2({ trackId: trackTags[i].dataValues.trackId });
+  for (let i = 0; i < trackIds.length; i++) {
+    const track = await getTrackByTrackId2({ trackId: trackIds[i] });
     results.push(track);
   }
   return results;
@@ -346,15 +349,16 @@ const getTracksForCategory = async ({ tags, category }) => {
     // 카테고리와 태그가 올경우
 
     // 카테고리와 필터링된 태그로 tracktag들 찾기
-    const findedTrackTags = await getTrackIdsByTag({ tag: findedTags, category });
+    const findedTrackIds = await getTrackIdsByTag({ tag: findedTags, category });
     // if (!findedTrackTags) {
     //   // db에 태그에 맞는 track이 없을경우 트랙을 주지 않음
     //   return;
     // }
     // 찾은 tracktag들로 track들 찾기
-    const tracksByTags = await getTracksByTrackTags({ trackTags: findedTrackTags });
+    const tracksByTrackIds = await getTracksByTrackTags({ trackIds: findedTrackIds });
     // track들 likCnt넣고 최신순으로 정렬
-    const results = await getTracksByOrdCreated({ tracks: tracksByTags });
+
+    const results = await getTracksByOrdCreated({ tracks: tracksByTrackIds });
     const results2 = { categoryTags: findedTags, tracks: results };
     return results2;
   } catch (error) {
