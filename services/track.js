@@ -182,6 +182,7 @@ const trackBasicForm = {
       include: [{ model: User, attributes: ["nickname"] }],
     },
   ],
+  order: [[Comment, "createdAt", "DESC"]],
 };
 
 //track에 likeCnt 넣는 함수
@@ -354,7 +355,8 @@ const getTracksForCategory = async ({ tags, category }) => {
     const tracksByTags = await getTracksByTrackTags({ trackTags: findedTrackTags });
     // track들 likCnt넣고 최신순으로 정렬
     const results = await getTracksByOrdCreated({ tracks: tracksByTags });
-    return results;
+    const results2 = { categoryTags: findedTags, tracks: results };
+    return results2;
   } catch (error) {
     throw error;
   }
