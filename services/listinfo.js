@@ -2,7 +2,7 @@ const { Category, Tag, TrackThumbnail } = require("../models");
 
 const getCategories = async () => {
   const category = await Category.findAll({
-    attributes: ["category", "categoryUrl"],
+    attributes: ["category", "categoryUrl", "categoryText"],
   });
 
   if (!category) {

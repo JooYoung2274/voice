@@ -4,10 +4,10 @@ const jwt = require("jsonwebtoken");
 const { needLogin, notNeedLogin } = require("../middleware/auth-middleware");
 const {
   updateUser,
-  updateProfileCon,
   kakaoCallback,
   googleCallback,
   naverCallback,
+  getUser,
 } = require("../controller/authCtrl");
 const { imageMulter } = require("../middleware/uploader");
 const imageUploader = imageMulter.single("profileImage");
@@ -26,4 +26,5 @@ router.get("/naver", passport.authenticate("naver"));
 router.get("/naver/callback", naverCallback);
 
 router.post("/profile", imageUploader, needLogin, updateUser);
+router.get("/me", needLogin, getUser);
 module.exports = router;

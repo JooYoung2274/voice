@@ -1,6 +1,17 @@
-const { Track, TrackTag, User, Like, Comment, Category, TrackThumbnail } = require("../models");
+const {
+  Track,
+  TrackTag,
+  User,
+  Like,
+  Tag,
+  Comment,
+  Category,
+  TrackThumbnail,
+} = require("../models");
+const { getTrackIdsByTag } = require("./tag");
 const sequelize = require("sequelize");
-const { Op, fn, col } = require("sequelize");
+const { Op } = require("sequelize");
+const { or, like } = Op;
 const { customizedError } = require("../utils/error");
 
 const createTrack = async ({ title, category, tag, trackThumbnailUrlFace, filename, userId }) => {
@@ -12,7 +23,7 @@ const createTrack = async ({ title, category, tag, trackThumbnailUrlFace, filena
     title: title,
     category: category,
     trackThumbnailUrlFace: trackThumbnailUrlFace,
-    trackUrl: "http://54.180.82.210/" + filename,
+    trackUrl: "http://13.125.215.6/" + filename,
     userId: userId,
   });
   for (let i = 0; i < tag.length; i++) {
@@ -55,8 +66,8 @@ const updateTrackByTrackId = async ({
     throw customizedError("권한이 없습니다.", 400);
   }
 
-  const result = await Track.update(
-    { category: category, trackThumbnailUrl: trackThumbnailUrlFace, title: title },
+  await Track.update(
+    { category: category, trackThumbnailUrlFace: trackThumbnailUrlFace, title: title },
     { where: { trackId: trackId } },
   );
 
@@ -66,148 +77,55 @@ const updateTrackByTrackId = async ({
       await TrackTag.create({ tag: tag[i], trackId: trackId, category: category });
     }
   }
-  return result;
+  return;
 };
 
 const getTracksByUserId = async ({ userId, myPage }) => {
-  if (myPage) {
-    const tracks = await Track.findAll({
-      attributes: ["title", "trackId", "category", "trackUrl", "userId", "createdAt"],
-      where: { userId: userId },
-      include: [
-        { model: TrackThumbnail, attributes: ["trackThumbnailUrlFace", "trackThumbnailUrlFull"] },
-        { model: TrackTag, attributes: ["tag"] },
-        { model: User, attributes: ["nickname"] },
-        {
-          model: Like,
-          attributes: [[sequelize.fn("COUNT", sequelize.col("Likes.trackId")), "likeCnt"]],
-        },
-        {
-          model: Comment,
-          attributes: [
-            "commentId",
-            "userId",
-            "comment",
-            "createdAt",
-            [(sequelize.fn("COUNT", sequelize.col("Comments.trackId")), "commentCnt")],
-          ],
-          include: [{ model: User, attributes: ["nickname"] }],
-        },
-      ],
-      group: ["Track.trackId", "TrackTags.trackTagId", "Likes.likeId", "Comments.commentId"],
-    });
+  // userId에 해당하는 모든 트랙 불러오기
+  let tracks = await Track.findAll({
+    where: { userId: userId },
+    ...trackBasicForm,
+  });
+  const results = await getTracksByOrdCreated({ tracks });
 
-    // sequelize subquery 로 해야할듯
+  // 해당 포트폴리오 User 정보 불러오기
+  const userDate = await User.findOne({
+    attributes: ["userId", "nickname", "profileImage", "contact", "introduce"],
+    where: { userId: userId },
+  });
+
+  if (myPage) {
     const likes = await Like.findAll({
       attributes: ["trackId"],
       where: { userId: userId },
     });
 
-    if (!tracks || !likes) {
-      throw customizedError("존재하지 않는 트랙입니다.", 400);
-    }
-
-    let likesArray = [];
+    tracks = [];
     for (let i = 0; i < likes.length; i++) {
-      const likesTracks = await Track.findAll({
-        attributes: ["title", "trackId", "category", "trackUrl", "userId", "createdAt"],
-        include: [
-          { model: TrackThumbnail, attributes: ["trackThumbnailUrlFace", "trackThumbnailUrlFull"] },
-          { model: TrackTag, attributes: ["tag"] },
-          { model: User, attributes: ["nickname"] },
-          {
-            model: Like,
-            attributes: [[sequelize.fn("COUNT", sequelize.col("Likes.trackId")), "likeCnt"]],
-          },
-          {
-            model: Comment,
-            attributes: [
-              "commentId",
-              "userId",
-              "comment",
-              "createdAt",
-              [sequelize.fn("COUNT", sequelize.col("Comments.trackId")), "commentCnt"],
-            ],
-            include: [{ model: User, attributes: ["nickname"] }],
-          },
-        ],
-        group: ["Track.trackId", "TrackTags.trackTagId", "Likes.likeId", "Comments.commentId"],
+      const likesTracks = await Track.findOne({
         where: { trackId: likes[i].trackId },
+        ...trackBasicForm,
       });
-      likesArray.push(likesTracks);
+      tracks.push(likesTracks);
     }
-
-    return { tracks, likesArray };
+    const likesArray = await getTracksByOrdCreated({ tracks });
+    return { results, likesArray, userDate };
   }
-
-  const result = await Track.findAll({
-    attributes: ["title", "trackId", "category", "trackUrl", "userId", "createdAt"],
-    include: [
-      { model: TrackThumbnail, attributes: ["trackThumbnailUrlFace", "trackThumbnailUrlFull"] },
-      { model: TrackTag, attributes: ["tag"] },
-      { model: User, attributes: ["nickname"] },
-      {
-        model: Like,
-        attributes: [[sequelize.fn("COUNT", sequelize.col("Likes.trackId")), "likeCnt"]],
-      },
-      {
-        model: Comment,
-        attributes: [
-          "commentId",
-          "userId",
-          "comment",
-          "createdAt",
-          [sequelize.fn("COUNT", sequelize.col("Comments.trackId")), "commentCnt"],
-        ],
-        include: [{ model: User, attributes: ["nickname"] }],
-      },
-    ],
-    group: ["Track.trackId", "TrackTags.trackTagId", "Likes.likeId", "Comments.commentId"],
-    where: { userId: userId },
-  });
-
-  if (!result) {
-    throw customizedError("존재하지 않는 트랙입니다.", 400);
+  if (!tracks || !userDate) {
+    throw customizedError("존재하지 않는 포트폴리오 페이지 입니다.", 400);
   }
-
-  return result;
+  return { results, userDate };
 };
 
-const getTrackByTrackId = async ({ trackId, userId }) => {
-  const findedTrack = await Track.findOne({
-    attributes: ["title", "trackId", "category", "trackUrl", "userId", "createdAt"],
-    include: [
-      { model: TrackThumbnail, attributes: ["trackThumbnailUrlFace", "trackThumbnailUrlFull"] },
-      { model: TrackTag, attributes: ["tag"] },
-      { model: User, attributes: ["nickname"] },
-      {
-        model: Like,
-        attributes: [[sequelize.fn("COUNT", sequelize.col("Likes.trackId")), "likeCnt"]],
-      },
-      {
-        model: Comment,
-        attributes: [
-          "commentId",
-          "userId",
-          "comment",
-          "createdAt",
-          [sequelize.fn("COUNT", sequelize.col("Comments.trackId")), "commentCnt"],
-        ],
-        include: [{ model: User, attributes: ["nickname"] }],
-      },
-    ],
-    group: ["Track.trackId", "TrackTags.trackTagId", "Likes.likeId", "Comments.commentId"],
+const getTrackByTrackId = async ({ trackId }) => {
+  const track = await Track.findOne({
+    ...trackBasicForm,
     where: { trackId: trackId },
   });
-
-  if (!findedTrack) {
+  if (!track) {
     throw customizedError("존재하지 않는 트랙입니다.", 400);
   }
-
-  if (userId !== findedTrack.userId) {
-    throw customizedError("권한이 없습니다.", 400);
-  }
-
+  const findedTrack = await insertLikeCnt(track);
   return findedTrack;
 };
 
@@ -250,111 +168,241 @@ const getTracksByLikes = async ({ findedTrackIds }) => {
   return tracks;
 };
 
+// 트랙이 기본적으로 가지는 property (성격이 다른 변수가 나타났으므로 아키텍처 수정필요)
+const trackBasicForm = {
+  attributes: ["title", "trackId", "category", "trackUrl", "userId", "createdAt"],
+  include: [
+    { model: TrackThumbnail, attributes: ["trackThumbnailUrlFace", "trackThumbnailUrlFull"] },
+    { model: TrackTag, attributes: ["tag"] },
+    { model: User, attributes: ["nickname"] },
+    {
+      model: Like,
+      attributes: ["likeId"],
+    },
+    {
+      model: Comment,
+      attributes: ["commentId", "userId", "comment", "createdAt"],
+      include: [{ model: User, attributes: ["nickname"] }],
+    },
+  ],
+  order: [[Comment, "createdAt", "DESC"]],
+};
+
+//track에 likeCnt 넣는 함수
+const insertLikeCnt = (track) => {
+  const { Likes: likesArray, Comments: commentsArray } = track.dataValues;
+  track.dataValues.Likes = { likeCnt: likesArray.length };
+  track.dataValues.CommentCnt = { commentCnt: commentsArray.length };
+  return track;
+};
+
+//track에 최신순 sort하는 함수
+const createdSort = (trackA, trackB) => {
+  return trackB.dataValues.trackId - trackA.dataValues.trackId;
+};
+
+//track에 1.좋아요순 2.최신순 sort하는 함수
+const likeCreatedSort = (trackA, trackB) => {
+  if (trackB.dataValues.Likes.likeCnt === trackA.dataValues.Likes.likeCnt) {
+    return createdSort(trackA, trackB);
+  }
+  return trackB.dataValues.Likes.likeCnt - trackA.dataValues.Likes.likeCnt;
+};
+
+//메인에 track자르는 개수:20
+const TRACKNUM = 19;
+
+// 메인에 처음에 주어지는 카테고리
+const categoryFirst = { category: "전체", categoryText: "최근에 올라온 목소리" };
+
+// 그냥 트랙들뽑기
+const getTracks = async () => {
+  const findedTracks = await Track.findAll(trackBasicForm);
+  return findedTracks;
+};
+
+// 키워드별 여러 트랙뽑기
+const getTracksByKeyword = async ({ keyword }) => {
+  try {
+    //   공백이 2개이상 존재하면 하나의 공백으로 변환(아직 더 생각해봐야함)
+    // keyword = keyword.replace(/\s\s+/gi, " ");
+    const results = await Track.findAll({
+      where: {
+        [or]: [
+          { title: { [like]: `%${keyword}%` } },
+          {
+            "$User.nickname$": { [like]: `%${keyword}%` },
+          },
+        ],
+      },
+      ...trackBasicForm,
+    });
+
+    return results;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// 카테고리별 여러 트랙뽑기
 const getTracksByCategory = async ({ category }) => {
   const findedTracks = await Track.findAll({
-    attributes: ["title", "trackId", "category", "trackUrl", "userId", "createdAt"],
-    order: [["category", "ASC"]],
-    include: [
-      { model: TrackThumbnail, attributes: ["trackThumbnailUrlFace", "trackThumbnailUrlFull"] },
-      { model: TrackTag, attributes: ["tag"] },
-      { model: User, attributes: ["nickname"] },
-      {
-        model: Like,
-        attributes: [[sequelize.fn("COUNT", sequelize.col("Likes.trackId")), "likeCnt"]],
-      },
-      {
-        model: Comment,
-        attributes: [
-          "commentId",
-          "userId",
-          "comment",
-          "createdAt",
-          [sequelize.fn("COUNT", sequelize.col("Comments.trackId")), "commentCnt"],
-        ],
-        include: [{ model: User, attributes: ["nickname"] }],
-      },
-    ],
-    group: ["Track.trackId", "TrackTags.trackTagId", "Likes.likeId", "Comments.commentId"],
-    where: { category: category },
+    where: { category },
+    ...trackBasicForm,
   });
   if (!findedTracks) {
     throw customizedError("존재하지 않는 트랙입니다.", 400);
   }
   return findedTracks;
 };
+// 트랙들 넣으면 likeCnt 넣어주고 좋아요순으로 바뀌고 상위 20개 뽑음
+const getTracksOrdLike = async ({ tracks }) => {
+  tracks = tracks
+    .map((track) => insertLikeCnt(track)) //likeCnt 넣어주기
+    .sort((trackA, trackB) => likeCreatedSort(trackA, trackB)) //likeCnt 내림차순 likeCnt같다면 createdAt최신순
+    .slice(0, TRACKNUM); //20개씩 자르기
+  return tracks;
+};
 
-const getTracks = async () => {
-  const totalTracks = await Track.findAll({
-    attributes: ["title", "trackId", "category", "trackUrl", "userId", "createdAt"],
-    include: [
-      { model: TrackThumbnail, attributes: ["trackThumbnailUrlFace", "trackThumbnailUrlFull"] },
-      { model: TrackTag, attributes: ["tag"] },
-      { model: User, attributes: ["nickname"] },
-      {
-        model: Like,
-        attributes: [[sequelize.fn("COUNT", sequelize.col("Likes.trackId")), "likeCnt"]],
-      },
-      {
-        model: Category,
-        attributes: ["categoryText"],
-      },
-      {
-        model: Comment,
-        attributes: [
-          "commentId",
-          "userId",
-          "comment",
-          "createdAt",
-          [sequelize.fn("COUNT", sequelize.col("Comments.trackId")), "commentCnt"],
-        ],
-        include: [{ model: User, attributes: ["nickname"] }],
-      },
-    ],
-    order: [["createdAt", "DESC"]],
-    group: ["Track.trackId", "TrackTags.trackTagId", "Likes.likeId", "Comments.commentId"],
+// 트랙들 넣으면 likeCnt 넣어주고 최신순으로 바뀌고 개수 제한 없음
+const getTracksByOrdCreated = async ({ tracks }) => {
+  tracks = tracks
+    .map((track) => insertLikeCnt(track)) //likeCnt 넣어주기
+    .sort((trackA, trackB) => createdSort(trackA, trackB)); // trackId 최신순
+  return tracks;
+};
+
+// 트랙들 넣으면 likeCnt 넣어주고 최신순으로 바뀌고 상위 20개 뽑음
+const getTracksByOrdCreatedLimit = async ({ tracks }) => {
+  tracks = tracks
+    .map((track) => insertLikeCnt(track)) //likeCnt 넣어주기
+    .sort((trackA, trackB) => createdSort(trackA, trackB)) // trackId 최신순
+    .slice(0, TRACKNUM);
+  return tracks;
+};
+
+// main에 카테고리와 text를 객체로 따로 주기위한 service
+const getCategory = async ({ category }) => {
+  const categoryAndText = await Category.findOne({
+    attributes: ["category", "categoryText"],
+    where: { category },
   });
+  return categoryAndText;
+};
 
-  if (!totalTracks) {
-    throw customizedError("존재하지 않는 트랙입니다.", 400);
+// trackId로 하나의 트랙 뽑기  (getTrackByTrackId에서 userId분리하면 지워도 되는 service)
+const getTrackByTrackId2 = async ({ trackId }) => {
+  const findedTrack = await Track.findOne({
+    where: { trackId },
+    ...trackBasicForm,
+  });
+  return findedTrack;
+};
+
+// trackTag들 안에 있는 trackId로 여러 트랙 뽑기
+const getTracksByTrackTags = async ({ trackIds }) => {
+  const results = [];
+  for (let i = 0; i < trackIds.length; i++) {
+    const track = await getTrackByTrackId2({ trackId: trackIds[i] });
+    results.push(track);
   }
+  return results;
+};
 
-  let categoryTracks = [[], [], [], [], [], [], [], [], []];
-  for (let i = 0; i < totalTracks.length; i++) {
-    switch (totalTracks[i].Category.categoryText.split(" ")[1]) {
-      case "자유 주제":
-        categoryTracks[0].push(totalTracks[i]);
-        break;
-      case "ASMR":
-        categoryTracks[1].push(totalTracks[i]);
-        break;
-      case "힐링/응원":
-        categoryTracks[2].push(totalTracks[i]);
-        break;
-      case "노래":
-        categoryTracks[3].push(totalTracks[i]);
-        break;
-      case "외국어":
-        categoryTracks[4].push(totalTracks[i]);
-        break;
-      case "나레이션":
-        categoryTracks[5].push(totalTracks[i]);
-        break;
-      case "성대모사":
-        categoryTracks[6].push(totalTracks[i]);
-        break;
-      case "유행어":
-        categoryTracks[7].push(totalTracks[i]);
-        break;
-      case "효과음":
-        categoryTracks[8].push(totalTracks[i]);
-        break;
-      default:
-        break;
+// keyword로 찾은 트랙 최종 service
+const getTracksForSearch = async ({ keyword }) => {
+  // keyword로 track들 찾기
+  const tracksInKeyword = await getTracksByKeyword({ keyword });
+  // 찾은 track들 likCnt넣고 최신순으로 정렬
+  const results = await getTracksByOrdCreated({ tracks: tracksInKeyword });
+  return results;
+};
+
+// tag와 카테고리로 찾은 트랙 최종 service
+const getTracksForCategory = async ({ tags, category }) => {
+  try {
+    const findedCategory = Category.findOne({ category });
+    if (!findedCategory) {
+      throw customizedError("운영하고 있는 카테고리가 아닙니다.", 400);
     }
+    // 파라미터에서 항상 tag1=tag2=tag3=형식으로 온다고 가정
+    if (tags.length !== 3) {
+      throw customizedError("올바른 태그 요청이 아닙니다.", 400);
+    }
+
+    // 카테고리만 올경우
+    if (tags[0] === "" && tags[1] === "" && tags[2] === "") {
+      const tracksInCtry = await getTracksByCategory({ category });
+      const results = await getTracksByOrdCreated({ tracks: tracksInCtry });
+      return results;
+    }
+
+    // 실제 db에 있는 태그만 필터링
+    const findedTags = [];
+    for (const tag of tags) {
+      const findedTag = await Tag.findOne({ where: { tag } });
+      if (findedTag) {
+        findedTags.push(tag);
+      }
+    }
+
+    // 카테고리와 태그가 올경우
+
+    // 카테고리와 필터링된 태그로 tracktag들 찾기
+    const findedTrackIds = await getTrackIdsByTag({ tag: findedTags, category });
+    // if (!findedTrackTags) {
+    //   // db에 태그에 맞는 track이 없을경우 트랙을 주지 않음
+    //   return;
+    // }
+    // 찾은 tracktag들로 track들 찾기
+    const tracksByTrackIds = await getTracksByTrackTags({ trackIds: findedTrackIds });
+    // track들 likCnt넣고 최신순으로 정렬
+
+    const results = await getTracksByOrdCreated({ tracks: tracksByTrackIds });
+    const results2 = { categoryTags: findedTags, tracks: results };
+    return results2;
+  } catch (error) {
+    throw error;
   }
-  const tracksTitle = { title: "최근에 올라온 목소리" };
-  totalTracks.unshift(tracksTitle);
-  return { categoryTracks, totalTracks };
+};
+
+// main 데이터 주는 최종 service
+const getTracksForMain = async () => {
+  try {
+    const results = [];
+    // 트랙들 뽑기
+    const plainTracks = await getTracks();
+    // 트랙들 likCnt넣고 최신순으로 몇개만 가져오기
+    const tracksOrdCreated = await getTracksByOrdCreatedLimit({ tracks: plainTracks });
+    // 리턴되는 배열에 먼저 최신순으로 가져온 전체데이터 넣기
+    results.push({ category: categoryFirst, tracks: tracksOrdCreated });
+
+    // category 이름순으로 정렬
+    const categoriesList = await Category.findAll({
+      order: [["category", "ASC"]],
+    });
+
+    // category를 기준으로 track들 가져온 후 results배열에 push
+    for (const category of categoriesList) {
+      const tracksInCtry = await getTracksByCategory({
+        category: category.dataValues.category,
+      });
+      // category에 없으면 넣지 않음
+      if (tracksInCtry.length === 0) {
+        continue;
+      }
+      // 카테고리 text뽑기
+      const categoryAndText = await getCategory({ category: category.dataValues.category });
+      // 좋아요 순뽑고 likeCnt 바꿔주면서 20개씩 자르기
+      const tracksInCtryOrdLike = await getTracksOrdLike({ tracks: tracksInCtry });
+      // 프론트에게 주기위해 배열안에 담음
+      results.push({ category: categoryAndText, tracks: tracksInCtryOrdLike });
+    }
+
+    return results;
+  } catch (error) {
+    throw error;
+  }
 };
 
 module.exports = {
@@ -362,8 +410,11 @@ module.exports = {
   deleteTrackByTrackId,
   getTracksByUserId,
   getTrackByTrackId,
-  getTracks,
+  getTracksForSearch,
+  getTracksForCategory,
+  getTracksForMain,
   getTracksByLikes,
   getTracksByCategory,
   updateTrackByTrackId,
+  getTracksByKeyword,
 };

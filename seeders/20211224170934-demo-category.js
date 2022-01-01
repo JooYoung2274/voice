@@ -8,47 +8,47 @@ module.exports = {
     return queryInterface.bulkInsert("Categories", [
       {
         category: "자유주제",
-        categoryUrl: "http://54.180.82.210/categoryUrl/자유주제.png",
+        categoryUrl: "http://13.125.215.6/categoryUrl/자유주제.png",
         categoryText: "인기있는 자유주제",
       },
       {
         category: "ASMR",
-        categoryUrl: "http://54.180.82.210/categoryUrl/ASMR.png",
+        categoryUrl: "http://13.125.215.6/categoryUrl/ASMR.png",
         categoryText: "인기있는 ASMR",
       },
       {
-        category: "힐링/응원",
-        categoryUrl: "http://54.180.82.210/categoryUrl/힐링응원.png",
+        category: "힐링응원",
+        categoryUrl: "http://13.125.215.6/categoryUrl/힐링응원.png",
         categoryText: "인기있는 힐링/응원",
       },
       {
         category: "노래",
-        categoryUrl: "http://54.180.82.210/categoryUrl/노래.png",
+        categoryUrl: "http://13.125.215.6/categoryUrl/노래.png",
         categoryText: "인기있는 노래",
       },
       {
         category: "외국어",
-        categoryUrl: "http://54.180.82.210/categoryUrl/외국어.png",
+        categoryUrl: "http://13.125.215.6/categoryUrl/외국어.png",
         categoryText: "인기있는 외국어",
       },
       {
         category: "나레이션",
-        categoryUrl: "http://54.180.82.210/categoryUrl/나레이션.png",
+        categoryUrl: "http://13.125.215.6/categoryUrl/나레이션.png",
         categoryText: "인기있는 나레이션",
       },
       {
         category: "성대모사",
-        categoryUrl: "http://54.180.82.210/categoryUrl/성대모사.png",
+        categoryUrl: "http://13.125.215.6/categoryUrl/성대모사.png",
         categoryText: "인기있는 성대모사",
       },
       {
         category: "유행어",
-        categoryUrl: "http://54.180.82.210/categoryUrl/유행어.png",
+        categoryUrl: "http://13.125.215.6/categoryUrl/유행어.png",
         categoryText: "인기있는 유행어",
       },
       {
         category: "효과음",
-        categoryUrl: "http://54.180.82.210/categoryUrl/효과음.png",
+        categoryUrl: "http://13.125.215.6/categoryUrl/효과음.png",
         categoryText: "인기있는 효과음",
       },
     ]);
