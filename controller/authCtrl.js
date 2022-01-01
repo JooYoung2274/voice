@@ -10,7 +10,7 @@ const updateUser = async (req, res, next) => {
     await userService.getUserByUserId({ nickname, userId });
     if (!req.file) {
       const exUserOne = await userService.getUserByUserId({ userId });
-      filename = exUserOne.profileImage.replace("http://13.125.215.6/", "");
+      filename = exUserOne.profileImage.replace("http://" + process.env.HOST + "/", "");
     } else {
       filename = req.file.filename;
     }

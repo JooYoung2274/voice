@@ -23,7 +23,7 @@ const createTrack = async ({ title, category, tag, trackThumbnailUrlFace, filena
     title: title,
     category: category,
     trackThumbnailUrlFace: trackThumbnailUrlFace,
-    trackUrl: "http://13.125.215.6/" + filename,
+    trackUrl: "http://" + process.env.HOST + "/" + filename,
     userId: userId,
   });
   for (let i = 0; i < tag.length; i++) {

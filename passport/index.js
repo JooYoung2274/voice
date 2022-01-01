@@ -31,7 +31,7 @@ module.exports = (app) => {
               nickname: newNickname,
               flatformType: profile.provider,
               snsId: profile.id,
-              profileImage: "http://13.125.215.6/etc/profile.png",
+              profileImage: "http://" + process.env.HOST + "/etc/profile.png",
             });
             let firstLogin = true;
             done(null, newUser, { firstLogin });
@@ -64,7 +64,7 @@ module.exports = (app) => {
               nickname: newNickname,
               flatformType: profile.provider,
               snsId: profile.id,
-              profileImage: "http://13.125.215.6/etc/profile.png",
+              profileImage: "http://" + process.env.HOST + "/etc/profile.png",
             });
             let firstLogin = true;
             done(null, newUser, { firstLogin });
@@ -98,7 +98,7 @@ module.exports = (app) => {
               nickname: newNickname,
               flatformType: profile.provider,
               snsId: profile.id,
-              profileImage: "http://13.125.215.6/etc/profile.png",
+              profileImage: "http://" + process.env.HOST + "/etc/profile.png",
             });
             let firstLogin = true;
             done(null, newUser, { firstLogin });

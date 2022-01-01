@@ -3,7 +3,7 @@ const { customizedError } = require("../utils/error");
 
 const updateUser = async ({ userId, filename, nickname, contact, introduce }) => {
   try {
-    const profileImage = `http://13.125.215.6/${filename}`;
+    const profileImage = `http://${process.env.HOST}/${filename}`;
     if (nickname.length < 4 || nickname.length > 15) {
       throw customizedError("닉네임은 4자이상 15자 이하여야 합니다.", 400);
     }
