@@ -12,7 +12,7 @@ const updateUser = async ({ userId, filename, nickname, contact, introduce }) =>
       throw customizedError("닉네임에 특수문자를 포함할 수 없습니다.", 400);
     }
     if (contact) {
-      let emailCheck = contact.match(/^([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})$/);
+      let emailCheck = contact.match(/^([a-z0-9_\.-]+)@([\da-zA-Z\.-]+)\.([a-z\.]{2,6})$/);
       if (!emailCheck) throw customizedError("이메일 형식이 올바르지 않습니다.", 400);
     }
     await User.update(

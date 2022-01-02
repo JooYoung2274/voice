@@ -321,7 +321,7 @@ const getTracksForSearch = async ({ keyword }) => {
 // tag와 카테고리로 찾은 트랙 최종 service
 const getTracksForCategory = async ({ tags, category }) => {
   try {
-    const findedCategory = Category.findOne({ category });
+    const findedCategory = await Category.findOne({ where: { category } });
     if (!findedCategory) {
       throw customizedError("운영하고 있는 카테고리가 아닙니다.", 400);
     }
