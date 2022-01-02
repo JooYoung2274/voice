@@ -4,6 +4,20 @@ const sequelize = require("sequelize");
 const Op = sequelize.Op;
 
 const getTrackIdsByTag = async ({ tag, category }) => {
+  if (category === "전체") {
+    const findedTrackTags = await TrackTag.findAll({
+      attributes: ["trackId", "tag"],
+      where: { tag: { [Op.or]: tag } },
+    });
+    let tags = [];
+    for (let i = 0; i < findedTrackTags.length; i++) {
+      tags.push(findedTrackTags[i].trackId);
+    }
+    const set = new Set(tags);
+    const result = [...set];
+
+    return result;
+  }
   const findedTrackTags = await TrackTag.findAll({
     attributes: ["trackId", "tag"],
     where: { tag: { [Op.or]: tag }, category: category },

@@ -7,6 +7,11 @@ module.exports = {
   up: async (queryInterface, Sequelize) => {
     return queryInterface.bulkInsert("Categories", [
       {
+        category: "전체",
+        categoryUrl: "http://" + process.env.HOST + "/categoryUrl/전체.png",
+        categoryText: "전체",
+      },
+      {
         category: "자유주제",
         categoryUrl: "http://" + process.env.HOST + "/categoryUrl/자유주제.png",
         categoryText: "인기있는 자유주제",

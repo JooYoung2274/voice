@@ -332,9 +332,15 @@ const getTracksForCategory = async ({ tags, category }) => {
 
     // 카테고리만 올경우
     if (tags[0] === "" && tags[1] === "" && tags[2] === "") {
+      if (category === "전체") {
+        const results = await Track.findAll({});
+        const results2 = { categoryTags: tags, tracks: results };
+        return results2;
+      }
       const tracksInCtry = await getTracksByCategory({ category });
       const results = await getTracksByOrdCreated({ tracks: tracksInCtry });
-      return results;
+      const results2 = { categoryTags: tags, tracks: results };
+      return results2;
     }
 
     // 실제 db에 있는 태그만 필터링
@@ -349,6 +355,14 @@ const getTracksForCategory = async ({ tags, category }) => {
     // 카테고리와 태그가 올경우
 
     // 카테고리와 필터링된 태그로 tracktag들 찾기
+    if (category === "전체") {
+      const findedTrackIds = await getTrackIdsByTag({ tag: findedTags, category });
+      const tracksByTrackIds = await getTracksByTrackTags({ trackIds: findedTrackIds });
+      const results = await getTracksByOrdCreated({ tracks: tracksByTrackIds });
+
+      const results2 = { categoryTags: tags, tracks: results };
+      return results2;
+    }
     const findedTrackIds = await getTrackIdsByTag({ tag: findedTags, category });
     // if (!findedTrackTags) {
     //   // db에 태그에 맞는 track이 없을경우 트랙을 주지 않음
@@ -359,7 +373,7 @@ const getTracksForCategory = async ({ tags, category }) => {
     // track들 likCnt넣고 최신순으로 정렬
 
     const results = await getTracksByOrdCreated({ tracks: tracksByTrackIds });
-    const results2 = { categoryTags: findedTags, tracks: results };
+    const results2 = { categoryTags: tags, tracks: results };
     return results2;
   } catch (error) {
     throw error;
