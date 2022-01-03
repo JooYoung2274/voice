@@ -4,7 +4,7 @@ const development = {
   username: process.env.DATABASE_NAME,
   password: process.env.DATABASE_PASSWORD,
   database: process.env.DATABASE,
-  host: process.env.HOST,
+  host: "127.0.0.1",
   dialect: "mysql",
 };
 const test = {
