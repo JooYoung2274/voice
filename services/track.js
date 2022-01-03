@@ -182,10 +182,10 @@ const trackBasicForm = {
     {
       model: Comment,
       attributes: ["commentId", "userId", "comment", "createdAt"],
-      include: [{ model: User, attributes: ["nickname"] }],
+      include: [{ model: User, attributes: ["nickname", "profileImage"] }],
     },
   ],
-  order: [[Comment, "createdAt", "DESC"]],
+  order: [[Comment, "commentId", "DESC"]],
 };
 
 //track에 likeCnt 넣는 함수
