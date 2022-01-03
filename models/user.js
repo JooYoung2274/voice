@@ -32,21 +32,28 @@ module.exports = (sequelize, DataTypes) => {
         type: Sequelize.INTEGER,
       },
       snsId: {
+        allowNull: false,
         type: Sequelize.STRING,
       },
       nickname: {
+        allowNull: false,
+        unique: true,
         type: Sequelize.STRING,
       },
       flatformType: {
+        allowNull: false,
         type: Sequelize.STRING,
       },
       profileImage: {
+        allowNull: false,
         type: Sequelize.STRING,
       },
       contact: {
+        allowNull: true,
         type: Sequelize.STRING,
       },
       introduce: {
+        allowNull: true,
         type: Sequelize.STRING,
       },
     },
