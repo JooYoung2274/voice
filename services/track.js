@@ -15,8 +15,12 @@ const { or, like } = Op;
 const { customizedError } = require("../utils/error");
 
 const createTrack = async ({ title, category, tag, trackThumbnailUrlFace, filename, userId }) => {
-  if (!trackThumbnailUrlFace || !category || !tag || !title || !userId) {
+  if (!trackThumbnailUrlFace || !category || !tag || !userId) {
     throw customizedError("녹음파일이 존재하지 않습니다.", 400);
+  }
+
+  if (title.length > 40) {
+    throw customizedError("제목은 20자를 넘길 수 없습니다.", 400);
   }
 
   const createdTrack = await Track.create({
@@ -57,8 +61,12 @@ const updateTrackByTrackId = async ({
   trackThumbnailUrlFace,
   userId,
 }) => {
-  if (!trackThumbnailUrlFace || !category || !tag.length || !title || !trackId) {
+  if (!trackThumbnailUrlFace || !category || !tag.length || !trackId) {
     throw customizedError("잘못된 접근입니다.", 400);
+  }
+
+  if (title.length > 40) {
+    throw customizedError("제목은 20자를 넘길 수 없습니다.", 400);
   }
 
   const track = await Track.findOne({ where: { trackId: trackId } });
