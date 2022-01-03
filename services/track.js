@@ -246,6 +246,15 @@ const getTracksByKeyword = async ({ keyword }) => {
 
 // 카테고리별 여러 트랙뽑기
 const getTracksByCategory = async ({ category }) => {
+  if (category === "전체") {
+    const findedTracks = await Track.findAll({
+      ...trackBasicForm,
+    });
+    if (!findedTracks) {
+      throw customizedError("존재하지 않는 트랙입니다.", 400);
+    }
+    return findedTracks;
+  }
   const findedTracks = await Track.findAll({
     where: { category },
     ...trackBasicForm,
@@ -332,11 +341,6 @@ const getTracksForCategory = async ({ tags, category }) => {
 
     // 카테고리만 올경우
     if (tags[0] === "" && tags[1] === "" && tags[2] === "") {
-      if (category === "전체") {
-        const results = await Track.findAll({});
-        const results2 = { categoryTags: tags, tracks: results };
-        return results2;
-      }
       const tracksInCtry = await getTracksByCategory({ category });
       const results = await getTracksByOrdCreated({ tracks: tracksInCtry });
       const results2 = { categoryTags: tags, tracks: results };
