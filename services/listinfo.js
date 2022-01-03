@@ -2,7 +2,7 @@ const { Category, Tag, TrackThumbnail } = require("../models");
 const { Op } = require("sequelize");
 
 const getCategories = async () => {
-  let category = await Category.findAll({
+  const category = await Category.findAll({
     attributes: ["category", "categoryUrl", "categoryText"],
     where: { category: { [Op.ne]: "전체" } },
   });
