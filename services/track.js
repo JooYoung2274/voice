@@ -182,10 +182,10 @@ const trackBasicForm = {
     {
       model: Comment,
       attributes: ["commentId", "userId", "comment", "createdAt"],
-      include: [{ model: User, attributes: ["nickname"] }],
+      include: [{ model: User, attributes: ["nickname", "profileImage"] }],
     },
   ],
-  order: [[Comment, "createdAt", "DESC"]],
+  order: [[Comment, "commentId", "DESC"]],
 };
 
 //track에 likeCnt 넣는 함수
@@ -246,6 +246,15 @@ const getTracksByKeyword = async ({ keyword }) => {
 
 // 카테고리별 여러 트랙뽑기
 const getTracksByCategory = async ({ category }) => {
+  if (category === "전체") {
+    const findedTracks = await Track.findAll({
+      ...trackBasicForm,
+    });
+    if (!findedTracks) {
+      throw customizedError("존재하지 않는 트랙입니다.", 400);
+    }
+    return findedTracks;
+  }
   const findedTracks = await Track.findAll({
     where: { category },
     ...trackBasicForm,
@@ -332,11 +341,6 @@ const getTracksForCategory = async ({ tags, category }) => {
 
     // 카테고리만 올경우
     if (tags[0] === "" && tags[1] === "" && tags[2] === "") {
-      if (category === "전체") {
-        const results = await Track.findAll({});
-        const results2 = { categoryTags: tags, tracks: results };
-        return results2;
-      }
       const tracksInCtry = await getTracksByCategory({ category });
       const results = await getTracksByOrdCreated({ tracks: tracksInCtry });
       const results2 = { categoryTags: tags, tracks: results };
@@ -355,14 +359,6 @@ const getTracksForCategory = async ({ tags, category }) => {
     // 카테고리와 태그가 올경우
 
     // 카테고리와 필터링된 태그로 tracktag들 찾기
-    if (category === "전체") {
-      const findedTrackIds = await getTrackIdsByTag({ tag: findedTags, category });
-      const tracksByTrackIds = await getTracksByTrackTags({ trackIds: findedTrackIds });
-      const results = await getTracksByOrdCreated({ tracks: tracksByTrackIds });
-
-      const results2 = { categoryTags: tags, tracks: results };
-      return results2;
-    }
     const findedTrackIds = await getTrackIdsByTag({ tag: findedTags, category });
     // if (!findedTrackTags) {
     //   // db에 태그에 맞는 track이 없을경우 트랙을 주지 않음

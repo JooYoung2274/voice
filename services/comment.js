@@ -37,10 +37,10 @@ const createComment = async ({ comment, trackId, userId }) => {
       attributes: ["comment", "commentId", "createdAt", "userId"],
       include: {
         model: User,
-        attributes: ["nickname"],
+        attributes: ["nickname", "profileImage"],
       },
       where: { trackId },
-      order: [["createdAt", "DESC"]],
+      order: [["commentId", "DESC"]],
     });
     return result;
   } catch (error) {
@@ -92,9 +92,10 @@ const deleteComment = async ({ userId, trackId, commentId }) => {
       attributes: ["comment", "commentId", "createdAt", "userId"],
       include: {
         model: User,
-        attributes: ["nickname"],
+        attributes: ["nickname", "profileImage"],
       },
       where: { trackId },
+      order: [["commentId", "DESC"]],
     });
     return results;
   } catch (error) {
