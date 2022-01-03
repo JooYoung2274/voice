@@ -359,14 +359,6 @@ const getTracksForCategory = async ({ tags, category }) => {
     // 카테고리와 태그가 올경우
 
     // 카테고리와 필터링된 태그로 tracktag들 찾기
-    if (category === "전체") {
-      const findedTrackIds = await getTrackIdsByTag({ tag: findedTags, category });
-      const tracksByTrackIds = await getTracksByTrackTags({ trackIds: findedTrackIds });
-      const results = await getTracksByOrdCreated({ tracks: tracksByTrackIds });
-
-      const results2 = { categoryTags: tags, tracks: results };
-      return results2;
-    }
     const findedTrackIds = await getTrackIdsByTag({ tag: findedTags, category });
     // if (!findedTrackTags) {
     //   // db에 태그에 맞는 track이 없을경우 트랙을 주지 않음
