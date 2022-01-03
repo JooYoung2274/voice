@@ -4,8 +4,8 @@ const likePost = async (req, res, next) => {
   try {
     const { trackId } = req.params;
     const { userId } = res.locals.user;
-    await likeService.createOrDeleteLike({ trackId, userId });
-    return res.sendStatus(200);
+    const result = await likeService.createOrDeleteLike({ trackId, userId });
+    return res.status(200).send({ result });
   } catch (error) {
     next(error);
   }
