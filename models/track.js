@@ -12,6 +12,7 @@ module.exports = (sequelize, DataTypes) => {
       Track.hasMany(models.TrackTag, { foreignKey: "trackId" });
       Track.hasMany(models.Comment, { foreignKey: "trackId" });
       Track.hasMany(models.Like, { foreignKey: "trackId" });
+      Track.hasMany(models.PlayList, { foreignKey: "trackId" });
       Track.belongsTo(models.User, { foreignKey: "userId", onDelete: "cascade" });
       Track.belongsTo(models.Category, { foreignKey: "category", onDelete: "cascade" });
       Track.belongsTo(models.TrackThumbnail, {
@@ -38,7 +39,7 @@ module.exports = (sequelize, DataTypes) => {
       },
       title: {
         allowNull: false,
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(40),
       },
       category: {
         allowNull: false,

@@ -2,28 +2,34 @@
 const Sequelize = require("sequelize");
 const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
-  class Comment extends Model {
+  class PlayList extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      Comment.belongsTo(models.User, { foreignKey: "userId", onDelete: "cascade" });
-      Comment.belongsTo(models.Track, { foreignKey: "trackId", onDelete: "cascade" });
+      PlayList.belongsTo(models.Track, { foreignKey: "trackId", onDelete: "cascade" });
+      PlayList.belongsTo(models.User, { foreignKey: "userId", onDelete: "cascade" });
     }
   }
-  Comment.init(
+  PlayList.init(
     {
-      commentId: {
+      playListId: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      comment: {
+      createdAt: {
+        type: "TIMESTAMP",
+        defaultValue: sequelize.literal("CURRENT_TIMESTAMP"),
         allowNull: false,
-        type: Sequelize.STRING(100),
+      },
+      updatedAt: {
+        type: "TIMESTAMP",
+        defaultValue: sequelize.literal("CURRENT_TIMESTAMP"),
+        allowNull: false,
       },
       userId: {
         allowNull: false,
@@ -36,9 +42,9 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       sequelize,
-      modelName: "Comment",
-      timestamps: true,
+      modelName: "PlayList",
+      timestamps: false,
     },
   );
-  return Comment;
+  return PlayList;
 };
