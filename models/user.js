@@ -58,7 +58,7 @@ module.exports = (sequelize, DataTypes) => {
       },
       introduce: {
         allowNull: true,
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(100),
       },
     },
     {
