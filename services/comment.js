@@ -27,13 +27,16 @@ const createComment = async ({ comment, trackId, userId }) => {
       throw customizedError("존재하지 않는 트랙입니다.", 400);
     }
     // 댓글 만들기
+    if (comment.length > 100) {
+      throw customizedError("댓글은 50자를 넘길 수 없습니다.", 400);
+    }
     await Comment.create({
       comment,
       trackId,
       userId,
     });
     // 클라이언트에게 줄 댓글 가공
-    const result = await Comment.findAll({
+    const results = await Comment.findAll({
       attributes: ["comment", "commentId", "createdAt", "userId"],
       include: {
         model: User,
@@ -42,40 +45,40 @@ const createComment = async ({ comment, trackId, userId }) => {
       where: { trackId },
       order: [["commentId", "DESC"]],
     });
-    return result;
+    return results;
   } catch (error) {
     throw error;
   }
 };
 
-const updateComment = async ({ comment, commentId, userId, trackId, nickname }) => {
-  try {
-    // 댓글 업데이트
-    const updated = await Comment.update({ comment }, { where: { commentId, trackId, userId } });
-    if (!updated[0]) {
-      throw customizedError(
-        "존재하지 않는 댓글이거나 트랙에 포함되지 않거나 댓글쓴사람이 아닙니다",
-        400,
-      );
-    }
-    // 댓글만 바뀌는 거니까 댓글만 주면 안되나? like처럼 like눌러도 다른건 안주는 것처럼 효과: 밑에있는 findOne제거가능
-    // userId,trackId를 통해 comment 있는지 없는지 확인하고 createdAt 뽑음
-    const { createdAt } = await Comment.findOne({
-      attributes: ["commentId", "createdAt"],
-      where: { commentId, trackId, userId },
-    });
-    // 업데이트된 후 클라이언트에게 줄 댓글 가공
-    const result = {
-      commentId,
-      nickname,
-      comment,
-      createdAt,
-    };
-    return result;
-  } catch (error) {
-    throw error;
-  }
-};
+// const updateComment = async ({ comment, commentId, userId, trackId, nickname }) => {
+//   try {
+//     // 댓글 업데이트
+//     const updated = await Comment.update({ comment }, { where: { commentId, trackId, userId } });
+//     if (!updated[0]) {
+//       throw customizedError(
+//         "존재하지 않는 댓글이거나 트랙에 포함되지 않거나 댓글쓴사람이 아닙니다",
+//         400,
+//       );
+//     }
+//     // 댓글만 바뀌는 거니까 댓글만 주면 안되나? like처럼 like눌러도 다른건 안주는 것처럼 효과: 밑에있는 findOne제거가능
+//     // userId,trackId를 통해 comment 있는지 없는지 확인하고 createdAt 뽑음
+//     const { createdAt } = await Comment.findOne({
+//       attributes: ["commentId", "createdAt"],
+//       where: { commentId, trackId, userId },
+//     });
+//     // 업데이트된 후 클라이언트에게 줄 댓글 가공
+//     const result = {
+//       commentId,
+//       nickname,
+//       comment,
+//       createdAt,
+//     };
+//     return result;
+//   } catch (error) {
+//     throw error;
+//   }
+// };
 
 const deleteComment = async ({ userId, trackId, commentId }) => {
   try {
@@ -106,6 +109,5 @@ const deleteComment = async ({ userId, trackId, commentId }) => {
 module.exports = {
   findCommentsByTrackId,
   createComment,
-  updateComment,
   deleteComment,
 };

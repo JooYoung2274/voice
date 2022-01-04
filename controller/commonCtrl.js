@@ -1,7 +1,4 @@
 const trackService = require("../services/track");
-const trackTagService = require("../services/tag");
-const commentService = require("../services/comment");
-const likeService = require("../services/like");
 
 const myTracksGet = async (req, res, next) => {
   try {
