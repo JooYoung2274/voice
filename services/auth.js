@@ -1,5 +1,7 @@
 const { User } = require("../models");
 const { customizedError } = require("../utils/error");
+const s3Host = process.env.S3_HOST;
+const DIRECTORY = "images";
 
 const getUserBy = async (col) => {
   try {
@@ -27,8 +29,8 @@ const updateUser = async ({ userId, reqFile, nickname, contact, introduce }) => 
   try {
     const findedUser = await getUserByNickname({ nickname });
     if (findedUser) {
-      if (findedUser.userId !== userId){
-      throw customizedError("사용중인 닉네임입니다", 400);
+      if (findedUser.userId !== userId) {
+        throw customizedError("사용중인 닉네임입니다", 400);
       }
     }
     if (nickname.length < 4 || nickname.length > 15) {
@@ -47,7 +49,7 @@ const updateUser = async ({ userId, reqFile, nickname, contact, introduce }) => 
     }
     if (reqFile) {
       const { filename } = reqFile;
-      const profileImage = `http://${process.env.HOST}/${filename}`;
+      const profileImage = `${s3Host}/${DIRECTORY}/${filename}`;
       await User.update(
         {
           profileImage,

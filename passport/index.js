@@ -3,8 +3,22 @@ const naverStrategy = require("passport-naver").Strategy;
 const kakaoStrategy = require("passport-kakao").Strategy;
 const googleStrategy = require("passport-google-oauth20").Strategy;
 const { User } = require("../models");
-const userService = require("../services/auth");
 const randomstring = require("randomstring");
+const naver_client_id = process.env.NAVER_CLIENT_ID;
+const naver_client_secret = process.env.NAVER_CLIENT_SECRET;
+const domain = process.env.DOMAIN;
+const s3Host = process.env.S3_HOST;
+const kakao_client_id = process.env.KAKAO_CLIENT_ID;
+const google_client_id = process.env.GOOGLE_CLIENT_ID;
+const google_client_secret = process.env.GOOGLE_CLIENT_SECRET;
+const DIRECTORY = "etc";
+const BASIC_PROFILE = "profile.png";
+const profileImage = `${s3Host}/${DIRECTORY}/${BASIC_PROFILE}`;
+const KAKAO = "kakao";
+const NAVER = "naver";
+const GOOGLE = "google";
+const callbackURL = (company) => `${domain}/api/auth/${company}/callback`;
+
 let newNickname = "";
 
 module.exports = (app) => {
@@ -12,12 +26,11 @@ module.exports = (app) => {
   passport.use(
     new naverStrategy(
       {
-        clientID: process.env.NAVER_CLIENT_ID,
-        clientSecret: process.env.NAVER_CLIENT_SECRET,
-        callbackURL: process.env.DOMAIN + "/api/auth/naver/callback",
+        clientID: naver_client_id,
+        clientSecret: naver_client_secret,
+        callbackURL: callbackURL(NAVER),
       },
       async (accessToken, refreshToken, profile, done) => {
-        console.log("*********naver profile*********", profile);
         try {
           const exUser = await User.findOne({
             where: { snsId: profile.id, flatformType: profile.provider },
@@ -31,7 +44,7 @@ module.exports = (app) => {
               nickname: newNickname,
               flatformType: profile.provider,
               snsId: profile.id,
-              profileImage: "http://" + process.env.HOST + "/etc/profile.png",
+              profileImage: profileImage,
             });
             let firstLogin = true;
             done(null, newUser, { firstLogin });
@@ -46,11 +59,10 @@ module.exports = (app) => {
   passport.use(
     new kakaoStrategy(
       {
-        clientID: process.env.KAKAO_CLIENT_ID,
-        callbackURL: process.env.DOMAIN + "/api/auth/kakao/callback",
+        clientID: kakao_client_id,
+        callbackURL: callbackURL(KAKAO),
       },
       async (accessToken, refreshToken, profile, done) => {
-        console.log("*********kakao profile*********", profile);
         try {
           const exUser = await User.findOne({
             where: { snsId: profile.id, flatformType: profile.provider },
@@ -64,7 +76,7 @@ module.exports = (app) => {
               nickname: newNickname,
               flatformType: profile.provider,
               snsId: profile.id,
-              profileImage: "http://" + process.env.HOST + "/etc/profile.png",
+              profileImage: profileImage,
             });
             let firstLogin = true;
             done(null, newUser, { firstLogin });
@@ -79,12 +91,11 @@ module.exports = (app) => {
   passport.use(
     new googleStrategy(
       {
-        clientID: process.env.GOOGLE_CLIENT_ID,
-        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-        callbackURL: process.env.DOMAIN + "/api/auth/google/callback",
+        clientID: google_client_id,
+        clientSecret: google_client_secret,
+        callbackURL: callbackURL(GOOGLE),
       },
       async (accessToken, refreshToken, profile, done) => {
-        console.log("*********google profile*********", profile);
         try {
           const exUser = await User.findOne({
             where: { snsId: profile.id, flatformType: profile.provider },
@@ -98,7 +109,7 @@ module.exports = (app) => {
               nickname: newNickname,
               flatformType: profile.provider,
               snsId: profile.id,
-              profileImage: "http://" + process.env.HOST + "/etc/profile.png",
+              profileImage: profileImage,
             });
             let firstLogin = true;
             done(null, newUser, { firstLogin });

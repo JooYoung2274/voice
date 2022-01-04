@@ -14,9 +14,10 @@ const sequelize = require("sequelize");
 const { Op } = require("sequelize");
 const { or, like } = Op;
 const { customizedError } = require("../utils/error");
+const s3Host = process.env.S3_HOST;
+const DIRECTORY = "tracks";
 
 const createTrack = async ({ title, category, tag, trackThumbnailUrlFace, filename, userId }) => {
-
   if (!trackThumbnailUrlFace || !category || !tag.length || !title || !userId) {
     throw customizedError("잘못된 녹음 업로드 요청입니다.", 400);
   }
@@ -29,7 +30,7 @@ const createTrack = async ({ title, category, tag, trackThumbnailUrlFace, filena
     title: title,
     category: category,
     trackThumbnailUrlFace: trackThumbnailUrlFace,
-    trackUrl: "http://" + process.env.HOST + "/" + filename,
+    trackUrl: `${s3Host}/${DIRECTORY}/${filename}`,
     userId: userId,
   });
   for (let i = 0; i < tag.length; i++) {
