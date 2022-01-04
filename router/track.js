@@ -10,5 +10,7 @@ router.post("/", needLogin, trackUploader, trackController.trackUploads);
 router.get("/:trackId", trackController.trackPage);
 router.delete("/:trackId", needLogin, trackController.trackDelete);
 router.put("/:trackId", needLogin, trackController.trackUpdate);
+router.post("/playlist", needLogin, trackController.listUpdate);
+router.get("/playlist", needLogin, trackController.listGet);
 
 module.exports = router;
