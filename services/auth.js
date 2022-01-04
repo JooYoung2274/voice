@@ -27,7 +27,9 @@ const updateUser = async ({ userId, reqFile, nickname, contact, introduce }) => 
   try {
     const findedUser = await getUserByNickname({ nickname });
     if (findedUser) {
+      if (findedUser.userId !== userId){
       throw customizedError("사용중인 닉네임입니다", 400);
+      }
     }
     if (nickname.length < 4 || nickname.length > 15) {
       throw customizedError("닉네임은 4자이상 15자 이하여야 합니다.", 400);
