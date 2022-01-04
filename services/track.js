@@ -7,6 +7,7 @@ const {
   Comment,
   Category,
   TrackThumbnail,
+  PlayList,
 } = require("../models");
 const { getTrackIdsByTag } = require("./tag");
 const sequelize = require("sequelize");
@@ -15,7 +16,7 @@ const { or, like } = Op;
 const { customizedError } = require("../utils/error");
 
 const createTrack = async ({ title, category, tag, trackThumbnailUrlFace, filename, userId }) => {
-  if (!trackThumbnailUrlFace || !category || !tag || !title || !userId) {
+  if (!trackThumbnailUrlFace || !category || !tag.length || !title || !userId) {
     throw customizedError("녹음파일이 존재하지 않습니다.", 400);
   }
 
@@ -408,13 +409,51 @@ const getTracksForMain = async () => {
       // 프론트에게 주기위해 배열안에 담음
       results.push({ category: categoryAndText, tracks: tracksInCtryOrdLike });
     }
-
     return results;
   } catch (error) {
     throw error;
   }
 };
 
+const updateListByTrackId = async ({ trackId, userId }) => {
+  try {
+    if (!trackId.length) {
+      throw customizedError("선택된 트랙이 없습니다.", 400);
+    }
+    await PlayList.destroy({ where: { userId: userId } });
+    for (let i = 0; i < trackId.length; i++) {
+      await PlayList.create({ trackId: trackId[i], userId: userId });
+    }
+  } catch (error) {
+    throw error;
+  }
+};
+
+const getListByUserId = async ({ userId }) => {
+  try {
+    const trackIds = [];
+    const trackId = await PlayList.findAll({ where: { userId: userId } });
+    for (let i = 0; i < trackId.length; i++) {
+      trackIds.push(trackId[i].trackId);
+    }
+    if (!trackIds.length) {
+      throw customizedError("저장된 재생목록이 없습니다.", 400);
+    }
+    const tracks = [];
+    for (let i = 0; i < trackIds.length; i++) {
+      const track = await Track.findOne(trackBasicForm, { where: { trackId: trackIds[i] } });
+      tracks.push({
+        name: track.title,
+        singer: track.User.nickname,
+        cover: track.TrackThumbnail.trackThumbnailUrlFace,
+        musicSrc: track.trackUrl,
+      });
+    }
+    return { tracks };
+  } catch (error) {
+    throw error;
+  }
+};
 module.exports = {
   createTrack,
   deleteTrackByTrackId,
@@ -426,5 +465,7 @@ module.exports = {
   getTracksByLikes,
   getTracksByCategory,
   updateTrackByTrackId,
+  updateListByTrackId,
+  getListByUserId,
   getTracksByKeyword,
 };

@@ -78,4 +78,34 @@ const trackUpdate = async (req, res, next) => {
   }
 };
 
-module.exports = { trackUploads, trackDelete, trackPage, listInfoGet, trackUpdate };
+const listUpdate = async (req, res, next) => {
+  try {
+    const { trackId } = req.body;
+    const { userId } = res.locals.user;
+    await trackService.updateListByTrackId({ trackId, userId });
+    res.sendStatus(200);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const listGet = async (req, res, next) => {
+  try {
+    const { userId } = res.locals.user;
+    const { tracks } = await trackService.getListByUserId({ userId });
+    console.log(tracks);
+    res.status(200).json({ tracks });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = {
+  trackUploads,
+  trackDelete,
+  trackPage,
+  listInfoGet,
+  trackUpdate,
+  listUpdate,
+  listGet,
+};
