@@ -445,9 +445,6 @@ const getListByUserId = async ({ userId }) => {
     for (let i = 0; i < trackId.length; i++) {
       trackIds.push(trackId[i].trackId);
     }
-    if (!trackIds.length) {
-      throw customizedError("저장된 재생목록이 없습니다.", 400);
-    }
     const tracks = [];
     for (let i = 0; i < trackIds.length; i++) {
       const track = await Track.findOne(trackBasicForm, { where: { trackId: trackIds[i] } });
