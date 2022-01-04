@@ -6,6 +6,7 @@ const likeRouter = require("./like.js");
 const AuthRouter = require("./auth");
 const listInfoRouter = require("./listinfo");
 const searchRouter = require("./search");
+const playListRouter = require("./playList");
 const router = express.Router();
 
 router.use("/tracks", trackRouter);
@@ -15,5 +16,6 @@ router.use("/tracks", likeRouter);
 router.use("/auth", AuthRouter);
 router.use("/listinfo", listInfoRouter);
 router.use("/search", searchRouter);
+router.use("/playlist", playListRouter);
 
 module.exports = router;

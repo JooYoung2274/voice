@@ -21,6 +21,10 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "userId",
         sourceKey: "userId",
       });
+      User.hasMany(models.PlayList, {
+        foreignKey: "userId",
+        sourceKey: "userId",
+      });
     }
   }
   User.init(
