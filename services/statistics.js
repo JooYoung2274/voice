@@ -1,7 +1,7 @@
 const { Track, Like, Category, TrackTag, Tag, User } = require("../models");
 const { Op } = require("sequelize");
 
-//user별로 올린 모든 trackId 찾기
+//해당하는 모든 trackId 찾기
 const TrackIdsByUserId = async (userId) => {
   const findedTrackIds = await Track.findAll({
     attributes: ["trackId"],
@@ -10,6 +10,17 @@ const TrackIdsByUserId = async (userId) => {
   const results = findedTrackIds.map((track) => track.trackId);
   return results;
 };
+//카테고리별 트랙 아이디 찾기
+const TrackIdsByCategory = async (category, userId) => {
+  const findedTrackIds = await Track.findAll({
+    attributes: ["trackId"],
+    where: category,
+    userId,
+  });
+  const results = findedTrackIds.map((track) => track.trackId);
+  return results;
+};
+
 //전체제외 카테고리 항목
 const getCategorys = async () => {
   const categoryList = await Category.findAll({
@@ -22,7 +33,7 @@ const getCategorys = async () => {
 };
 //모든 태그 항목
 const getTags = async () => {
-  const tagList = await Tag.findAll({ attributes: ["tag"], order: [["tag", "ASC"]] });
+  const tagList = await Tag.findAll({ attributes: ["tag"] });
   const results = tagList.map((el) => el.tag);
   return results;
 };
@@ -49,10 +60,32 @@ const getCategoryTags = async ({ userId }) => {
     const findedCategoryCount = await Track.count({
       where: { userId, category },
     });
-    categorysCount.push({ category: category, count: findedCategoryCount });
+    //카테고리별 트랙 아이디 찾기
+    const trackIdsByCategory = await TrackIdsByCategory({ category, userId });
+    if (trackIdsByCategory.length === 0) {
+      categorysCount.push({ category: category, count: findedCategoryCount, likeCnt: 0 });
+    } else {
+      //카테고리별 좋아요 세기
+      const likeByCategoryCount = await Like.count({
+        where: { trackId: { [Op.or]: trackIdsByCategory } },
+      });
+      categorysCount.push({
+        category: category,
+        count: findedCategoryCount,
+        likeCnt: likeByCategoryCount,
+      });
+    }
   }
-  //개수 많은 순 정렬
-  categorysCount.sort((a, b) => b.count - a.count);
+  //개수 많은 순 정렬(같으면 좋아요 많은순)
+  categorysCount.sort((a, b) => {
+    if (a.count > b.count) return -1;
+    if (a.count < b.count) return 1;
+    if (a.count === b.count) {
+      if (a.likeCnt > b.likeCnt) return -1;
+      if (a.likeCnt < b.likeCnt) return 1;
+      return 0;
+    }
+  });
   const maxCategory = categorysCount[0].category;
   //모든 태그 항목
   const tagList = await getTags();
@@ -61,9 +94,33 @@ const getCategoryTags = async ({ userId }) => {
     const findedTagCount = await TrackTag.count({
       where: { trackId: { [Op.or]: findedTrackIds }, tag: tag },
     });
-    tagsCount.push({ tag: tag, count: findedTagCount });
+    //태그별 트랙 아이디 찾기
+    const trackIdsByTag = await TrackTag.findAll({
+      attributes: ["trackId"],
+      where: { trackId: { [Op.or]: findedTrackIds }, tag: tag },
+    });
+    const trackIds = trackIdsByTag.map((track) => track.trackId);
+    if (trackIds.length === 0) {
+      tagsCount.push({ tag: tag, count: findedTagCount, likeCnt: 0 });
+    } else {
+      //태그별 좋아요 세기
+      const likeByTagCount = await Like.count({
+        where: { trackId: { [Op.or]: trackIds } },
+      });
+      tagsCount.push({ tag: tag, count: findedTagCount, likeCnt: likeByTagCount });
+    }
   }
-  tagsCount.sort((a, b) => b.count - a.count);
+  tagsCount.sort((a, b) => {
+    if (a.count > b.count) return -1;
+    if (a.count < b.count) return 1;
+    if (a.count === b.count) {
+      if (a.likeCnt > b.likeCnt) return -1;
+      if (a.likeCnt < b.likeCnt) return 1;
+      return 0;
+    }
+  });
+  //console.log(tagsCount);
+  //console.log(categorysCount);
   const maxTreeTags = [tagsCount[0].tag, tagsCount[1].tag, tagsCount[2].tag];
   const results = { category: maxCategory, tags: maxTreeTags };
   return results;
