@@ -41,7 +41,6 @@ const storageFor = (dir) =>
 
 // 파일 타입 필터링
 const fileFilterFor = (passTypes) => (req, file, cb) => {
-  console.log(s3);
   const fileType = getfileType(file);
   if (fileTypeValidate(fileType, passTypes)) {
     cb(null, true);
