@@ -91,9 +91,8 @@ const listUpdate = async (req, res, next) => {
 const listGet = async (req, res, next) => {
   try {
     const { userId } = res.locals.user;
-    const { tracks } = await trackService.getListByUserId({ userId });
-    console.log(tracks);
-    res.status(200).json({ tracks });
+    const { playlist } = await trackService.getListByUserId({ userId });
+    res.status(200).json({ playlist });
   } catch (error) {
     next(error);
   }
