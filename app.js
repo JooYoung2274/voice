@@ -26,9 +26,9 @@ dotenv.config();
 passportConfig(app);
 
 // //test용
-// app.get("/", (req, res) => {
-//   res.sendFile(__dirname + "/views/kakao.html");
-// });
+app.get("/", (req, res) => {
+  res.sendFile(__dirname + "/views/kakao.html");
+});
 
 app.use(express.json());
 app.use("/api", reqLimiter, router);

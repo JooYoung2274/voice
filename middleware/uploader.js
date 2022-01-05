@@ -17,14 +17,14 @@ const passImageTypes = ["jpg", "png", "jpeg"];
 const passvoiceTypes = ["mp4", "mp3", "flac", "wav", "ogg", "mpeg", "x-m4a", "webm"];
 
 // 파일이름 정하는 함수
-const randomFilename = Math.random().toString(36).substr(2, 11) + Date.now();
+const randomFilename = () => Math.random().toString(36).substr(2, 11) + Date.now();
 
 // 파일 type 얻는 함수
 const getfileType = (file) => file.mimetype.split("/")[1];
 
 // 파일 타입 vaildate
-const fileTypeValidate = (filetype, passTypes) => {
-  passTypes.some((passType) => passType === filetype);
+const fileTypeValidate = (fileType, passTypes) => {
+  return passTypes.some((passType) => passType === fileType);
 };
 
 // 파일 넣을 디렉토리 정하기
@@ -35,12 +35,13 @@ const storageFor = (dir) =>
     key: function (req, file, cb) {
       const fileType = getfileType(file);
       const directory = dir;
-      cb(null, `${directory}/${randomFilename}.${fileType}`);
+      cb(null, `${directory}/${randomFilename()}.${fileType}`);
     },
   });
 
 // 파일 타입 필터링
 const fileFilterFor = (passTypes) => (req, file, cb) => {
+  console.log(s3);
   const fileType = getfileType(file);
   if (fileTypeValidate(fileType, passTypes)) {
     cb(null, true);

@@ -4,16 +4,15 @@ const listInfoService = require("../services/listinfo");
 const trackUploads = async (req, res, next) => {
   try {
     const { title, category, tag1, tag2, tag3, trackThumbnailUrlFace } = req.body;
-    const { filename } = req.file;
+    const { location } = req.file;
     const { userId } = res.locals.user;
     const tag = [tag1, tag2, tag3];
-
     const trackId = await trackService.createTrack({
       title,
       category,
       tag,
       trackThumbnailUrlFace,
-      filename,
+      location,
       userId,
     });
     res.status(200).json({ trackId });
