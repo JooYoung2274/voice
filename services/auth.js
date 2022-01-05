@@ -4,7 +4,7 @@ const { customizedError } = require("../utils/error");
 const getUserBy = async (col) => {
   try {
     const findedUser = await User.findOne({
-      attributes: ["nickname", "contact", "profileImage", "introduce"],
+      attributes: ["userId", "nickname", "contact", "profileImage", "introduce"],
       where: col,
     });
     return findedUser;
@@ -27,8 +27,8 @@ const updateUser = async ({ userId, reqFile, nickname, contact, introduce }) => 
   try {
     const findedUser = await getUserByNickname({ nickname });
     if (findedUser) {
-      if (findedUser.userId !== userId){
-      throw customizedError("사용중인 닉네임입니다", 400);
+      if (findedUser.userId !== userId) {
+        throw customizedError("사용중인 닉네임입니다", 400);
       }
     }
     if (nickname.length < 4 || nickname.length > 15) {
