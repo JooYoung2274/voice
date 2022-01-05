@@ -1,6 +1,6 @@
 const { User } = require("../models");
 const { customizedError } = require("../utils/error");
-const s3Host = process.env.S3_HOST;
+const { S3_HOST } = process.env;
 const DIRECTORY = "images";
 
 const getUserBy = async (col) => {
@@ -49,7 +49,7 @@ const updateUser = async ({ userId, reqFile, nickname, contact, introduce }) => 
     }
     if (reqFile) {
       const { filename } = reqFile;
-      const profileImage = `${s3Host}/${DIRECTORY}/${filename}`;
+      const profileImage = `${S3_HOST}/${DIRECTORY}/${filename}`;
       await User.update(
         {
           profileImage,

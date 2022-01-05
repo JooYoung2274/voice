@@ -2,16 +2,13 @@ const multer = require("multer");
 const multerS3 = require("multer-s3");
 const aws = require("aws-sdk");
 const { customizedError } = require("../utils/error");
-const accessKeyId = process.env.S3_ACCESS_KEY_ID;
-const secretAccessKey = process.env.S3_SECRET_ACEESS_KEY;
-const region = process.env.S3_REGION;
-const bucket = process.env.S3_BUCKET_NAME;
+const { S3_ACCESS_KEY_ID, S3_SECRET_ACEESS_KEY, S3_REGION, S3_BUCKET_NAME } = process.env;
 const IMAGES = "images";
 const TRACKS = "tracks";
 const s3 = new aws.S3({
-  accessKeyId,
-  secretAccessKey,
-  region,
+  accessKeyId: S3_ACCESS_KEY_ID,
+  secretAccessKey: S3_SECRET_ACEESS_KEY,
+  region: S3_REGION,
 });
 
 // 통과되는 image타입들
@@ -34,7 +31,7 @@ const fileTypeValidate = (filetype, passTypes) => {
 const storageFor = (dir) =>
   multerS3({
     s3,
-    bucket,
+    bucket: S3_BUCKET_NAME,
     key: function (req, file, cb) {
       const fileType = getfileType(file);
       const directory = dir;

@@ -14,8 +14,9 @@ const sequelize = require("sequelize");
 const { Op } = require("sequelize");
 const { or, like } = Op;
 const { customizedError } = require("../utils/error");
-const s3Host = process.env.S3_HOST;
+const { S3_HOST } = process.env;
 const DIRECTORY = "tracks";
+const trackUrl = `${S3_HOST}/${DIRECTORY}/${filename}`;
 
 const createTrack = async ({ title, category, tag, trackThumbnailUrlFace, filename, userId }) => {
   if (!trackThumbnailUrlFace || !category || !tag.length || !title || !userId) {
@@ -30,7 +31,7 @@ const createTrack = async ({ title, category, tag, trackThumbnailUrlFace, filena
     title: title,
     category: category,
     trackThumbnailUrlFace: trackThumbnailUrlFace,
-    trackUrl: `${s3Host}/${DIRECTORY}/${filename}`,
+    trackUrl: trackUrl,
     userId: userId,
   });
   for (let i = 0; i < tag.length; i++) {

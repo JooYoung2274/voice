@@ -4,20 +4,22 @@ const kakaoStrategy = require("passport-kakao").Strategy;
 const googleStrategy = require("passport-google-oauth20").Strategy;
 const { User } = require("../models");
 const randomstring = require("randomstring");
-const naver_client_id = process.env.NAVER_CLIENT_ID;
-const naver_client_secret = process.env.NAVER_CLIENT_SECRET;
-const domain = process.env.DOMAIN;
-const s3Host = process.env.S3_HOST;
-const kakao_client_id = process.env.KAKAO_CLIENT_ID;
-const google_client_id = process.env.GOOGLE_CLIENT_ID;
-const google_client_secret = process.env.GOOGLE_CLIENT_SECRET;
+const {
+  NAVER_CLIENT_ID,
+  NAVER_CLIENT_SECRET,
+  DOMAIN,
+  S3_HOST,
+  KAKAO_CLIENT_ID,
+  GOOGLE_CLIENT_ID,
+  GOOGLE_CLIENT_SECRET,
+} = process.env;
 const DIRECTORY = "etc";
 const BASIC_PROFILE = "profile.png";
-const profileImage = `${s3Host}/${DIRECTORY}/${BASIC_PROFILE}`;
+const profileImage = `${S3_HOST}/${DIRECTORY}/${BASIC_PROFILE}`;
 const KAKAO = "kakao";
 const NAVER = "naver";
 const GOOGLE = "google";
-const callbackURL = (company) => `${domain}/api/auth/${company}/callback`;
+const callbackURL = (company) => `${DOMAIN}/api/auth/${company}/callback`;
 
 let newNickname = "";
 
@@ -26,8 +28,8 @@ module.exports = (app) => {
   passport.use(
     new naverStrategy(
       {
-        clientID: naver_client_id,
-        clientSecret: naver_client_secret,
+        clientID: NAVER_CLIENT_ID,
+        clientSecret: NAVER_CLIENT_SECRET,
         callbackURL: callbackURL(NAVER),
       },
       async (accessToken, refreshToken, profile, done) => {
@@ -59,7 +61,7 @@ module.exports = (app) => {
   passport.use(
     new kakaoStrategy(
       {
-        clientID: kakao_client_id,
+        clientID: KAKAO_CLIENT_ID,
         callbackURL: callbackURL(KAKAO),
       },
       async (accessToken, refreshToken, profile, done) => {
@@ -91,8 +93,8 @@ module.exports = (app) => {
   passport.use(
     new googleStrategy(
       {
-        clientID: google_client_id,
-        clientSecret: google_client_secret,
+        clientID: GOOGLE_CLIENT_ID,
+        clientSecret: GOOGLE_CLIENT_SECRET,
         callbackURL: callbackURL(GOOGLE),
       },
       async (accessToken, refreshToken, profile, done) => {

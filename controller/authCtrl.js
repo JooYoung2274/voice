@@ -1,7 +1,7 @@
 const userService = require("../services/auth");
 const passport = require("passport");
 const jwt = require("jsonwebtoken");
-const jwt_secret = process.env.JWT_SECRET;
+const { JWT_SECRET } = process.env;
 const KAKAO = "kakao";
 const NAVER = "naver";
 const GOOGLE = "google";
@@ -24,7 +24,7 @@ const kakaoCallback = (req, res, next) => {
     if (err) return next(err);
     const { userId, nickname, contact, profileImage, introduce } = user;
     const { firstLogin } = info;
-    const jwtToken = jwt.sign({ userId: userId }, jwt_secret);
+    const jwtToken = jwt.sign({ userId: userId }, JWT_SECRET);
     result = {
       firstLogin: firstLogin,
       jwtToken: jwtToken,
@@ -42,7 +42,7 @@ const googleCallback = (req, res, next) => {
     if (err) return next(err);
     const { userId, nickname, contact, profileImage, introduce } = user;
     const { firstLogin } = info;
-    const jwtToken = jwt.sign({ userId: userId }, jwt_secret);
+    const jwtToken = jwt.sign({ userId: userId }, JWT_SECRET);
     result = {
       firstLogin: firstLogin,
       jwtToken: jwtToken,
@@ -60,7 +60,7 @@ const naverCallback = (req, res, next) => {
     if (err) return next(err);
     const { userId, nickname, contact, profileImage, introduce } = user;
     const { firstLogin } = info;
-    const jwtToken = jwt.sign({ userId: userId }, jwt_secret);
+    const jwtToken = jwt.sign({ userId: userId }, JWT_SECRET);
     result = {
       firstLogin: firstLogin,
       jwtToken: jwtToken,

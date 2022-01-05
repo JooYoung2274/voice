@@ -3,9 +3,9 @@
 // up:npx sequelize-cli db:seed:all seeders전부 적용
 // down:npx sequelize-cli db:seed:undo:all seeders 전부 삭제
 
-const s3Host = process.env.S3_HOST;
+const { S3_HOST } = process.env;
 const DIRECTORY = "categoryUrl";
-const categoryUrl = `${s3Host}/${DIRECTORY}/`;
+const categoryUrl = `${S3_HOST}/${DIRECTORY}/`;
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {

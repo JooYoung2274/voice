@@ -1,8 +1,8 @@
 "use strict";
 
-const s3Host = process.env.S3_HOST;
+const { S3_HOST } = process.env;
 const DIRECTORY = "trackThumbnail";
-const trackThumbnailUrl = `${s3Host}/${DIRECTORY}/`;
+const trackThumbnailUrl = `${S3_HOST}/${DIRECTORY}/`;
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
