@@ -12,10 +12,13 @@ const {
 const { getTrackIdsByTag } = require("./tag");
 const sequelize = require("sequelize");
 const { Op } = require("sequelize");
-const { or, like } = Op;
+const { or, like, ne } = Op;
 const { customizedError } = require("../utils/error");
 const { S3_HOST } = process.env;
 const DIRECTORY = "tracks";
+const CATEGORYALL = "전체";
+const CATEGORYALLTEXT = "최근에 올라온 목소리";
+const TRACKNUM = 19;
 
 const createTrack = async ({ title, category, tag, trackThumbnailUrlFace, location, userId }) => {
   if (!trackThumbnailUrlFace || !category || !tag.length || !title || !userId) {
@@ -136,7 +139,7 @@ const getTrackByTrackId = async ({ trackId }) => {
   if (!track) {
     throw customizedError("존재하지 않는 트랙입니다.", 400);
   }
-  const findedTrack = await insertLikeCnt(track);
+  const findedTrack = await insertLikeAndCmtCnt(track);
   return findedTrack;
 };
 
@@ -185,7 +188,7 @@ const trackBasicForm = {
   include: [
     { model: TrackThumbnail, attributes: ["trackThumbnailUrlFace", "trackThumbnailUrlFull"] },
     { model: TrackTag, attributes: ["tag"] },
-    { model: User, attributes: ["nickname"] },
+    { model: User, attributes: ["nickname", "profileImage"] },
     {
       model: Like,
       attributes: ["likeId"],
@@ -199,8 +202,8 @@ const trackBasicForm = {
   order: [[Comment, "commentId", "DESC"]],
 };
 
-//track에 likeCnt 넣는 함수
-const insertLikeCnt = (track) => {
+//track에 likeCnt, commentCnt 넣는 함수
+const insertLikeAndCmtCnt = (track) => {
   const { Likes: likesArray, Comments: commentsArray } = track.dataValues;
   track.dataValues.Likes = { likeCnt: likesArray.length };
   track.dataValues.CommentCnt = { commentCnt: commentsArray.length };
@@ -220,11 +223,8 @@ const likeCreatedSort = (trackA, trackB) => {
   return trackB.dataValues.Likes.likeCnt - trackA.dataValues.Likes.likeCnt;
 };
 
-//메인에 track자르는 개수:20
-const TRACKNUM = 19;
-
 // 메인에 처음에 주어지는 카테고리
-const categoryFirst = { category: "전체", categoryText: "최근에 올라온 목소리" };
+const categoryFirst = { category: CATEGORYALL, categoryText: CATEGORYALLTEXT };
 
 // 그냥 트랙들뽑기
 const getTracks = async () => {
@@ -257,7 +257,7 @@ const getTracksByKeyword = async ({ keyword }) => {
 
 // 카테고리별 여러 트랙뽑기
 const getTracksByCategory = async ({ category }) => {
-  if (category === "전체") {
+  if (category === CATEGORYALL) {
     const findedTracks = await Track.findAll({
       ...trackBasicForm,
     });
@@ -278,7 +278,7 @@ const getTracksByCategory = async ({ category }) => {
 // 트랙들 넣으면 likeCnt 넣어주고 좋아요순으로 바뀌고 상위 20개 뽑음
 const getTracksOrdLike = async ({ tracks }) => {
   tracks = tracks
-    .map((track) => insertLikeCnt(track)) //likeCnt 넣어주기
+    .map((track) => insertLikeAndCmtCnt(track)) //likeCnt 넣어주기
     .sort((trackA, trackB) => likeCreatedSort(trackA, trackB)) //likeCnt 내림차순 likeCnt같다면 createdAt최신순
     .slice(0, TRACKNUM); //20개씩 자르기
   return tracks;
@@ -287,7 +287,7 @@ const getTracksOrdLike = async ({ tracks }) => {
 // 트랙들 넣으면 likeCnt 넣어주고 최신순으로 바뀌고 개수 제한 없음
 const getTracksByOrdCreated = async ({ tracks }) => {
   tracks = tracks
-    .map((track) => insertLikeCnt(track)) //likeCnt 넣어주기
+    .map((track) => insertLikeAndCmtCnt(track)) //likeCnt 넣어주기
     .sort((trackA, trackB) => createdSort(trackA, trackB)); // trackId 최신순
   return tracks;
 };
@@ -295,7 +295,7 @@ const getTracksByOrdCreated = async ({ tracks }) => {
 // 트랙들 넣으면 likeCnt 넣어주고 최신순으로 바뀌고 상위 20개 뽑음
 const getTracksByOrdCreatedLimit = async ({ tracks }) => {
   tracks = tracks
-    .map((track) => insertLikeCnt(track)) //likeCnt 넣어주기
+    .map((track) => insertLikeAndCmtCnt(track)) //likeCnt 넣어주기
     .sort((trackA, trackB) => createdSort(trackA, trackB)) // trackId 최신순
     .slice(0, TRACKNUM);
   return tracks;
@@ -401,6 +401,11 @@ const getTracksForMain = async () => {
     // category 이름순으로 정렬
     const categoriesList = await Category.findAll({
       order: [["category", "ASC"]],
+      where: {
+        category: {
+          [ne]: CATEGORYALL,
+        },
+      },
     });
 
     // category를 기준으로 track들 가져온 후 results배열에 push
