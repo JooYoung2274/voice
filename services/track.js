@@ -16,7 +16,6 @@ const { or, like } = Op;
 const { customizedError } = require("../utils/error");
 const { S3_HOST } = process.env;
 const DIRECTORY = "tracks";
-const trackUrl = `${S3_HOST}/${DIRECTORY}/${filename}`;
 
 const createTrack = async ({ title, category, tag, trackThumbnailUrlFace, filename, userId }) => {
   if (!trackThumbnailUrlFace || !category || !tag.length || !title || !userId) {
@@ -31,7 +30,7 @@ const createTrack = async ({ title, category, tag, trackThumbnailUrlFace, filena
     title: title,
     category: category,
     trackThumbnailUrlFace: trackThumbnailUrlFace,
-    trackUrl: trackUrl,
+    trackUrl: `${S3_HOST}/${DIRECTORY}/${filename}`,
     userId: userId,
   });
   for (let i = 0; i < tag.length; i++) {
