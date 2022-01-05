@@ -50,17 +50,17 @@ const fileFilterFor = (passTypes) => (req, file, cb) => {
 };
 
 // local에 저장 --2
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "./uploads");
-  },
-  filename: function (req, file, cb) {
-    cb(
-      null,
-      Math.random().toString(36).substr(2, 11) + Date.now() + "." + file.mimetype.split("/")[1],
-    ); // 생성한 난수 + 현재 시각 + . + 파일 확장자명
-  },
-});
+// const storage = multer.diskStorage({
+//   destination: (req, file, cb) => {
+//     cb(null, "./uploads");
+//   },
+//   filename: function (req, file, cb) {
+//     cb(
+//       null,
+//       Math.random().toString(36).substr(2, 11) + Date.now() + "." + file.mimetype.split("/")[1],
+//     ); // 생성한 난수 + 현재 시각 + . + 파일 확장자명
+//   },
+// });
 
 // 업로드 하기
 const uploader = (storage, fileFilter) =>
@@ -79,11 +79,11 @@ const imageFileFilter = fileFilterFor(passImageTypes);
 const voiceFileFilter = fileFilterFor(passvoiceTypes);
 
 // multer 미들웨어 --1
-// const imageMulter = uploader(imageStorage, imageFileFilter);
-// const voiceMulter = uploader(voiceStorage, voiceFileFilter);
+const imageMulter = uploader(imageStorage, imageFileFilter);
+const voiceMulter = uploader(voiceStorage, voiceFileFilter);
 
 // local uploads에 파일 저장하고 싶을때--3 방법: 1 주석처리하고 2,3주석 풀면됨
-const imageMulter = uploader(storage, imageFileFilter);
-const voiceMulter = uploader(storage, voiceFileFilter);
+// const imageMulter = uploader(storage, imageFileFilter);
+// const voiceMulter = uploader(storage, voiceFileFilter);
 
 module.exports = { imageMulter, voiceMulter };
