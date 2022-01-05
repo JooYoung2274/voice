@@ -239,6 +239,7 @@ const getTracksByKeyword = async ({ keyword }) => {
     // 만약 띄어쓰기 된 키워드가 3개 이상일 경우 검색 코드 전체적으로 좀 달라져야함.
     // 추후에 협의 후 수정해야 할 듯.
     const keywordArray = keyword.split(" ");
+
     if (keywordArray.length !== 1) {
       const results = await Track.findAll({
         where: {
@@ -350,13 +351,24 @@ const getTracksByTrackTags = async ({ trackIds }) => {
   }
   return results;
 };
+///////////////////////////////////////////////////////////////
+const accSort = (trackA, trackB) => {
+  return trackB.dataValues.trackId - trackA.dataValues.trackId;
+};
 
+const getTracksByOrdAcc = async ({ tracks }) => {
+  tracks = tracks
+    .map((track) => insertLikeCnt(track)) //likeCnt 넣어주기
+    .sort((trackA, trackB) => accSort(trackA, trackB));
+  return tracks;
+};
+///////////////////////////////////////////////////////////////
 // keyword로 찾은 트랙 최종 service
 const getTracksForSearch = async ({ keyword }) => {
   // keyword로 track들 찾기
+  // test === true면 정확도순 정렬
   const tracksInKeyword = await getTracksByKeyword({ keyword });
-  // 찾은 track들 likCnt넣고 최신순으로 정렬
-  const results = await getTracksByOrdCreated({ tracks: tracksInKeyword });
+  const results = await getTracksByOrdAcc({ tracks: tracksInKeyword });
   return results;
 };
 
@@ -468,17 +480,22 @@ const getListByUserId = async ({ userId }) => {
     for (let i = 0; i < trackId.length; i++) {
       trackIds.push(trackId[i].trackId);
     }
+    const playlist = [];
     const tracks = [];
     for (let i = 0; i < trackIds.length; i++) {
-      const track = await Track.findOne(trackBasicForm, { where: { trackId: trackIds[i] } });
-      tracks.push({
-        name: track.title,
-        singer: track.User.nickname,
-        cover: track.TrackThumbnail.trackThumbnailUrlFace,
-        musicSrc: track.trackUrl,
+      const track = await Track.findOne({ where: { trackId: trackIds[i] }, ...trackBasicForm });
+      tracks.push(track);
+    }
+    for (let i = 0; i < tracks.length; i++) {
+      playlist.push({
+        name: tracks[i].title,
+        singer: tracks[i].User.nickname,
+        cover: tracks[i].TrackThumbnail.trackThumbnailUrlFace,
+        musicSrc: tracks[i].trackUrl,
+        trackId: tracks[i].trackId,
       });
     }
-    return { tracks };
+    return { playlist };
   } catch (error) {
     throw error;
   }
