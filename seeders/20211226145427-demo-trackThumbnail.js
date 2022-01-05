@@ -1,43 +1,47 @@
 "use strict";
 
+const { S3_HOST } = process.env;
+const DIRECTORY = "trackThumbnail";
+const trackThumbnailUrl = `${S3_HOST}/${DIRECTORY}/`;
+
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     return queryInterface.bulkInsert("TrackThumbnails", [
       {
-        trackThumbnailUrlFace: "http://" + process.env.HOST + "/trackThumbnail/OAO1_face.png",
-        trackThumbnailUrlFull: "http://" + process.env.HOST + "/trackThumbnail/OAO1_full.png",
+        trackThumbnailUrlFace: trackThumbnailUrl + "OAO1_face.png",
+        trackThumbnailUrlFull: trackThumbnailUrl + "OAO1_full.png",
       },
       {
-        trackThumbnailUrlFace: "http://" + process.env.HOST + "/trackThumbnail/OAO2_face.png",
-        trackThumbnailUrlFull: "http://" + process.env.HOST + "/trackThumbnail/OAO2_full.png",
+        trackThumbnailUrlFace: trackThumbnailUrl + "OAO2_face.png",
+        trackThumbnailUrlFull: trackThumbnailUrl + "OAO2_full.png",
       },
       {
-        trackThumbnailUrlFace: "http://" + process.env.HOST + "/trackThumbnail/OAO3_face.png",
-        trackThumbnailUrlFull: "http://" + process.env.HOST + "/trackThumbnail/OAO3_full.png",
+        trackThumbnailUrlFace: trackThumbnailUrl + "OAO3_face.png",
+        trackThumbnailUrlFull: trackThumbnailUrl + "OAO3_full.png",
       },
       {
-        trackThumbnailUrlFace: "http://" + process.env.HOST + "/trackThumbnail/OAO4_face.png",
-        trackThumbnailUrlFull: "http://" + process.env.HOST + "/trackThumbnail/OAO4_full.png",
+        trackThumbnailUrlFace: trackThumbnailUrl + "OAO4_face.png",
+        trackThumbnailUrlFull: trackThumbnailUrl + "OAO4_full.png",
       },
       {
-        trackThumbnailUrlFace: "http://" + process.env.HOST + "/trackThumbnail/OAO5_face.png",
-        trackThumbnailUrlFull: "http://" + process.env.HOST + "/trackThumbnail/OAO5_full.png",
+        trackThumbnailUrlFace: trackThumbnailUrl + "OAO5_face.png",
+        trackThumbnailUrlFull: trackThumbnailUrl + "OAO5_full.png",
       },
       {
-        trackThumbnailUrlFace: "http://" + process.env.HOST + "/trackThumbnail/OAO6_face.png",
-        trackThumbnailUrlFull: "http://" + process.env.HOST + "/trackThumbnail/OAO6_full.png",
+        trackThumbnailUrlFace: trackThumbnailUrl + "OAO6_face.png",
+        trackThumbnailUrlFull: trackThumbnailUrl + "OAO6_full.png",
       },
       {
-        trackThumbnailUrlFace: "http://" + process.env.HOST + "/trackThumbnail/OAO7_face.png",
-        trackThumbnailUrlFull: "http://" + process.env.HOST + "/trackThumbnail/OAO7_full.png",
+        trackThumbnailUrlFace: trackThumbnailUrl + "OAO7_face.png",
+        trackThumbnailUrlFull: trackThumbnailUrl + "OAO7_full.png",
       },
       {
-        trackThumbnailUrlFace: "http://" + process.env.HOST + "/trackThumbnail/OAO8_face.png",
-        trackThumbnailUrlFull: "http://" + process.env.HOST + "/trackThumbnail/OAO8_full.png",
+        trackThumbnailUrlFace: trackThumbnailUrl + "OAO8_face.png",
+        trackThumbnailUrlFull: trackThumbnailUrl + "OAO8_full.png",
       },
       {
-        trackThumbnailUrlFace: "http://" + process.env.HOST + "/trackThumbnail/OAO9_face.png",
-        trackThumbnailUrlFull: "http://" + process.env.HOST + "/trackThumbnail/OAO9_full.png",
+        trackThumbnailUrlFace: trackThumbnailUrl + "OAO9_face.png",
+        trackThumbnailUrlFull: trackThumbnailUrl + "OAO9_full.png",
       },
     ]);
   },
