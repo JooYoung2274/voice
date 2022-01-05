@@ -235,8 +235,30 @@ const getTracks = async () => {
 // 키워드별 여러 트랙뽑기
 const getTracksByKeyword = async ({ keyword }) => {
   try {
-    //   공백이 2개이상 존재하면 하나의 공백으로 변환(아직 더 생각해봐야함)
-    // keyword = keyword.replace(/\s\s+/gi, " ");
+    // 띄어쓰기 된 키워드가 2개일때만 구현해 놓음.
+    // 만약 띄어쓰기 된 키워드가 3개 이상일 경우 검색 코드 전체적으로 좀 달라져야함.
+    // 추후에 협의 후 수정해야 할 듯.
+    const keywordArray = keyword.split(" ");
+    if (keywordArray.length !== 1) {
+      const results = await Track.findAll({
+        where: {
+          [or]: [
+            { title: { [like]: `%${keywordArray[0].trim()}%` } },
+            { title: { [like]: `%${keywordArray[1].trim()}%` } },
+            {
+              "$User.nickname$": { [like]: `%${keywordArray[0].trim()}%` },
+            },
+            {
+              "$User.nickname$": { [like]: `%${keywordArray[1].trim()}%` },
+            },
+          ],
+        },
+        ...trackBasicForm,
+      });
+
+      return results;
+    }
+    // 띄어쓰기 없는 키워드로 검색했을 때
     const results = await Track.findAll({
       where: {
         [or]: [
