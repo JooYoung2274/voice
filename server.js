@@ -6,7 +6,7 @@ const { SERVER_PORT } = process.env;
 
 const server = http.createServer(app);
 
-// const test = "test";3f3f3f3fdfdfsdfsdfdffdㅇㄴㄹㅁㅇㄹㅁㅇㄴㄹ
+// const test = "test";3f3f3f3e
 
 connectDB();
 server.listen(SERVER_PORT, () => {
