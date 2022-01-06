@@ -14,8 +14,6 @@ const sequelize = require("sequelize");
 const { Op } = require("sequelize");
 const { or, like, ne } = Op;
 const { customizedError } = require("../utils/error");
-const { S3_HOST } = process.env;
-const DIRECTORY = "tracks";
 const CATEGORYALL = "전체";
 const CATEGORYALLTEXT = "최근에 올라온 목소리";
 const TRACKNUM = 19;
@@ -33,7 +31,7 @@ const createTrack = async ({ title, category, tag, trackThumbnailUrlFace, locati
     title: title,
     category: category,
     trackThumbnailUrlFace: trackThumbnailUrlFace,
-    trackUrl: `${S3_HOST}/${DIRECTORY}/${location}`,
+    trackUrl: `${location}`,
     userId: userId,
   });
   for (let i = 0; i < tag.length; i++) {
@@ -352,23 +350,23 @@ const getTracksByTrackTags = async ({ trackIds }) => {
   return results;
 };
 ///////////////////////////////////////////////////////////////
-const accSort = (trackA, trackB) => {
-  return trackB.dataValues.trackId - trackA.dataValues.trackId;
-};
+// const accSort = (trackA, trackB) => {
+//   return trackB.dataValues.trackId - trackA.dataValues.trackId;
+// };
 
-const getTracksByOrdAcc = async ({ tracks }) => {
-  tracks = tracks
-    .map((track) => insertLikeCnt(track)) //likeCnt 넣어주기
-    .sort((trackA, trackB) => accSort(trackA, trackB));
-  return tracks;
-};
+// const getTracksByOrdAcc = async ({ tracks }) => {
+//   tracks = tracks
+//     .map((track) => insertLikeCnt(track)) //likeCnt 넣어주기
+//     .sort((trackA, trackB) => accSort(trackA, trackB));
+//   return tracks;
+// };
 ///////////////////////////////////////////////////////////////
 // keyword로 찾은 트랙 최종 service
 const getTracksForSearch = async ({ keyword }) => {
   // keyword로 track들 찾기
   // test === true면 정확도순 정렬
   const tracksInKeyword = await getTracksByKeyword({ keyword });
-  const results = await getTracksByOrdAcc({ tracks: tracksInKeyword });
+  const results = await getTracksByOrdCreated({ tracks: tracksInKeyword });
   return results;
 };
 

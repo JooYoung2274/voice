@@ -1,12 +1,10 @@
 const { User } = require("../models");
 const { customizedError } = require("../utils/error");
-const { S3_HOST } = process.env;
-const DIRECTORY = "images";
 
 const getUserBy = async (col) => {
   try {
     const findedUser = await User.findOne({
-      attributes: ["nickname", "contact", "profileImage", "introduce"],
+      attributes: ["nickname", "contact", "profileImage", "introduce", "userId"],
       where: col,
     });
     return findedUser;
@@ -48,8 +46,8 @@ const updateUser = async ({ userId, reqFile, nickname, contact, introduce }) => 
       throw customizedError("자기 소개는 50자를 넘길 수 없습니다.", 400);
     }
     if (reqFile) {
-      const { filename } = reqFile;
-      const profileImage = `${S3_HOST}/${DIRECTORY}/${filename}`;
+      const { location } = reqFile;
+      const profileImage = `${location}`;
       await User.update(
         {
           profileImage,
