@@ -4,16 +4,15 @@ const listInfoService = require("../services/listinfo");
 const trackUploads = async (req, res, next) => {
   try {
     const { title, category, tag1, tag2, tag3, trackThumbnailUrlFace } = req.body;
-    const { filename } = req.file;
+    const { location } = req.file;
     const { userId } = res.locals.user;
     const tag = [tag1, tag2, tag3];
-
     const trackId = await trackService.createTrack({
       title,
       category,
       tag,
       trackThumbnailUrlFace,
-      filename,
+      location,
       userId,
     });
     res.status(200).json({ trackId });
@@ -92,9 +91,8 @@ const listUpdate = async (req, res, next) => {
 const listGet = async (req, res, next) => {
   try {
     const { userId } = res.locals.user;
-    const { tracks } = await trackService.getListByUserId({ userId });
-    console.log(tracks);
-    res.status(200).json({ tracks });
+    const { playlist } = await trackService.getListByUserId({ userId });
+    res.status(200).json({ playlist });
   } catch (error) {
     next(error);
   }

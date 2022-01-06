@@ -1,6 +1,10 @@
 const userService = require("../services/auth");
 const passport = require("passport");
 const jwt = require("jsonwebtoken");
+const { JWT_SECRET } = process.env;
+const KAKAO = "kakao";
+const NAVER = "naver";
+const GOOGLE = "google";
 
 const updateUser = async (req, res, next) => {
   try {
@@ -16,11 +20,11 @@ const updateUser = async (req, res, next) => {
 };
 
 const kakaoCallback = (req, res, next) => {
-  passport.authenticate("kakao", { failureRedirect: "/" }, (err, user, info) => {
+  passport.authenticate(KAKAO, { failureRedirect: "/" }, (err, user, info) => {
     if (err) return next(err);
     const { userId, nickname, contact, profileImage, introduce } = user;
     const { firstLogin } = info;
-    const jwtToken = jwt.sign({ userId: userId }, process.env.JWT_SECRET);
+    const jwtToken = jwt.sign({ userId: userId }, JWT_SECRET);
     result = {
       firstLogin: firstLogin,
       jwtToken: jwtToken,
@@ -34,11 +38,11 @@ const kakaoCallback = (req, res, next) => {
 };
 
 const googleCallback = (req, res, next) => {
-  passport.authenticate("google", { failureRedirect: "/" }, (err, user, info) => {
+  passport.authenticate(GOOGLE, { failureRedirect: "/" }, (err, user, info) => {
     if (err) return next(err);
     const { userId, nickname, contact, profileImage, introduce } = user;
     const { firstLogin } = info;
-    const jwtToken = jwt.sign({ userId: userId }, process.env.JWT_SECRET);
+    const jwtToken = jwt.sign({ userId: userId }, JWT_SECRET);
     result = {
       firstLogin: firstLogin,
       jwtToken: jwtToken,
@@ -52,11 +56,11 @@ const googleCallback = (req, res, next) => {
 };
 
 const naverCallback = (req, res, next) => {
-  passport.authenticate("naver", { failureRedirect: "/" }, (err, user, info) => {
+  passport.authenticate(NAVER, { failureRedirect: "/" }, (err, user, info) => {
     if (err) return next(err);
     const { userId, nickname, contact, profileImage, introduce } = user;
     const { firstLogin } = info;
-    const jwtToken = jwt.sign({ userId: userId }, process.env.JWT_SECRET);
+    const jwtToken = jwt.sign({ userId: userId }, JWT_SECRET);
     result = {
       firstLogin: firstLogin,
       jwtToken: jwtToken,

@@ -16,7 +16,7 @@ const commentPost = async (req, res, next) => {
       trackId,
       userId,
     });
-    return res.status(200).json({ comment: results });
+    return res.status(200).json({ trackId: trackId, comments: results });
   } catch (error) {
     next(error);
   }
@@ -57,7 +57,7 @@ const commentDelete = async (req, res, next) => {
 
     // 댓글 삭제하는 service 실행
     const results = await commentService.deleteComment({ userId, trackId, commentId });
-    return res.status(200).json({ comment: results });
+    return res.status(200).json({ comments: results });
   } catch (error) {
     next(error);
   }

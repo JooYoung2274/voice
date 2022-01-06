@@ -1,25 +1,27 @@
 require("dotenv").config();
+const { DATABASE_NAME, DATABASE_PASSWORD, DATABASE_USE, DATABASE_HOST, DATABASE_DIALECT } =
+  process.env;
 
 const development = {
-  username: process.env.DATABASE_NAME,
-  password: process.env.DATABASE_PASSWORD,
-  database: process.env.DATABASE,
-  host: process.env.HOST,
-  dialect: "mysql",
+  username: DATABASE_NAME,
+  password: DATABASE_PASSWORD,
+  database: DATABASE_USE,
+  host: DATABASE_HOST,
+  dialect: DATABASE_DIALECT,
 };
 const test = {
-  username: "root",
-  password: null,
-  database: "database_test",
-  host: "127.0.0.1",
-  dialect: "mysql",
+  username: DATABASE_NAME,
+  password: DATABASE_PASSWORD,
+  database: DATABASE_USE,
+  host: DATABASE_HOST,
+  dialect: DATABASE_DIALECT,
 };
 const production = {
-  username: "root",
-  password: null,
-  database: "database_test",
-  host: "127.0.0.1",
-  dialect: "mysql",
+  username: DATABASE_NAME,
+  password: DATABASE_PASSWORD,
+  database: DATABASE_USE,
+  host: DATABASE_HOST,
+  dialect: DATABASE_DIALECT,
 };
 
 module.exports = { development, test, production };
