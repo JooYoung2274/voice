@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       TrackTag.belongsTo(models.Track, { foreignKey: "trackId", onDelete: "cascade" });
       TrackTag.belongsTo(models.Tag, { foreignKey: "tag", onDelete: "cascade" });
-      TrackTag.belongsTo(models.Category, { foreignKey: "category", onDelete: "cascade" });
+      TrackTag.belongsTo(models.Category, { foreignKey: "categoryId", onDelete: "cascade" });
     }
   }
   TrackTag.init(
@@ -30,9 +30,9 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         type: Sequelize.INTEGER,
       },
-      category: {
+      categoryId: {
         allowNull: false,
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER,
       },
     },
     {
