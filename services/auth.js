@@ -13,6 +13,7 @@ const getUserBy = async (col) => {
   }
 };
 
+//test
 const getUserByNickname = async ({ nickname }) => {
   const result = await getUserBy({ nickname });
   return result;
