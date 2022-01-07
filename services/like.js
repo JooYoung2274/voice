@@ -1,4 +1,4 @@
-const { Like, Track, TrackTag, Category, User, Tag } = require("../models");
+const { Like, Track } = require("../models");
 const { customizedError } = require("../utils/error");
 
 const returnLikeCntAndLike = async ({ trackId, like }) => {
@@ -41,77 +41,18 @@ const createOrDeleteLike = async ({ trackId, userId }) => {
   }
 };
 
-const findLikesByTrackId = async ({ trackId }) => {
-  const findedLikes = await Like.count({ where: { trackId: trackId } });
-  return findedLikes;
-};
+// const findLikesByTrackId = async ({ trackId }) => {
+//   const findedLikes = await Like.count({ where: { trackId: trackId } });
+//   return findedLikes;
+// };
 
-const findLike = async ({ findedTracks }) => {
-  let array = [];
-  for (let i = 0; i < findedTracks.length; i++) {
-    const findedLikes = await Like.count({ where: { trackId: findedTracks[i] } });
-    array.push(findedLikes);
-  }
-  return array;
-};
+// const findLike = async ({ findedTracks }) => {
+//   let array = [];
+//   for (let i = 0; i < findedTracks.length; i++) {
+//     const findedLikes = await Like.count({ where: { trackId: findedTracks[i] } });
+//     array.push(findedLikes);
+//   }
+//   return array;
+// };
 
-const getTracks = async ({ userId }) => {
-  const likes = await Like.findAll({
-    attributes: ["trackId"],
-    where: { userId: userId },
-  });
-
-  let array = [];
-  for (let i = 0; i < likes.length; i++) {
-    array.push(likes[i].trackId);
-  }
-
-  let tracks = [];
-  for (let i = 0; i < array.length; i++) {
-    const track = await Track.findOne({
-      attributes: ["trackId", "categoryId", "thumbnailUrl", "trackUrl", "userId"],
-      where: { trackId: array[i] },
-    });
-
-    const { trackId, categoryId, thumbnailUrl, trackUrl, userId } = track;
-
-    const findedCategory = await Category.findOne({
-      attributes: ["category"],
-      where: { categoryId: categoryId },
-    });
-    const category = findedCategory.category;
-
-    const findedNickname = await User.findOne({
-      attributes: ["nickname"],
-      where: { userId: userId },
-    });
-    const nickname = findedNickname.nickname;
-
-    const findedTagid = await TrackTag.findOne({
-      attributes: ["tagId"],
-      where: { trackId: trackId, categoryId: categoryId },
-    });
-    const tagId = findedTagid.tagId;
-
-    const findedTag = await Tag.findOne({
-      attributes: ["tag"],
-      where: { tagId: tagId },
-    });
-    const tag = findedTag.tag;
-
-    const tracked = {
-      trackId,
-      category,
-      tag,
-      categoryId,
-      thumbnailUrl,
-      trackUrl,
-      userId,
-      nickname,
-    };
-    tracks.push(tracked);
-  }
-  return tracks;
-};
-
-module.exports = { createOrDeleteLike, findLikesByTrackId, findLike, getTracks };
+module.exports = { createOrDeleteLike };
