@@ -10,12 +10,18 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       TrackThumbnail.hasMany(models.Track, {
-        foreignKey: "trackThumbnailUrlFace",
+        foreignKey: "trackThumbnailId",
       });
     }
   }
   TrackThumbnail.init(
     {
+      trackThumbnailId: {
+        allowNull: false,
+        autoIncrement: true,
+        primaryKey: true,
+        type: Sequelize.INTEGER,
+      },
       trackThumbnailUrlFace: {
         allowNull: false,
         primaryKey: true,

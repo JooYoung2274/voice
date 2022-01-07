@@ -14,9 +14,9 @@ module.exports = (sequelize, DataTypes) => {
       Track.hasMany(models.Like, { foreignKey: "trackId" });
       Track.hasMany(models.PlayList, { foreignKey: "trackId" });
       Track.belongsTo(models.User, { foreignKey: "userId", onDelete: "cascade" });
-      Track.belongsTo(models.Category, { foreignKey: "category", onDelete: "cascade" });
+      Track.belongsTo(models.Category, { foreignKey: "categoryId", onDelete: "cascade" });
       Track.belongsTo(models.TrackThumbnail, {
-        foreignKey: "trackThumbnailUrlFace",
+        foreignKey: "trackThumbnailId",
         onDelete: "cascade",
       });
     }
@@ -33,7 +33,7 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         type: Sequelize.STRING,
       },
-      trackThumbnailUrlFace: {
+      trackThumbnailId: {
         allowNull: false,
         type: Sequelize.STRING,
       },
@@ -41,9 +41,9 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         type: Sequelize.STRING(40),
       },
-      category: {
+      categoryId: {
         allowNull: false,
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER,
       },
       userId: {
         allowNull: false,
