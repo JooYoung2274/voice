@@ -456,7 +456,11 @@ const getListByUserId = async ({ userId }) => {
       playlist.push({
         name: tracks[i].title,
         singer: tracks[i].User.nickname,
-        cover: tracks[i].TrackThumbnail.trackThumbnailUrlFace,
+        cover: {
+          trackThumbnailId: tracks[i].TrackThumbnail.trackThumbnailId,
+          trackThumbnailUrlFace: tracks[i].TrackThumbnail.trackThumbnailUrlFace,
+          trackThumbnailUrlFull: tracks[i].TrackThumbnail.trackThumbnailUrlFull,
+        },
         musicSrc: tracks[i].trackUrl,
         trackId: tracks[i].trackId,
       });
