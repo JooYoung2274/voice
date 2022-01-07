@@ -14,7 +14,7 @@ const sequelize = require("sequelize");
 const { Op } = require("sequelize");
 const { or, like, ne } = Op;
 const { customizedError } = require("../utils/error");
-const CATEGORYALLID = 0;
+const CATEGORYALLID = 1;
 const CATEGORYALL = "전체";
 const CATEGORYALLTEXT = "최근에 올라온 목소리";
 const TRACKNUM = 19;
@@ -366,10 +366,7 @@ const getTracksForCategory = async ({ tags, category }) => {
 
     // 카테고리와 필터링된 태그로 tracktag들 찾기
     const findedTrackIds = await getTrackIdsByTagAndCtryId({ tag: findedTags, categoryId });
-    // if (!findedTrackTags) {
-    //   // db에 태그에 맞는 track이 없을경우 트랙을 주지 않음
-    //   return;
-    // }
+
     // 찾은 tracktag들로 track들 찾기
     const tracksByTrackIds = await getTracksByTrackIds({ trackIds: findedTrackIds });
     // track들 likCnt넣고 최신순으로 정렬
@@ -459,7 +456,7 @@ const getListByUserId = async ({ userId }) => {
       playlist.push({
         name: tracks[i].title,
         singer: tracks[i].User.nickname,
-        cover: tracks[i].TrackThumbnail.trackThumbnailId,
+        cover: tracks[i].TrackThumbnail.trackThumbnailUrlFace,
         musicSrc: tracks[i].trackUrl,
         trackId: tracks[i].trackId,
       });
