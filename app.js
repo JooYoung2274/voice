@@ -8,7 +8,7 @@ const dotenv = require("dotenv");
 const cors = require("cors");
 const helmet = require("helmet");
 const { reqLimiter } = require("./middleware/security");
-// jenkins@@
+
 app.use(helmet.hidePoweredBy({ setTo: "PHP 8.1.1" })); //req header x-powerd-by 변경
 app.use(helmet.xssFilter()); //xss cross site script 공격 방어
 app.use(helmet.noSniff());
@@ -16,7 +16,7 @@ app.use(helmet.frameguard({ action: "deny" })); //iframe 클릭재킹
 // app.use(helmet.ieNoOpen()); //internet explorer 버전에서 신뢰할 수 없는 html을 다운못하게함
 // app.use(helmet.hsts()) // 이후 요청이 https로만 와야 허락
 // app.use(helmet.dnsPrefetchControl()) //브라우저의 dns레코드 미리추출방지
-
+// test
 const { logHandler, errorHandler } = require("./middleware/errorHandler");
 
 app.use(cors());
