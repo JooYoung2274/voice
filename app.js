@@ -10,10 +10,10 @@ const helmet = require("helmet");
 const hpp = require("hpp");
 const { reqLimiter } = require("./middleware/security");
 
-let corsOptions = {
-  origin: "https://oao-voice.com",
-  credentials: true,
-};
+// let corsOptions = {
+//   origin: "https://oao-voice.com",
+//   credentials: true,
+// };
 
 app.use(helmet.hidePoweredBy({ setTo: "PHP 8.1.1" })); //req header x-powerd-by 변경
 app.use(helmet.xssFilter()); //xss cross site script 공격 방어
@@ -26,7 +26,7 @@ app.use(hpp()); //오염된 req.query방어
 
 const { logHandler, errorHandler } = require("./middleware/errorHandler");
 
-app.use(cors(corsOptions));
+app.use(cors());
 
 app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerFile));
 dotenv.config();
