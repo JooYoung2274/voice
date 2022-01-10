@@ -386,7 +386,6 @@ const getTracksForCategory = async ({ tags, category, page }) => {
 
     // 카테고리와 필터링된 태그로 tracktag들 찾기
     const findedTrackIds = await getTrackIdsByTagAndCtryId({ tag: findedTags, categoryId });
-    console.log(categoryId + "**********");
     // 찾은 tracktag들로 track들 찾기
     const tracksByTrackIds = await getTracksByTrackIds({ trackIds: findedTrackIds, start, end });
     // track들 likCnt넣고 최신순으로 정렬
