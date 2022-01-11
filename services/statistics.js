@@ -11,25 +11,34 @@ const TrackIdsByUserId = async (userId) => {
   return results;
 };
 //카테고리별 트랙 아이디 찾기
-const TrackIdsByCategory = async (category, userId) => {
+const TrackIdsByCategory = async (categoryId, userId) => {
   const findedTrackIds = await Track.findAll({
     attributes: ["trackId"],
-    where: category,
+    where: categoryId,
     userId,
   });
   const results = findedTrackIds.map((track) => track.trackId);
   return results;
 };
 
-//전체제외 카테고리 항목
+//전체제외 카테고리 항목 아이디
 const getCategorys = async () => {
   const categoryList = await Category.findAll({
-    attributes: ["category"],
+    attributes: ["categoryId"],
     where: { category: { [Op.ne]: "전체" } },
-    order: [["category", "ASC"]],
+    order: [["categoryId", "ASC"]],
   });
-  const results = categoryList.map((el) => el.category);
+  const results = categoryList.map((el) => el.categoryId);
   return results;
+};
+//카테고리 아이디로 카테고리 이름 찾기
+const getCategoryByCategoryId = async (categoryId) => {
+  const findedCategory = await Category.findOne({
+    attributes: ["category"],
+    where: { categoryId },
+  });
+  const result = findedCategory.category;
+  return result;
 };
 //모든 태그 항목
 const getTags = async () => {
@@ -50,27 +59,27 @@ const getCategoryTags = async ({ userId }) => {
   //userId가 올린 모든 트랙의 트랙 아이디 찾기
   const findedTrackIds = await TrackIdsByUserId({ userId });
   if (findedTrackIds.length === 0) {
-    return { category: null, tags: null };
+    return { category: "", tags: "" };
   }
   //전체제외 카테고리 항목
   const categoryList = await getCategorys();
 
   //카테고리 항목 별로 userId가 올린 카테고리 세기
-  for (let category of categoryList) {
+  for (let categoryId of categoryList) {
     const findedCategoryCount = await Track.count({
-      where: { userId, category },
+      where: { userId, categoryId },
     });
     //카테고리별 트랙 아이디 찾기
-    const trackIdsByCategory = await TrackIdsByCategory({ category, userId });
+    const trackIdsByCategory = await TrackIdsByCategory({ categoryId, userId });
     if (trackIdsByCategory.length === 0) {
-      categorysCount.push({ category: category, count: findedCategoryCount, likeCnt: 0 });
+      categorysCount.push({ category: categoryId, count: findedCategoryCount, likeCnt: 0 });
     } else {
       //카테고리별 좋아요 세기
       const likeByCategoryCount = await Like.count({
         where: { trackId: { [Op.or]: trackIdsByCategory } },
       });
       categorysCount.push({
-        category: category,
+        category: categoryId,
         count: findedCategoryCount,
         likeCnt: likeByCategoryCount,
       });
@@ -86,7 +95,9 @@ const getCategoryTags = async ({ userId }) => {
       return 0;
     }
   });
-  const maxCategory = categorysCount[0].category;
+  const maxCategoryId = categorysCount[0].category;
+  //카테고리 아이디로 해당 카테고리 찾기
+  const findedMaxCategory = await getCategoryByCategoryId(maxCategoryId);
   //모든 태그 항목
   const tagList = await getTags();
   //userId가 올린 트랙의 태그를 태그 항목별 세기
@@ -122,7 +133,7 @@ const getCategoryTags = async ({ userId }) => {
   //console.log(tagsCount);
   //console.log(categorysCount);
   const maxTreeTags = [tagsCount[0].tag, tagsCount[1].tag, tagsCount[2].tag];
-  const results = { category: maxCategory, tags: maxTreeTags };
+  const results = { category: findedMaxCategory, tags: maxTreeTags };
   return results;
 };
 //랭킹보드
@@ -133,32 +144,55 @@ const getRanks = async () => {
     //userId가 올린 모든 트랙의 트랙 아이디 찾기
     const findedTrackIds = await TrackIdsByUserId({ userId });
     if (findedTrackIds.length === 0) {
-      LikesCount.push({ userId: userId, count: 0 });
+      LikesCount.push({ userId: userId, likeCnt: 0 });
     } else {
       const findedLikesCount = await Like.count({
         where: { trackId: { [Op.or]: findedTrackIds } },
       });
-      LikesCount.push({ userId: userId, count: findedLikesCount });
+      LikesCount.push({ userId: userId, likeCnt: findedLikesCount });
     }
   }
-  LikesCount.sort((a, b) => b.count - a.count);
+  LikesCount.sort((a, b) => b.likeCnt - a.likeCnt);
 
-  const LikesCountRank = LikesCount.map((el, i) => {
-    return { rank: i + 1, ...el };
+  const LikesCountRank = LikesCount.map((el, i, arr) => {
+    const parents = arr.length;
+    const rank = i + 1;
+    const rate = rank / parents;
+    let classes = "";
+    if (rate > 0 && rate <= 0.2) {
+      classes = "탑스타 와오";
+    } else if (rate <= 0.4) {
+      classes = "핫한 와오";
+    } else if (rate <= 0.6) {
+      classes = "라이징스타 와오";
+    } else if (rate <= 0.8) {
+      classes = "끼쟁이 와오";
+    } else {
+      classes = "수줍은 와오";
+    }
+    return { rank: rank, class: classes, ...el };
   });
+  //console.log(LikesCountRank);
   return LikesCountRank;
 };
-//user하나의 순위
+//user하나의 순위와 등급
 const getRankByUserId = async ({ userId }) => {
   const findedRanks = await getRanks();
-  const result = findedRanks.filter((el) => el.userId == userId).map((el) => el.rank);
-  return result;
+  const result = findedRanks
+    .filter((el) => el.userId == userId)
+    .map((el) => {
+      let rankByUserId = {};
+      rankByUserId["rank"] = el.rank;
+      rankByUserId["class"] = el.class;
+      return rankByUserId;
+    });
+  return result[0];
 };
 //최종 1인 통계
 const getStatistics = async ({ userId }) => {
   const categoryTags = await getCategoryTags({ userId });
-  const rank = await getRankByUserId({ userId });
-  const result = { categoryTags, rank };
+  const rankClass = await getRankByUserId({ userId });
+  const result = { categoryTags, rankClass };
   return result;
 };
 module.exports = { getStatistics };
