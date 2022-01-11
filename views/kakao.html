@@ -5,9 +5,40 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.1/socket.io.min.js"
+      integrity="sha384-fKnu0iswBIqkjxrhQCTZ7qlLHOFEgNkRmK2vaO/LbTZSXdJfAu6ewRBdwHPhBo/H"
+      crossorigin="anonymous"
+    ></script>
   </head>
   <body>
-    <a href="/api/auth/kakao">카카오 로그인</a> <a href="/api/auth/google">구글 로그인</a>
-    <a href="/api/auth/naver">네이버 로그인</a>
+    <div>채팅방</div>
+    <input id="input1" />
+    <div id="totalChat"></div>
+    <button id="send">메세지 보내기</button>
+    <button id="room1">채팅방1 입장</button>
+    <button id="room1-send">채팅방1에서 메세지 보내기</button>
+    <script>
+      const socket = io();
+
+      document.getElementById("room1").addEventListener("click", function () {
+        socket.emit("joinRoom", "채팅방입장시켜줘");
+      });
+
+      document.getElementById("room1-send").addEventListener("click", function () {
+        socket.emit("room1-send", document.getElementById("input1").value);
+      });
+
+      document.getElementById("send").addEventListener("click", function () {
+        socket.emit("user-send", document.getElementById("input1").value);
+      });
+
+      socket.on("broadcast", (data) => {
+        var node = document.createElement("P");
+        var textnode = document.createTextNode(data);
+        node.appendChild(textnode);
+        document.getElementById("totalChat").append(node);
+      });
+    </script>
   </body>
 </html>
