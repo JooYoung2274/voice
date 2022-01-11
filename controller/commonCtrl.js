@@ -1,15 +1,16 @@
 const trackService = require("../services/track");
+const statisticsService = require("../services/statistics.js");
 
 const myTracksGet = async (req, res, next) => {
   try {
     const user = res.locals.user;
     let { userId } = req.params;
     userId = parseInt(userId, 10);
-
+    const tong_gye = await statisticsService.getStatistics({ userId });
     if (!user.userId || user.userId !== userId) {
       const myPage = false;
       const { results, userDate } = await trackService.getTracksByUserId({ userId, myPage });
-      res.status(200).send({ results, userDate });
+      res.status(200).send({ results, userDate, tong_gye });
       return;
     }
     if (user.userId === userId) {
@@ -18,7 +19,7 @@ const myTracksGet = async (req, res, next) => {
         userId,
         myPage,
       });
-      res.status(200).send({ results, likesArray, userDate });
+      res.status(200).send({ results, likesArray, userDate, tong_gye });
     }
   } catch (error) {
     next(error);
