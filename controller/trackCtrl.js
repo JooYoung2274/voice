@@ -3,17 +3,16 @@ const listInfoService = require("../services/listinfo");
 
 const trackUploads = async (req, res, next) => {
   try {
-    const { title, category, tag1, tag2, tag3, trackThumbnailUrlFace } = req.body;
-    const { filename } = req.file;
+    const { title, category, tag1, tag2, tag3, trackThumbnailId } = req.body;
+    const { location } = req.file;
     const { userId } = res.locals.user;
-    const tag = [tag1, tag2, tag3];
-
+    const tags = [tag1, tag2, tag3];
     const trackId = await trackService.createTrack({
       title,
       category,
-      tag,
-      trackThumbnailUrlFace,
-      filename,
+      tags,
+      trackThumbnailId,
+      location,
       userId,
     });
     res.status(200).json({ trackId });
@@ -46,11 +45,11 @@ const trackPage = async (req, res, next) => {
 
 const listInfoGet = async (req, res, next) => {
   try {
-    const category = await listInfoService.getCategories();
-    const tag = await listInfoService.getTags();
-    const trackThumbnail = await listInfoService.getTrackThumbnails();
+    const categories = await listInfoService.getCategories();
+    const tags = await listInfoService.getTags();
+    const trackThumbnails = await listInfoService.getTrackThumbnails();
 
-    res.status(200).json({ category, tag, trackThumbnail });
+    res.status(200).json({ categories, tags, trackThumbnails });
   } catch (error) {
     next(error);
   }
@@ -58,17 +57,17 @@ const listInfoGet = async (req, res, next) => {
 
 const trackUpdate = async (req, res, next) => {
   try {
-    const { title, category, tag1, tag2, tag3, trackThumbnailUrlFace } = req.body;
+    const { title, category, tag1, tag2, tag3, trackThumbnailId } = req.body;
     const { trackId } = req.params;
     const { userId } = res.locals.user;
-    const tag = [tag1, tag2, tag3];
+    const tags = [tag1, tag2, tag3];
 
     await trackService.updateTrackByTrackId({
       trackId,
       title,
-      tag,
+      tags,
       category,
-      trackThumbnailUrlFace,
+      trackThumbnailId,
       userId,
     });
 
@@ -92,9 +91,8 @@ const listUpdate = async (req, res, next) => {
 const listGet = async (req, res, next) => {
   try {
     const { userId } = res.locals.user;
-    const { tracks } = await trackService.getListByUserId({ userId });
-    console.log(tracks);
-    res.status(200).json({ tracks });
+    const { playlist } = await trackService.getListByUserId({ userId });
+    res.status(200).json({ playlist });
   } catch (error) {
     next(error);
   }

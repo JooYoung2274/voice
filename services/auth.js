@@ -4,7 +4,7 @@ const { customizedError } = require("../utils/error");
 const getUserBy = async (col) => {
   try {
     const findedUser = await User.findOne({
-      attributes: ["userId", "nickname", "contact", "profileImage", "introduce"],
+      attributes: ["nickname", "contact", "profileImage", "introduce", "userId"],
       where: col,
     });
     return findedUser;
@@ -13,6 +13,7 @@ const getUserBy = async (col) => {
   }
 };
 
+//test
 const getUserByNickname = async ({ nickname }) => {
   const result = await getUserBy({ nickname });
   return result;
@@ -46,8 +47,8 @@ const updateUser = async ({ userId, reqFile, nickname, contact, introduce }) => 
       throw customizedError("자기 소개는 50자를 넘길 수 없습니다.", 400);
     }
     if (reqFile) {
-      const { filename } = reqFile;
-      const profileImage = `http://${process.env.HOST}/${filename}`;
+      const { location } = reqFile;
+      const profileImage = `${location}`;
       await User.update(
         {
           profileImage,

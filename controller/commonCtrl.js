@@ -52,9 +52,9 @@ const mainTracksGet = async (req, res, next) => {
 
 const categorySelect = async (req, res, next) => {
   try {
-    const { category, tag1, tag2, tag3 } = req.query;
+    const { category, tag1, tag2, tag3, page } = req.query;
     const tags = [tag1, tag2, tag3];
-    const results = await trackService.getTracksForCategory({ tags, category });
+    const results = await trackService.getTracksForCategory({ tags, category, page });
     res.status(200).json({ tracks: results });
   } catch (error) {
     next(error);

@@ -1,46 +1,43 @@
-const { TrackTag } = require("../models");
-const { customizedError } = require("../utils/error");
+const { TrackTag, Tag } = require("../models");
 const sequelize = require("sequelize");
 const Op = sequelize.Op;
+const CATEGORYALLID = 1;
 
-const getTrackIdsByTag = async ({ tag, category }) => {
-  if (category === "전체") {
-    const findedTrackTags = await TrackTag.findAll({
+// 실제 db에 있는 태그만 필터링
+const filteringTags = async (tags) => {
+  const findedTags = [];
+  for (const tag of tags) {
+    const findedTag = await Tag.findOne({ where: { tag } });
+    if (findedTag) {
+      findedTags.push(tag);
+    }
+  }
+  return findedTags;
+};
+
+// 태그와 카테고리로 트랙아이디 찾는 함수
+const getTrackIdsByTagAndCtryId = async ({ tag, categoryId }) => {
+  // 카테고리와 태그로 트랙태그관계 뽑음
+  let findedTrackTags = [];
+  if (categoryId === CATEGORYALLID) {
+    findedTrackTags = await TrackTag.findAll({
       attributes: ["trackId", "tag"],
       where: { tag: { [Op.or]: tag } },
     });
-    let tags = [];
-    for (let i = 0; i < findedTrackTags.length; i++) {
-      tags.push(findedTrackTags[i].trackId);
-    }
-    const set = new Set(tags);
-    const result = [...set];
-
-    return result;
+  } else {
+    findedTrackTags = await TrackTag.findAll({
+      attributes: ["trackId", "tag"],
+      where: { tag: { [Op.or]: tag }, categoryId },
+    });
   }
-  const findedTrackTags = await TrackTag.findAll({
-    attributes: ["trackId", "tag"],
-    where: { tag: { [Op.or]: tag }, category: category },
-  });
-
-  let tags = [];
+  const trackIds = [];
   for (let i = 0; i < findedTrackTags.length; i++) {
-    tags.push(findedTrackTags[i].trackId);
+    trackIds.push(findedTrackTags[i].trackId);
   }
-  const set = new Set(tags);
-  const result = [...set];
+  const set = new Set(trackIds);
+  const results = [...set];
 
-  return result;
+  return results;
 };
-// const trackIds = {};
-// for (const trackTag of findedTrackTags) {
-//   const newTrackId = trackTag.dataValues.trackId;
-//   trackIds = { ...trackIds };
-//   if (!trackIds.newTrackId) {
-//     trackIds.trackTag.dataValues.trackId = 0;
-//   } else if (trackIds.trackId) {
-//     trackIds.trackTag.dataValues.trackId += 1;
-//   }
-// }
 
-module.exports = { getTrackIdsByTag };
+module.exports = { getTrackIdsByTagAndCtryId, filteringTags };

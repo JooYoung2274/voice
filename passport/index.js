@@ -3,8 +3,24 @@ const naverStrategy = require("passport-naver").Strategy;
 const kakaoStrategy = require("passport-kakao").Strategy;
 const googleStrategy = require("passport-google-oauth20").Strategy;
 const { User } = require("../models");
-const userService = require("../services/auth");
 const randomstring = require("randomstring");
+const {
+  NAVER_CLIENT_ID,
+  NAVER_CLIENT_SECRET,
+  DOMAIN,
+  S3_HOST,
+  KAKAO_CLIENT_ID,
+  GOOGLE_CLIENT_ID,
+  GOOGLE_CLIENT_SECRET,
+} = process.env;
+const DIRECTORY = "etc";
+const BASIC_PROFILE = "profile.png";
+const profileImage = `${S3_HOST}/${DIRECTORY}/${BASIC_PROFILE}`;
+const KAKAO = "kakao";
+const NAVER = "naver";
+const GOOGLE = "google";
+const callbackURL = (company) => `${DOMAIN}/api/auth/${company}/callback`;
+
 let newNickname = "";
 
 module.exports = (app) => {
@@ -12,12 +28,11 @@ module.exports = (app) => {
   passport.use(
     new naverStrategy(
       {
-        clientID: process.env.NAVER_CLIENT_ID,
-        clientSecret: process.env.NAVER_CLIENT_SECRET,
-        callbackURL: process.env.DOMAIN + "/api/auth/naver/callback",
+        clientID: NAVER_CLIENT_ID,
+        clientSecret: NAVER_CLIENT_SECRET,
+        callbackURL: callbackURL(NAVER),
       },
       async (accessToken, refreshToken, profile, done) => {
-        console.log("*********naver profile*********", profile);
         try {
           const exUser = await User.findOne({
             where: { snsId: profile.id, flatformType: profile.provider },
@@ -31,7 +46,7 @@ module.exports = (app) => {
               nickname: newNickname,
               flatformType: profile.provider,
               snsId: profile.id,
-              profileImage: "http://" + process.env.HOST + "/etc/profile.png",
+              profileImage: profileImage,
             });
             let firstLogin = true;
             done(null, newUser, { firstLogin });
@@ -46,11 +61,10 @@ module.exports = (app) => {
   passport.use(
     new kakaoStrategy(
       {
-        clientID: process.env.KAKAO_CLIENT_ID,
-        callbackURL: process.env.DOMAIN + "/api/auth/kakao/callback",
+        clientID: KAKAO_CLIENT_ID,
+        callbackURL: callbackURL(KAKAO),
       },
       async (accessToken, refreshToken, profile, done) => {
-        console.log("*********kakao profile*********", profile);
         try {
           const exUser = await User.findOne({
             where: { snsId: profile.id, flatformType: profile.provider },
@@ -64,7 +78,7 @@ module.exports = (app) => {
               nickname: newNickname,
               flatformType: profile.provider,
               snsId: profile.id,
-              profileImage: "http://" + process.env.HOST + "/etc/profile.png",
+              profileImage: profileImage,
             });
             let firstLogin = true;
             done(null, newUser, { firstLogin });
@@ -79,12 +93,11 @@ module.exports = (app) => {
   passport.use(
     new googleStrategy(
       {
-        clientID: process.env.GOOGLE_CLIENT_ID,
-        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-        callbackURL: process.env.DOMAIN + "/api/auth/google/callback",
+        clientID: GOOGLE_CLIENT_ID,
+        clientSecret: GOOGLE_CLIENT_SECRET,
+        callbackURL: callbackURL(GOOGLE),
       },
       async (accessToken, refreshToken, profile, done) => {
-        console.log("*********google profile*********", profile);
         try {
           const exUser = await User.findOne({
             where: { snsId: profile.id, flatformType: profile.provider },
@@ -98,7 +111,7 @@ module.exports = (app) => {
               nickname: newNickname,
               flatformType: profile.provider,
               snsId: profile.id,
-              profileImage: "http://" + process.env.HOST + "/etc/profile.png",
+              profileImage: profileImage,
             });
             let firstLogin = true;
             done(null, newUser, { firstLogin });

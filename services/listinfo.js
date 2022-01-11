@@ -1,20 +1,10 @@
 const { Category, Tag, TrackThumbnail } = require("../models");
-const { Op } = require("sequelize");
 
 const getCategories = async () => {
-  const category = await Category.findAll({
-    attributes: ["category", "categoryUrl", "categoryText"],
-    where: { category: { [Op.ne]: "전체" } },
+  const categories = await Category.findAll({
+    attributes: ["categoryId", "category", "categoryUrl", "categoryText"],
   });
-  const category_all = await Category.findOne({
-    attributes: ["category", "categoryUrl", "categoryText"],
-    where: { category: "전체" },
-  });
-  category.unshift(category_all);
-  if (!category) {
-    throw customizedError("기본 카테고리 목록이 없습니다.", 400);
-  }
-  return category;
+  return categories;
 };
 
 const getTags = async () => {
@@ -30,7 +20,7 @@ const getTags = async () => {
 
 const getTrackThumbnails = async () => {
   const trackThumbnails = await TrackThumbnail.findAll({
-    attributes: ["trackThumbnailUrlFace", "trackThumbnailUrlFull"],
+    attributes: ["trackThumbnailId", "trackThumbnailUrlFace", "trackThumbnailUrlFull"],
   });
 
   if (!trackThumbnails) {

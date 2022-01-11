@@ -3,45 +3,59 @@ const {
   TrackTag,
   User,
   Like,
-  Tag,
   Comment,
   Category,
   TrackThumbnail,
   PlayList,
 } = require("../models");
-const { getTrackIdsByTag } = require("./tag");
+const { getTrackIdsByTagAndCtryId, filteringTags } = require("./tag");
+const { getCtryByCtry } = require("./category");
 const sequelize = require("sequelize");
 const { Op } = require("sequelize");
-const { or, like } = Op;
+const { or, like, ne } = Op;
 const { customizedError } = require("../utils/error");
+const CATEGORYALLID = 1;
+const CATEGORYALL = "전체";
+const CATEGORYALLTEXT = "최근에 올라온 목소리";
+const TRACKNUM = 19;
 
-const createTrack = async ({ title, category, tag, trackThumbnailUrlFace, filename, userId }) => {
-
-  if (!trackThumbnailUrlFace || !category || !tag.length || !title || !userId) {
+const createTrack = async ({ title, category, tags, trackThumbnailId, location, userId }) => {
+  if (!trackThumbnailId || !userId) {
     throw customizedError("잘못된 녹음 업로드 요청입니다.", 400);
   }
 
-  if (title.length > 40) {
-    throw customizedError("제목은 20자를 넘길 수 없습니다.", 400);
+  const findedTags = await filteringTags(tags);
+  if (findedTags.length === 0) {
+    throw customizedError("적어도 하나의 태그는 선택해야 합니다.", 400);
   }
 
+  const findedCategory = await getCtryByCtry({ category });
+  if (!findedCategory) {
+    throw customizedError("현재 운영하고 있는 카테고리가 아닙니다.", 400);
+  }
+  const { categoryId } = findedCategory;
+
+  if (!title || title.length > 40) {
+    throw customizedError("제목은 존재해야하고 20자를 넘길 수 없습니다.", 400);
+  }
   const createdTrack = await Track.create({
-    title: title,
-    category: category,
-    trackThumbnailUrlFace: trackThumbnailUrlFace,
-    trackUrl: "http://" + process.env.HOST + "/" + filename,
-    userId: userId,
+    title,
+    categoryId,
+    trackThumbnailId,
+    trackUrl: `${location}`,
+    userId,
   });
-  for (let i = 0; i < tag.length; i++) {
-    if (tag[i]) {
+  const trackId = createdTrack.trackId;
+  for (let i = 0; i < tags.length; i++) {
+    if (tags[i]) {
       await TrackTag.create({
-        trackId: createdTrack.trackId,
-        tag: tag[i],
-        category: category,
+        trackId,
+        tag: tags[i],
+        categoryId,
       });
     }
   }
-  const result = createdTrack.trackId;
+  const result = trackId;
 
   return result;
 };
@@ -58,33 +72,41 @@ const deleteTrackByTrackId = async ({ trackId }) => {
 const updateTrackByTrackId = async ({
   trackId,
   title,
-  tag,
+  tags,
   category,
-  trackThumbnailUrlFace,
+  trackThumbnailId,
   userId,
 }) => {
-  if (!trackThumbnailUrlFace || !category || !tag.length || !trackId) {
+  if (!trackThumbnailId || !trackId) {
     throw customizedError("잘못된 접근입니다.", 400);
   }
 
-  if (title.length > 40) {
-    throw customizedError("제목은 20자를 넘길 수 없습니다.", 400);
+  const findedTags = await filteringTags(tags);
+  if (findedTags.length === 0) {
+    throw customizedError("적어도 하나의 태그는 선택해야 합니다.", 400);
   }
 
-  const track = await Track.findOne({ where: { trackId: trackId } });
+  // category값 아예안올때도 확인
+  const findedCategory = await getCtryByCtry({ category });
+  if (!findedCategory) {
+    throw customizedError("현재 운영하고 있는 카테고리가 아닙니다.", 400);
+  }
+  const { categoryId } = findedCategory;
+  if (!title || title.length > 40) {
+    throw customizedError("제목은 존재해야하고 20자를 넘길 수 없습니다.", 400);
+  }
+
+  const track = await Track.findOne({ where: { trackId } });
   if (track.userId !== userId) {
     throw customizedError("권한이 없습니다.", 400);
   }
 
-  await Track.update(
-    { category: category, trackThumbnailUrlFace: trackThumbnailUrlFace, title: title },
-    { where: { trackId: trackId } },
-  );
+  await Track.update({ categoryId, trackThumbnailId, title }, { where: { trackId } });
 
-  await TrackTag.destroy({ where: { trackId: trackId } });
-  for (let i = 0; i < tag.length; i++) {
-    if (tag[i] !== "") {
-      await TrackTag.create({ tag: tag[i], trackId: trackId, category: category });
+  await TrackTag.destroy({ where: { trackId } });
+  for (let i = 0; i < tags.length; i++) {
+    if (tags[i] !== "") {
+      await TrackTag.create({ tag: tags[i], trackId, categoryId });
     }
   }
   return;
@@ -135,60 +157,25 @@ const getTrackByTrackId = async ({ trackId }) => {
   if (!track) {
     throw customizedError("존재하지 않는 트랙입니다.", 400);
   }
-  const findedTrack = await insertLikeCnt(track);
+  const findedTrack = await insertLikeAndCmtCnt(track);
   return findedTrack;
-};
-
-const getTracksByLikes = async ({ findedTrackIds }) => {
-  let tracks = [];
-  for (let i = 0; i < findedTrackIds.length; i++) {
-    const findedTrack = await Track.findOne({
-      attributes: ["title", "trackId", "category", "trackUrl", "userId", "createdAt"],
-
-      where: { trackId: findedTrackIds[i] },
-      include: [
-        { model: TrackThumbnail, attributes: ["trackThumbnailUrlFace", "trackThumbnailUrlFull"] },
-        { model: TrackTag, attributes: ["tag"] },
-        { model: User, attributes: ["nickname"] },
-        {
-          model: Like,
-          attributes: [[sequelize.fn("COUNT", sequelize.col("Likes.trackId")), "likeCnt"]],
-        },
-        {
-          model: Comment,
-          attributes: [
-            "commentId",
-            "userId",
-            "comment",
-            "createdAt",
-            [sequelize.fn("COUNT", sequelize.col("Comments.trackId")), "commentCnt"],
-          ],
-          include: [{ model: User, attributes: ["nickname"] }],
-        },
-      ],
-      group: ["Track.trackId", "TrackTags.trackTagId", "Likes.likeId", "Comments.commentId"],
-    });
-    tracks.push(findedTrack);
-  }
-
-  if (!tracks.length) {
-    throw customizedError("존재하지 않는 트랙입니다.", 400);
-  }
-
-  return tracks;
 };
 
 // 트랙이 기본적으로 가지는 property (성격이 다른 변수가 나타났으므로 아키텍처 수정필요)
 const trackBasicForm = {
-  attributes: ["title", "trackId", "category", "trackUrl", "userId", "createdAt"],
+  attributes: ["title", "trackId", "trackUrl", "userId", "createdAt"],
   include: [
-    { model: TrackThumbnail, attributes: ["trackThumbnailUrlFace", "trackThumbnailUrlFull"] },
+    {
+      model: TrackThumbnail,
+      attributes: ["trackThumbnailId", "trackThumbnailUrlFace", "trackThumbnailUrlFull"],
+    },
     { model: TrackTag, attributes: ["tag"] },
-    { model: User, attributes: ["nickname"] },
+    { model: User, attributes: ["nickname", "profileImage"] },
     {
       model: Like,
       attributes: ["likeId"],
     },
+    { model: Category, attributes: ["category"] },
     {
       model: Comment,
       attributes: ["commentId", "userId", "comment", "createdAt"],
@@ -198,8 +185,8 @@ const trackBasicForm = {
   order: [[Comment, "commentId", "DESC"]],
 };
 
-//track에 likeCnt 넣는 함수
-const insertLikeCnt = (track) => {
+//track에 likeCnt, commentCnt 넣는 함수
+const insertLikeAndCmtCnt = (track) => {
   const { Likes: likesArray, Comments: commentsArray } = track.dataValues;
   track.dataValues.Likes = { likeCnt: likesArray.length };
   track.dataValues.CommentCnt = { commentCnt: commentsArray.length };
@@ -219,11 +206,8 @@ const likeCreatedSort = (trackA, trackB) => {
   return trackB.dataValues.Likes.likeCnt - trackA.dataValues.Likes.likeCnt;
 };
 
-//메인에 track자르는 개수:20
-const TRACKNUM = 19;
-
 // 메인에 처음에 주어지는 카테고리
-const categoryFirst = { category: "전체", categoryText: "최근에 올라온 목소리" };
+const categoryFirst = { category: CATEGORYALL, categoryText: CATEGORYALLTEXT };
 
 // 그냥 트랙들뽑기
 const getTracks = async () => {
@@ -232,10 +216,33 @@ const getTracks = async () => {
 };
 
 // 키워드별 여러 트랙뽑기
-const getTracksByKeyword = async ({ keyword }) => {
+const getTracksByKeyword = async ({ keyword, start, end }) => {
   try {
-    //   공백이 2개이상 존재하면 하나의 공백으로 변환(아직 더 생각해봐야함)
-    // keyword = keyword.replace(/\s\s+/gi, " ");
+    // 띄어쓰기 된 키워드가 2개일때만 구현해 놓음.
+    // 만약 띄어쓰기 된 키워드가 3개 이상일 경우 검색 코드 전체적으로 좀 달라져야함.
+    // 추후에 협의 후 수정해야 할 듯.
+    const keywordArray = keyword.split(" ");
+
+    if (keywordArray.length !== 1) {
+      const results = await Track.findAll({
+        where: {
+          [or]: [
+            { title: { [like]: `%${keywordArray[0].trim()}%` } },
+            { title: { [like]: `%${keywordArray[1].trim()}%` } },
+            {
+              "$User.nickname$": { [like]: `%${keywordArray[0].trim()}%` },
+            },
+            {
+              "$User.nickname$": { [like]: `%${keywordArray[1].trim()}%` },
+            },
+          ],
+        },
+        ...trackBasicForm,
+      });
+
+      return results;
+    }
+    // 띄어쓰기 없는 키워드로 검색했을 때
     const results = await Track.findAll({
       where: {
         [or]: [
@@ -247,37 +254,31 @@ const getTracksByKeyword = async ({ keyword }) => {
       },
       ...trackBasicForm,
     });
-
-    return results;
+    const results2 = results.slice(start, end);
+    return results2;
   } catch (error) {
     throw error;
   }
 };
 
 // 카테고리별 여러 트랙뽑기
-const getTracksByCategory = async ({ category }) => {
-  if (category === "전체") {
-    const findedTracks = await Track.findAll({
-      ...trackBasicForm,
-    });
-    if (!findedTracks) {
-      throw customizedError("존재하지 않는 트랙입니다.", 400);
-    }
-    return findedTracks;
+const getTracksByCtryId = async ({ categoryId, start, end }) => {
+  if (categoryId === CATEGORYALLID) {
+    const findedTracks = await getTracks();
+    const findedTracks2 = findedTracks.slice(start, end);
+    return findedTracks2;
   }
   const findedTracks = await Track.findAll({
-    where: { category },
+    where: { categoryId },
     ...trackBasicForm,
   });
-  if (!findedTracks) {
-    throw customizedError("존재하지 않는 트랙입니다.", 400);
-  }
-  return findedTracks;
+  const findedTracks2 = findedTracks.slice(start, end);
+  return findedTracks2;
 };
 // 트랙들 넣으면 likeCnt 넣어주고 좋아요순으로 바뀌고 상위 20개 뽑음
 const getTracksOrdLike = async ({ tracks }) => {
   tracks = tracks
-    .map((track) => insertLikeCnt(track)) //likeCnt 넣어주기
+    .map((track) => insertLikeAndCmtCnt(track)) //likeCnt 넣어주기
     .sort((trackA, trackB) => likeCreatedSort(trackA, trackB)) //likeCnt 내림차순 likeCnt같다면 createdAt최신순
     .slice(0, TRACKNUM); //20개씩 자르기
   return tracks;
@@ -286,7 +287,7 @@ const getTracksOrdLike = async ({ tracks }) => {
 // 트랙들 넣으면 likeCnt 넣어주고 최신순으로 바뀌고 개수 제한 없음
 const getTracksByOrdCreated = async ({ tracks }) => {
   tracks = tracks
-    .map((track) => insertLikeCnt(track)) //likeCnt 넣어주기
+    .map((track) => insertLikeAndCmtCnt(track)) //likeCnt 넣어주기
     .sort((trackA, trackB) => createdSort(trackA, trackB)); // trackId 최신순
   return tracks;
 };
@@ -294,19 +295,10 @@ const getTracksByOrdCreated = async ({ tracks }) => {
 // 트랙들 넣으면 likeCnt 넣어주고 최신순으로 바뀌고 상위 20개 뽑음
 const getTracksByOrdCreatedLimit = async ({ tracks }) => {
   tracks = tracks
-    .map((track) => insertLikeCnt(track)) //likeCnt 넣어주기
+    .map((track) => insertLikeAndCmtCnt(track)) //likeCnt 넣어주기
     .sort((trackA, trackB) => createdSort(trackA, trackB)) // trackId 최신순
     .slice(0, TRACKNUM);
   return tracks;
-};
-
-// main에 카테고리와 text를 객체로 따로 주기위한 service
-const getCategory = async ({ category }) => {
-  const categoryAndText = await Category.findOne({
-    attributes: ["category", "categoryText"],
-    where: { category },
-  });
-  return categoryAndText;
 };
 
 // trackId로 하나의 트랙 뽑기  (getTrackByTrackId에서 userId분리하면 지워도 되는 service)
@@ -319,31 +311,61 @@ const getTrackByTrackId2 = async ({ trackId }) => {
 };
 
 // trackTag들 안에 있는 trackId로 여러 트랙 뽑기
-const getTracksByTrackTags = async ({ trackIds }) => {
+const getTracksByTrackIds = async ({ trackIds, start, end }) => {
   const results = [];
-  for (let i = 0; i < trackIds.length; i++) {
-    const track = await getTrackByTrackId2({ trackId: trackIds[i] });
+  const trackIds2 = trackIds.slice(start, end);
+  console.log(trackIds2);
+  for (let i = 0; i < trackIds2.length; i++) {
+    const track = await getTrackByTrackId2({ trackId: trackIds2[i] });
     results.push(track);
   }
   return results;
 };
+///////////////////////////////////////////////////////////////
+// const accSort = (trackA, trackB) => {
+//   return trackB.dataValues.trackId - trackA.dataValues.trackId;
+// };
 
+// const getTracksByOrdAcc = async ({ tracks }) => {
+//   tracks = tracks
+//     .map((track) => insertLikeCnt(track)) //likeCnt 넣어주기
+//     .sort((trackA, trackB) => accSort(trackA, trackB));
+//   return tracks;
+// };
+///////////////////////////////////////////////////////////////
 // keyword로 찾은 트랙 최종 service
-const getTracksForSearch = async ({ keyword }) => {
+const getTracksForSearch = async ({ keyword, page }) => {
   // keyword로 track들 찾기
-  const tracksInKeyword = await getTracksByKeyword({ keyword });
-  // 찾은 track들 likCnt넣고 최신순으로 정렬
+  // test === true면 정확도순 정렬
+  let start = 0;
+  let pageSize = 60;
+  if (page <= 0 || !page) {
+    page = 1;
+  } else {
+    start = (page - 1) * pageSize;
+  }
+  let end = page * pageSize;
+  const tracksInKeyword = await getTracksByKeyword({ keyword, start, end });
   const results = await getTracksByOrdCreated({ tracks: tracksInKeyword });
   return results;
 };
 
 // tag와 카테고리로 찾은 트랙 최종 service
-const getTracksForCategory = async ({ tags, category }) => {
+const getTracksForCategory = async ({ tags, category, page }) => {
   try {
-    const findedCategory = await Category.findOne({ where: { category } });
+    let start = 0;
+    let pageSize = 60;
+    if (page <= 0 || !page) {
+      page = 1;
+    } else {
+      start = (page - 1) * pageSize;
+    }
+    let end = page * pageSize;
+    const findedCategory = await getCtryByCtry({ category });
     if (!findedCategory) {
       throw customizedError("운영하고 있는 카테고리가 아닙니다.", 400);
     }
+    const { categoryId } = findedCategory;
     // 파라미터에서 항상 tag1=tag2=tag3=형식으로 온다고 가정
     if (tags.length !== 3) {
       throw customizedError("올바른 태그 요청이 아닙니다.", 400);
@@ -351,31 +373,21 @@ const getTracksForCategory = async ({ tags, category }) => {
 
     // 카테고리만 올경우
     if (tags[0] === "" && tags[1] === "" && tags[2] === "") {
-      const tracksInCtry = await getTracksByCategory({ category });
+      const tracksInCtry = await getTracksByCtryId({ categoryId, start, end });
       const results = await getTracksByOrdCreated({ tracks: tracksInCtry });
       const results2 = { categoryTags: tags, tracks: results };
       return results2;
     }
 
     // 실제 db에 있는 태그만 필터링
-    const findedTags = [];
-    for (const tag of tags) {
-      const findedTag = await Tag.findOne({ where: { tag } });
-      if (findedTag) {
-        findedTags.push(tag);
-      }
-    }
+    const findedTags = await filteringTags(tags);
 
     // 카테고리와 태그가 올경우
 
     // 카테고리와 필터링된 태그로 tracktag들 찾기
-    const findedTrackIds = await getTrackIdsByTag({ tag: findedTags, category });
-    // if (!findedTrackTags) {
-    //   // db에 태그에 맞는 track이 없을경우 트랙을 주지 않음
-    //   return;
-    // }
+    const findedTrackIds = await getTrackIdsByTagAndCtryId({ tag: findedTags, categoryId });
     // 찾은 tracktag들로 track들 찾기
-    const tracksByTrackIds = await getTracksByTrackTags({ trackIds: findedTrackIds });
+    const tracksByTrackIds = await getTracksByTrackIds({ trackIds: findedTrackIds, start, end });
     // track들 likCnt넣고 최신순으로 정렬
 
     const results = await getTracksByOrdCreated({ tracks: tracksByTrackIds });
@@ -400,19 +412,27 @@ const getTracksForMain = async () => {
     // category 이름순으로 정렬
     const categoriesList = await Category.findAll({
       order: [["category", "ASC"]],
+      where: {
+        category: {
+          [ne]: CATEGORYALL,
+        },
+      },
     });
 
     // category를 기준으로 track들 가져온 후 results배열에 push
     for (const category of categoriesList) {
-      const tracksInCtry = await getTracksByCategory({
-        category: category.dataValues.category,
+      const tracksInCtry = await getTracksByCtryId({
+        categoryId: category.dataValues.categoryId,
       });
       // category에 없으면 넣지 않음
       if (tracksInCtry.length === 0) {
         continue;
       }
       // 카테고리 text뽑기
-      const categoryAndText = await getCategory({ category: category.dataValues.category });
+      const categoryAndText = {
+        category: category.dataValues.category,
+        categoryText: category.dataValues.categoryText,
+      };
       // 좋아요 순뽑고 likeCnt 바꿔주면서 20개씩 자르기
       const tracksInCtryOrdLike = await getTracksOrdLike({ tracks: tracksInCtry });
       // 프론트에게 주기위해 배열안에 담음
@@ -445,17 +465,22 @@ const getListByUserId = async ({ userId }) => {
     for (let i = 0; i < trackId.length; i++) {
       trackIds.push(trackId[i].trackId);
     }
+    const playlist = [];
     const tracks = [];
     for (let i = 0; i < trackIds.length; i++) {
-      const track = await Track.findOne(trackBasicForm, { where: { trackId: trackIds[i] } });
-      tracks.push({
-        name: track.title,
-        singer: track.User.nickname,
-        cover: track.TrackThumbnail.trackThumbnailUrlFace,
-        musicSrc: track.trackUrl,
+      const track = await Track.findOne({ where: { trackId: trackIds[i] }, ...trackBasicForm });
+      tracks.push(track);
+    }
+    for (let i = 0; i < tracks.length; i++) {
+      playlist.push({
+        name: tracks[i].title,
+        singer: tracks[i].User.nickname,
+        cover: tracks[i].TrackThumbnail.trackThumbnailUrlFace,
+        musicSrc: tracks[i].trackUrl,
+        trackId: tracks[i].trackId,
       });
     }
-    return { tracks };
+    return { playlist };
   } catch (error) {
     throw error;
   }
@@ -468,8 +493,7 @@ module.exports = {
   getTracksForSearch,
   getTracksForCategory,
   getTracksForMain,
-  getTracksByLikes,
-  getTracksByCategory,
+  getTracksByCtryId,
   updateTrackByTrackId,
   updateListByTrackId,
   getListByUserId,
