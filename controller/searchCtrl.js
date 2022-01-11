@@ -2,9 +2,9 @@ const searchService = require("../services/track");
 
 const searchGet = async (req, res, next) => {
   try {
-    const { keyword } = req.query;
+    const { keyword, page } = req.query;
 
-    const results = await searchService.getTracksForSearch({ keyword });
+    const results = await searchService.getTracksForSearch({ keyword, page });
     return res.status(200).json({ tracks: results });
   } catch (error) {
     next(error);

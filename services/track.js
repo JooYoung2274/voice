@@ -216,7 +216,7 @@ const getTracks = async () => {
 };
 
 // 키워드별 여러 트랙뽑기
-const getTracksByKeyword = async ({ keyword }) => {
+const getTracksByKeyword = async ({ keyword, start, end }) => {
   try {
     // 띄어쓰기 된 키워드가 2개일때만 구현해 놓음.
     // 만약 띄어쓰기 된 키워드가 3개 이상일 경우 검색 코드 전체적으로 좀 달라져야함.
@@ -254,24 +254,26 @@ const getTracksByKeyword = async ({ keyword }) => {
       },
       ...trackBasicForm,
     });
-
-    return results;
+    const results2 = results.slice(start, end);
+    return results2;
   } catch (error) {
     throw error;
   }
 };
 
 // 카테고리별 여러 트랙뽑기
-const getTracksByCtryId = async ({ categoryId }) => {
+const getTracksByCtryId = async ({ categoryId, start, end }) => {
   if (categoryId === CATEGORYALLID) {
     const findedTracks = await getTracks();
-    return findedTracks;
+    const findedTracks2 = findedTracks.slice(start, end);
+    return findedTracks2;
   }
   const findedTracks = await Track.findAll({
     where: { categoryId },
     ...trackBasicForm,
   });
-  return findedTracks;
+  const findedTracks2 = findedTracks.slice(start, end);
+  return findedTracks2;
 };
 // 트랙들 넣으면 likeCnt 넣어주고 좋아요순으로 바뀌고 상위 20개 뽑음
 const getTracksOrdLike = async ({ tracks }) => {
@@ -309,10 +311,12 @@ const getTrackByTrackId2 = async ({ trackId }) => {
 };
 
 // trackTag들 안에 있는 trackId로 여러 트랙 뽑기
-const getTracksByTrackIds = async ({ trackIds }) => {
+const getTracksByTrackIds = async ({ trackIds, start, end }) => {
   const results = [];
-  for (let i = 0; i < trackIds.length; i++) {
-    const track = await getTrackByTrackId2({ trackId: trackIds[i] });
+  const trackIds2 = trackIds.slice(start, end);
+  console.log(trackIds2);
+  for (let i = 0; i < trackIds2.length; i++) {
+    const track = await getTrackByTrackId2({ trackId: trackIds2[i] });
     results.push(track);
   }
   return results;
@@ -330,17 +334,33 @@ const getTracksByTrackIds = async ({ trackIds }) => {
 // };
 ///////////////////////////////////////////////////////////////
 // keyword로 찾은 트랙 최종 service
-const getTracksForSearch = async ({ keyword }) => {
+const getTracksForSearch = async ({ keyword, page }) => {
   // keyword로 track들 찾기
   // test === true면 정확도순 정렬
-  const tracksInKeyword = await getTracksByKeyword({ keyword });
+  let start = 0;
+  let pageSize = 60;
+  if (page <= 0 || !page) {
+    page = 1;
+  } else {
+    start = (page - 1) * pageSize;
+  }
+  let end = page * pageSize;
+  const tracksInKeyword = await getTracksByKeyword({ keyword, start, end });
   const results = await getTracksByOrdCreated({ tracks: tracksInKeyword });
   return results;
 };
 
 // tag와 카테고리로 찾은 트랙 최종 service
-const getTracksForCategory = async ({ tags, category }) => {
+const getTracksForCategory = async ({ tags, category, page }) => {
   try {
+    let start = 0;
+    let pageSize = 60;
+    if (page <= 0 || !page) {
+      page = 1;
+    } else {
+      start = (page - 1) * pageSize;
+    }
+    let end = page * pageSize;
     const findedCategory = await getCtryByCtry({ category });
     if (!findedCategory) {
       throw customizedError("운영하고 있는 카테고리가 아닙니다.", 400);
@@ -353,7 +373,7 @@ const getTracksForCategory = async ({ tags, category }) => {
 
     // 카테고리만 올경우
     if (tags[0] === "" && tags[1] === "" && tags[2] === "") {
-      const tracksInCtry = await getTracksByCtryId({ categoryId });
+      const tracksInCtry = await getTracksByCtryId({ categoryId, start, end });
       const results = await getTracksByOrdCreated({ tracks: tracksInCtry });
       const results2 = { categoryTags: tags, tracks: results };
       return results2;
@@ -366,9 +386,8 @@ const getTracksForCategory = async ({ tags, category }) => {
 
     // 카테고리와 필터링된 태그로 tracktag들 찾기
     const findedTrackIds = await getTrackIdsByTagAndCtryId({ tag: findedTags, categoryId });
-
     // 찾은 tracktag들로 track들 찾기
-    const tracksByTrackIds = await getTracksByTrackIds({ trackIds: findedTrackIds });
+    const tracksByTrackIds = await getTracksByTrackIds({ trackIds: findedTrackIds, start, end });
     // track들 likCnt넣고 최신순으로 정렬
 
     const results = await getTracksByOrdCreated({ tracks: tracksByTrackIds });
