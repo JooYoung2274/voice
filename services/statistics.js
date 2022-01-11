@@ -180,7 +180,7 @@ const getRanks = async () => {
     }
     return { rank: rank, class: classes, classImage: classImage, ...el };
   });
-  console.log(LikesCountRank);
+  //console.log(LikesCountRank);
   return LikesCountRank;
 };
 //user하나의 순위와 등급
