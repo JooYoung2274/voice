@@ -12,31 +12,44 @@
     ></script>
   </head>
   <body>
+    <a href="/api/auth/kakao">카카오 로그인</a> <a href="/api/auth/google">구글 로그인</a>
+    <a href="/api/auth/naver">네이버 로그인</a>
+
     <div>채팅방</div>
-    <input id="input1" />
+    <button id="userId">채팅하기</button>
+    <p></p>
+
     <div id="totalChat"></div>
-    <button id="send">메세지 보내기</button>
-    <button id="room1">채팅방1 입장</button>
-    <button id="room1-send">채팅방1에서 메세지 보내기</button>
+    <input id="input1" />
+    <button id="room1">메세지 보내기</button>
     <script>
       const socket = io();
+      const userId = 1;
+      const qUserId = 2;
+      const sendUserId = qUserId;
+      const chat = document.getElementById("input1").value;
+      // const data1 = { userId: 1, chatText:
+      document.getElementById("userId").addEventListener("click", function () {
+        socket.emit("joinRoom", { userId, qUserId });
+      });
 
       document.getElementById("room1").addEventListener("click", function () {
-        socket.emit("joinRoom", "채팅방입장시켜줘");
+        socket.emit("room", {
+          userId, //해당 채팅방의 userId
+          sendUserId, //글쓴 사람의 userId
+          chatText: document.getElementById("input1").value, //입력값
+        });
       });
 
-      document.getElementById("room1-send").addEventListener("click", function () {
-        socket.emit("room1-send", document.getElementById("input1").value);
-      });
+      // document.getElementById("send").addEventListener("click", function () {
+      //   socket.emit("user-send", document.getElementById("input1").value);
+      // });
 
-      document.getElementById("send").addEventListener("click", function () {
-        socket.emit("user-send", document.getElementById("input1").value);
-      });
-
-      socket.on("broadcast", (data) => {
+      socket.on("chat", (data) => {
         var node = document.createElement("P");
         var textnode = document.createTextNode(data);
         node.appendChild(textnode);
+
         document.getElementById("totalChat").append(node);
       });
     </script>
