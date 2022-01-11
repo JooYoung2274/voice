@@ -334,11 +334,11 @@ const getTracksByTrackIds = async ({ trackIds, start, end }) => {
 // };
 ///////////////////////////////////////////////////////////////
 // keyword로 찾은 트랙 최종 service
-const getTracksForSearch = async ({ keyword, page }) => {
+const getTracksForSearch = async ({ keyword, page, track }) => {
   // keyword로 track들 찾기
   // test === true면 정확도순 정렬
   let start = 0;
-  let pageSize = 60;
+  const pageSize = track;
   if (page <= 0 || !page) {
     page = 1;
   } else {
@@ -351,10 +351,10 @@ const getTracksForSearch = async ({ keyword, page }) => {
 };
 
 // tag와 카테고리로 찾은 트랙 최종 service
-const getTracksForCategory = async ({ tags, category, page }) => {
+const getTracksForCategory = async ({ tags, category, page, track }) => {
   try {
     let start = 0;
-    let pageSize = 60;
+    let pageSize = track;
     if (page <= 0 || !page) {
       page = 1;
     } else {
