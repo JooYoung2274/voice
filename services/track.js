@@ -216,7 +216,7 @@ const getTracks = async () => {
 };
 
 // 키워드별 여러 트랙뽑기
-const getTracksByKeyword = async ({ keyword, start, end }) => {
+const getTracksByKeyword = async ({ keyword }) => {
   try {
     // 띄어쓰기 된 키워드가 2개일때만 구현해 놓음.
     // 만약 띄어쓰기 된 키워드가 3개 이상일 경우 검색 코드 전체적으로 좀 달라져야함.
@@ -254,26 +254,23 @@ const getTracksByKeyword = async ({ keyword, start, end }) => {
       },
       ...trackBasicForm,
     });
-    const results2 = results.slice(start, end);
-    return results2;
+    return results;
   } catch (error) {
     throw error;
   }
 };
 
 // 카테고리별 여러 트랙뽑기
-const getTracksByCtryId = async ({ categoryId, start, end }) => {
+const getTracksByCtryId = async ({ categoryId }) => {
   if (categoryId === CATEGORYALLID) {
     const findedTracks = await getTracks();
-    const findedTracks2 = findedTracks.slice(start, end);
-    return findedTracks2;
+    return findedTracks;
   }
   const findedTracks = await Track.findAll({
     where: { categoryId },
     ...trackBasicForm,
   });
-  const findedTracks2 = findedTracks.slice(start, end);
-  return findedTracks2;
+  return findedTracks;
 };
 // 트랙들 넣으면 likeCnt 넣어주고 좋아요순으로 바뀌고 상위 20개 뽑음
 const getTracksOrdLike = async ({ tracks }) => {
@@ -311,12 +308,10 @@ const getTrackByTrackId2 = async ({ trackId }) => {
 };
 
 // trackTag들 안에 있는 trackId로 여러 트랙 뽑기
-const getTracksByTrackIds = async ({ trackIds, start, end }) => {
+const getTracksByTrackIds = async ({ trackIds }) => {
   const results = [];
-  const trackIds2 = trackIds.slice(start, end);
-  console.log(trackIds2);
-  for (let i = 0; i < trackIds2.length; i++) {
-    const track = await getTrackByTrackId2({ trackId: trackIds2[i] });
+  for (let i = 0; i < trackIds.length; i++) {
+    const track = await getTrackByTrackId2({ trackId: trackIds[i] });
     results.push(track);
   }
   return results;
@@ -345,9 +340,10 @@ const getTracksForSearch = async ({ keyword, page, track }) => {
     start = (page - 1) * pageSize;
   }
   let end = page * pageSize;
-  const tracksInKeyword = await getTracksByKeyword({ keyword, start, end });
+  const tracksInKeyword = await getTracksByKeyword({ keyword });
   const results = await getTracksByOrdCreated({ tracks: tracksInKeyword });
-  return results;
+  const pagingResults = results.slice(start, end);
+  return pagingResults;
 };
 
 // tag와 카테고리로 찾은 트랙 최종 service
@@ -373,9 +369,10 @@ const getTracksForCategory = async ({ tags, category, page, track }) => {
 
     // 카테고리만 올경우
     if (tags[0] === "" && tags[1] === "" && tags[2] === "") {
-      const tracksInCtry = await getTracksByCtryId({ categoryId, start, end });
+      const tracksInCtry = await getTracksByCtryId({ categoryId });
       const results = await getTracksByOrdCreated({ tracks: tracksInCtry });
-      const results2 = { categoryTags: tags, tracks: results };
+      const pagingResults = results.slice(start, end);
+      const results2 = { categoryTags: tags, tracks: pagingResults };
       return results2;
     }
 
@@ -387,11 +384,12 @@ const getTracksForCategory = async ({ tags, category, page, track }) => {
     // 카테고리와 필터링된 태그로 tracktag들 찾기
     const findedTrackIds = await getTrackIdsByTagAndCtryId({ tag: findedTags, categoryId });
     // 찾은 tracktag들로 track들 찾기
-    const tracksByTrackIds = await getTracksByTrackIds({ trackIds: findedTrackIds, start, end });
+    const tracksByTrackIds = await getTracksByTrackIds({ trackIds: findedTrackIds });
     // track들 likCnt넣고 최신순으로 정렬
 
     const results = await getTracksByOrdCreated({ tracks: tracksByTrackIds });
-    const results2 = { categoryTags: tags, tracks: results };
+    const pagingResults = results.slice(start, end);
+    const results2 = { categoryTags: tags, tracks: pagingResults };
     return results2;
   } catch (error) {
     throw error;
