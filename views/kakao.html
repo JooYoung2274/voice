@@ -24,11 +24,11 @@
     <button id="room1">메세지 보내기</button>
     <script>
       const socket = io();
-      const userId = 1;
-      const qUserId = 2;
-      const sendUserId = qUserId;
+      const userId = 2;
+      const qUserId = 1;
+      const sendUserId = qUserId; //보내는 사람의 id 값 할당
       const chat = document.getElementById("input1").value;
-      // const data1 = { userId: 1, chatText:
+
       document.getElementById("userId").addEventListener("click", function () {
         socket.emit("joinRoom", { userId, qUserId });
       });
@@ -41,16 +41,13 @@
         });
       });
 
-      // document.getElementById("send").addEventListener("click", function () {
-      //   socket.emit("user-send", document.getElementById("input1").value);
-      // });
-
       socket.on("chat", (data) => {
-        var node = document.createElement("P");
-        var textnode = document.createTextNode(data);
-        node.appendChild(textnode);
-
-        document.getElementById("totalChat").append(node);
+        for (let i = 0; i < data.length; i++) {
+          let node = document.createElement("P");
+          let textnode = document.createTextNode(data[i].chatText);
+          node.appendChild(textnode);
+          document.getElementById("totalChat").append(node);
+        }
       });
     </script>
   </body>

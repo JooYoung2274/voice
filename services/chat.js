@@ -1,8 +1,9 @@
 const { ChatRoom, ChatParticipant } = require("../models");
 
 const createChatRoom = async ({ userId, qUserId }) => {
-  const findedChatRoom = await ChatRoom.findOne({ where: { userId, qUserId } });
-  if (!findedChatRoom) {
+  console.log(userId, qUserId);
+  const getChatRoom = await ChatRoom.findOne({ where: { userId, qUserId } });
+  if (!getChatRoom) {
     await ChatRoom.create({
       userId,
       qUserId,
@@ -12,13 +13,12 @@ const createChatRoom = async ({ userId, qUserId }) => {
 };
 
 const createChat = async ({ userId, qUserId, sendUserId, chatText }) => {
-  const findedChatRoom = await ChatRoom.findOne({
+  const getChatRoom = await ChatRoom.findOne({
     attributes: ["chatRoomId"],
     where: { userId, qUserId },
   });
-  console.log(findedChatRoom.chatRoomId);
 
-  const chatRoomId = findedChatRoom.chatRoomId;
+  const chatRoomId = getChatRoom.chatRoomId;
   await ChatParticipant.create({
     sendUserId,
     chatRoomId,
@@ -27,4 +27,19 @@ const createChat = async ({ userId, qUserId, sendUserId, chatText }) => {
   return;
 };
 
-module.exports = { createChatRoom, createChat };
+const getRoomId = async ({ userId, qUserId }) => {
+  const getChatRoom = await ChatRoom.findOne({
+    attributes: ["chatRoomId"],
+    where: { userId, qUserId },
+  });
+  if (getChatRoom) {
+    const getChat = await ChatParticipant.findAll({
+      attributes: ["sendUserId", "chatText"],
+      where: { chatRoomId: getChatRoom.chatRoomId },
+    });
+    return getChat;
+  }
+  return;
+};
+
+module.exports = { createChatRoom, createChat, getRoomId };

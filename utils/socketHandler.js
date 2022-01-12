@@ -7,16 +7,18 @@ io.on("connection", (socket) => {
   let roomNum = 0;
 
   socket.on("joinRoom", async ({ userId, qUserId }) => {
+    const getchat = await chatService.getRoomId({ userId, qUserId });
     await chatService.createChatRoom({ userId, qUserId });
     roomNum = userId.toString() + " " + qUserId;
     socket.join(roomNum);
+    io.to(roomNum).emit("chat", getchat);
   });
 
   socket.on("room", async ({ userId, sendUserId, chatText }) => {
-    // console.log(userId, qUserId, chatText);
     const qUserId = roomNum.split(" ")[1]; // 방문객 Id 찾아야함
+    const getChat = [{ sendUserId, chatText }];
     await chatService.createChat({ userId, qUserId, sendUserId, chatText });
-    io.to(roomNum).emit("chat", chatText);
+    io.to(roomNum).emit("chat", getChat);
   });
 
   //   // emit은 전체 알림

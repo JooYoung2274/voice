@@ -30,7 +30,6 @@ module.exports = (sequelize, DataTypes) => {
       },
       chatText: {
         allowNull: false,
-        unique: true,
         type: Sequelize.STRING,
       },
     },
