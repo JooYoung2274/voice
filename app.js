@@ -32,7 +32,7 @@ app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerFile));
 dotenv.config();
 passportConfig(app);
 
-// //test용
+// //jenkinstest용
 app.get("/", (req, res) => {
   res.sendFile(__dirname + "/views/kakao.html");
 });
