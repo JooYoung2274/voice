@@ -23,11 +23,12 @@
     <input id="input1" />
     <button id="room1">메세지 보내기</button>
     <script>
-      const socket = io();
       const userId = 2;
       const qUserId = 1;
       const sendUserId = qUserId; //보내는 사람의 id 값 할당
-      const chat = document.getElementById("input1").value;
+      // const chat = document.getElementById("input1").value;
+
+      const socket = io();
 
       document.getElementById("userId").addEventListener("click", function () {
         socket.emit("joinRoom", { userId, qUserId });
@@ -39,6 +40,7 @@
           sendUserId, //글쓴 사람의 userId
           chatText: document.getElementById("input1").value, //입력값
         });
+        document.getElementById("input1").value = "";
       });
 
       socket.on("chat", (data) => {

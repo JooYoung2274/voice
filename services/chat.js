@@ -1,45 +1,46 @@
 const { ChatRoom, ChatParticipant } = require("../models");
+const { customizedError } = require("../utils/error");
 
-const createChatRoom = async ({ userId, qUserId }) => {
-  console.log(userId, qUserId);
-  const getChatRoom = await ChatRoom.findOne({ where: { userId, qUserId } });
+const createChatRoom = async ({ userId, roomNum }) => {
+  const getChatRoom = await ChatRoom.findOne({ where: { roomNum } });
   if (!getChatRoom) {
     await ChatRoom.create({
       userId,
-      qUserId,
+      roomNum,
     });
   }
   return;
 };
 
-const createChat = async ({ userId, qUserId, sendUserId, chatText }) => {
-  const getChatRoom = await ChatRoom.findOne({
-    attributes: ["chatRoomId"],
-    where: { userId, qUserId },
-  });
-
-  const chatRoomId = getChatRoom.chatRoomId;
-  await ChatParticipant.create({
-    sendUserId,
-    chatRoomId,
-    chatText,
-  });
-  return;
+const createChat = async ({ roomNum, sendUserId, chatText }) => {
+  try {
+    const getChatRoom = await ChatRoom.findOne({ where: { roomNum } });
+    await ChatParticipant.create({
+      sendUserId,
+      roomNum,
+      chatText,
+      chatRoomId: getChatRoom.chatRoomId,
+    });
+    return;
+  } catch (error) {
+    throw error;
+  }
 };
 
-const getRoomId = async ({ userId, qUserId }) => {
-  const getChatRoom = await ChatRoom.findOne({
-    attributes: ["chatRoomId"],
-    where: { userId, qUserId },
-  });
-  if (getChatRoom) {
-    const getChat = await ChatParticipant.findAll({
-      attributes: ["sendUserId", "chatText"],
-      where: { chatRoomId: getChatRoom.chatRoomId },
-    });
-    return getChat;
+const getRoomId = async ({ roomNum }) => {
+  try {
+    const getChatRoom = await ChatRoom.findOne({ where: { roomNum } });
+    if (getChatRoom) {
+      const getChat = await ChatParticipant.findAll({
+        attributes: ["sendUserId", "chatText"],
+        where: { chatRoomId: getChatRoom.chatRoomId },
+      });
+      return getChat;
+    }
+    return;
+  } catch (error) {
+    throw error;
   }
-  return;
 };
 
 module.exports = { createChatRoom, createChat, getRoomId };

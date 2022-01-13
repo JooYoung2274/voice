@@ -20,10 +20,6 @@ module.exports = (sequelize, DataTypes) => {
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      chatRoomId: {
-        allowNull: false,
-        type: Sequelize.INTEGER,
-      },
       sendUserId: {
         allowNull: false,
         type: Sequelize.INTEGER,

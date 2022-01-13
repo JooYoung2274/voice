@@ -9,7 +9,7 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      ChatRoom.hasMany(models.ChatParticipant, { foreignKey: "chatRoomId", onDelete: "cascade" });
+      ChatRoom.hasMany(models.ChatParticipant, { foreignKey: "chatRoomId" });
       ChatRoom.belongsTo(models.User, { foreignKey: "userId", onDelete: "cascade" });
     }
   }
@@ -25,10 +25,9 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         type: Sequelize.INTEGER,
       },
-      qUserId: {
+      roomNum: {
         allowNull: false,
-        unique: true,
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING,
       },
     },
     {
