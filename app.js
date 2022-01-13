@@ -19,7 +19,6 @@ app.use(helmet.frameguard({ action: "deny" })); //iframe 클릭재킹
 // app.use(helmet.dnsPrefetchControl()) //브라우저의 dns레코드 미리추출방지
 app.use(hpp()); //오염된 req.query방어
 
-
 const { logHandler, errorHandler } = require("./middleware/errorHandler");
 
 app.use(cors());
@@ -28,7 +27,7 @@ app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerFile));
 dotenv.config();
 passportConfig(app);
 
-// //test용
+// //jenkinstest용
 app.get("/", (req, res) => {
   res.sendFile(__dirname + "/views/kakao.html");
 });
