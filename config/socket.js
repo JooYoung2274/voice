@@ -2,7 +2,7 @@ let io;
 
 module.exports = {
   init: (server) => {
-    io = require("socket.io")(server);
+    io = require("socket.io")(server, { path: "/socket.io" });
     return io;
   },
   getIo: () => {

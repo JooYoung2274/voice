@@ -5,11 +5,12 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
-    <script
+    <!-- <script
       src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.1/socket.io.min.js"
       integrity="sha384-fKnu0iswBIqkjxrhQCTZ7qlLHOFEgNkRmK2vaO/LbTZSXdJfAu6ewRBdwHPhBo/H"
       crossorigin="anonymous"
-    ></script>
+    ></script> -->
+    <script src="/socket.io/socket.io.js"></script>
   </head>
   <body>
     <a href="/api/auth/kakao">카카오 로그인</a> <a href="/api/auth/google">구글 로그인</a>
@@ -28,7 +29,9 @@
       const sendUserId = qUserId; //보내는 사람의 id 값 할당
       // const chat = document.getElementById("input1").value;
 
-      const socket = io();
+      const socket = io.connect("http://localhost:3000", {
+        path: "/socket.io",
+      });
 
       document.getElementById("userId").addEventListener("click", function () {
         socket.emit("joinRoom", { userId, qUserId });

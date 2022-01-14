@@ -3,8 +3,19 @@ const chatService = require("../services/chat");
 const io = require("../config/socket").getIo();
 
 io.on("connection", (socket) => {
-  console.log("접속됨");
+  const req = socket.request;
+  const ip = req.headers["x-forwarded-for"] || req.connection.remoteAddress;
+  console.log("접속됨", ip, socket.id, req.ip);
   let roomNum = 0;
+
+  socket.on("disconnect", () => {
+    console.log("접속해제", ip, socket.id);
+    clearInterval(socket.interval);
+  });
+
+  socket.on("error", (error) => {
+    console.error(error);
+  });
 
   socket.on("joinRoom", async ({ userId, qUserId }) => {
     try {
