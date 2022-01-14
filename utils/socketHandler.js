@@ -29,6 +29,14 @@ io.on("connection", (socket) => {
     }
   });
 
+  socket.on("leaveRoom", ({ userId, qUserId }) => {
+    console.log("gg");
+    const arr = [userId, qUserId];
+    arr.sort((a, b) => a - b);
+    roomNum = arr[0].toString() + arr[1];
+    socket.leave(roomNum);
+  });
+
   socket.on("room", async ({ userId, sendUserId, chatText }) => {
     try {
       const getChat = [{ sendUserId, chatText }];

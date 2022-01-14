@@ -1,4 +1,7 @@
-const { ChatRoom, ChatParticipant } = require("../models");
+const { ChatRoom, ChatParticipant, User } = require("../models");
+
+const { Op } = require("sequelize");
+const { or } = Op;
 const { customizedError } = require("../utils/error");
 
 const createChatRoom = async ({ userId, roomNum }) => {
@@ -27,15 +30,29 @@ const createChat = async ({ roomNum, sendUserId, chatText }) => {
   }
 };
 
-const getRoomId = async ({ roomNum }) => {
+const getRoomId = async ({ userId, qUserId, roomNum, page, chat }) => {
   try {
+    let start = 0;
+    let pageSize = chat;
+    if (page <= 0 || !page) {
+      page = 1;
+    } else {
+      start = (page - 1) * pageSize;
+    }
+    let end = page * pageSize;
+    const profile = await User.findAll({
+      where: {
+        [or]: [{ userId }, { userId: qUserId }],
+      },
+    });
     const getChatRoom = await ChatRoom.findOne({ where: { roomNum } });
     if (getChatRoom) {
-      const getChat = await ChatParticipant.findAll({
+      const results = await ChatParticipant.findAll({
         attributes: ["sendUserId", "chatText"],
         where: { chatRoomId: getChatRoom.chatRoomId },
       });
-      return getChat;
+      const getChat = results.slice(start, end);
+      return { getChat, profile };
     }
     return;
   } catch (error) {
