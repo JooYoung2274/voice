@@ -22,6 +22,7 @@ io.on("connection", (socket) => {
       const arr = [userId, qUserId];
       arr.sort((a, b) => a - b);
       roomNum = arr[0].toString() + arr[1];
+      await chatService.createChatRoom({ userId, roomNum });
       socket.join(roomNum);
     } catch (error) {
       console.log(error);

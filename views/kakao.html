@@ -37,23 +37,23 @@
         socket.emit("joinRoom", { userId, qUserId });
       });
 
-      document.getElementById("room1").addEventListener("click", function () {
-        socket.emit("room", {
-          userId, //해당 채팅방의 userId
-          sendUserId, //글쓴 사람의 userId
-          chatText: document.getElementById("input1").value, //입력값
-        });
-        document.getElementById("input1").value = "";
-      });
+      // document.getElementById("room1").addEventListener("click", function () {
+      //   socket.emit("room", {
+      //     userId, //해당 채팅방의 userId
+      //     sendUserId, //글쓴 사람의 userId
+      //     chatText: document.getElementById("input1").value, //입력값
+      //   });
+      //   document.getElementById("input1").value = "";
+      // });
 
-      socket.on("chat", (data) => {
-        for (let i = 0; i < data.length; i++) {
-          let node = document.createElement("P");
-          let textnode = document.createTextNode(data[i].chatText);
-          node.appendChild(textnode);
-          document.getElementById("totalChat").append(node);
-        }
-      });
+      // socket.on("chat", (data) => {
+      //   for (let i = 0; i < data.length; i++) {
+      //     let node = document.createElement("P");
+      //     let textnode = document.createTextNode(data[i].chatText);
+      //     node.appendChild(textnode);
+      //     document.getElementById("totalChat").append(node);
+      //   }
+      // });
     </script>
   </body>
 </html>
