@@ -35,6 +35,7 @@
     "randomstring": "^1.2.1",
     "sequelize": "^6.12.0",
     "sequelize-cli": "^6.3.0",
+    "socket.io": "^4.4.1",
     "swagger-autogen": "^2.18.0",
     "swagger-ui-express": "^4.3.0"
   }
