@@ -48,8 +48,9 @@ const getRoomId = async ({ userId, qUserId, roomNum, page, chat }) => {
     const getChatRoom = await ChatRoom.findOne({ where: { roomNum } });
     if (getChatRoom) {
       const results = await ChatParticipant.findAll({
-        attributes: ["sendUserId", "chatText"],
+        // attributes: ["sendUserId", "chatText"],
         where: { chatRoomId: getChatRoom.chatRoomId },
+        order: [["chatParticipantId", "DESC"]],
       });
       const getChat = results.slice(start, end);
       return { getChat, profile };
