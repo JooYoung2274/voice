@@ -1,4 +1,5 @@
 const chatService = require("../services/chat");
+const userService = require("../services/auth");
 
 const io = require("../config/socket").getIo();
 
@@ -52,10 +53,11 @@ io.on("connection", (socket) => {
 
   socket.on("room", async ({ receiveUserId, sendUserId, chatText }) => {
     try {
-      const getChat = [{ receiveUserId, sendUserId, chatText }];
+      const getChat = { receiveUserId, sendUserId, chatText };
+      const profile = await userService.getUserByUserId({ userId: receiveUserId });
       await chatService.createChat({ roomNum, sendUserId, chatText });
-      io.to(roomNum).emit("chat", getChat);
-      io.to(receiveUserId).emit("list", getChat);
+      io.to(roomNum).emit("chat", [getChat, profile]);
+      io.to(receiveUserId).emit("list", [getChat, profile]);
     } catch (error) {
       console.log(error);
     }
