@@ -7,7 +7,7 @@ io.on("connection", (socket) => {
   const ip = req.headers["x-forwarded-for"] || req.connection.remoteAddress;
   console.log("접속됨", ip, socket.id, req.ip);
   let roomNum = 0;
-
+  let qqUserId;
   socket.on("disconnect", () => {
     console.log("접속해제", ip, socket.id);
     clearInterval(socket.interval);
@@ -17,32 +17,45 @@ io.on("connection", (socket) => {
     console.error(error);
   });
 
+  socket.on("login", ({ userId }) => {
+    console.log("login!!", userId);
+    socket.join(userId);
+  });
+
+  socket.on("login2", ({ qUserId }) => {
+    console.log("login2!!", qUserId);
+    socket.join(qUserId);
+  });
+
   socket.on("joinRoom", async ({ userId, qUserId }) => {
     try {
       const arr = [userId, qUserId];
+      qqUserId = qUserId;
       arr.sort((a, b) => a - b);
       roomNum = arr[0].toString() + arr[1];
       await chatService.createChatRoom({ userId, roomNum });
       console.log("joinRoom!", roomNum);
       socket.join(roomNum);
+      socket.leave(userId);
     } catch (error) {
       console.log(error);
     }
   });
 
   socket.on("leaveRoom", ({ userId, qUserId }) => {
-    console.log("gg");
     const arr = [userId, qUserId];
     arr.sort((a, b) => a - b);
     roomNum = arr[0].toString() + arr[1];
+    console.log("leaveRoom!", roomNum);
     socket.leave(roomNum);
   });
 
-  socket.on("room", async ({ userId, sendUserId, chatText }) => {
+  socket.on("room", async ({ receiveUserId, sendUserId, chatText }) => {
     try {
-      const getChat = [{ sendUserId, chatText }];
+      const getChat = [{ receiveUserId, sendUserId, chatText }];
       await chatService.createChat({ roomNum, sendUserId, chatText });
       io.to(roomNum).emit("chat", getChat);
+      io.to(receiveUserId).emit("list", getChat);
     } catch (error) {
       console.log(error);
     }
