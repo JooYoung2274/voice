@@ -32,6 +32,7 @@ const kakaoCallback = (req, res, next) => {
       contact: contact,
       profileImage: profileImage,
       introduce,
+      userId,
     };
     res.send({ user: result });
   })(req, res, next);
@@ -50,6 +51,7 @@ const googleCallback = (req, res, next) => {
       contact: contact,
       profileImage: profileImage,
       introduce,
+      userId,
     };
     res.send({ user: result });
   })(req, res, next);
@@ -68,6 +70,7 @@ const naverCallback = (req, res, next) => {
       contact: contact,
       profileImage: profileImage,
       introduce,
+      userId,
     };
     res.send({ user: result });
   })(req, res, next);
