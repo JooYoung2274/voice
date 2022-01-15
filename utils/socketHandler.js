@@ -23,6 +23,7 @@ io.on("connection", (socket) => {
       arr.sort((a, b) => a - b);
       roomNum = arr[0].toString() + arr[1];
       await chatService.createChatRoom({ userId, roomNum });
+      console.log("joinRoom!", roomNum);
       socket.join(roomNum);
     } catch (error) {
       console.log(error);
