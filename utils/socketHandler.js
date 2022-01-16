@@ -52,7 +52,7 @@ io.on("connection", (socket) => {
   socket.on("room", async ({ receiveUserId, sendUserId, chatText }) => {
     try {
       let checkChat = false;
-      if (io.engine.clientsCount === 2) {
+      if (io.sockets.adapter.rooms.get(roomNum).size === 2) {
         checkChat = true;
       }
       console.log(io.sockets.adapter.rooms.get(roomNum).size);
