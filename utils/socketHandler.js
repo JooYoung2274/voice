@@ -19,7 +19,7 @@ io.on("connection", (socket) => {
 
   socket.on("login", ({ userId }) => {
     console.log("login!!", userId);
-    socket.join(userId);
+    socket.join(Number(userId));
   });
 
   socket.on("login2", ({ qUserId }) => {
@@ -35,7 +35,7 @@ io.on("connection", (socket) => {
       await chatService.createChatRoom({ userId, qUserId, roomNum });
       console.log("joinRoom!", roomNum);
       socket.join(roomNum);
-      socket.leave(userId);
+      socket.leave(Number(userId));
     } catch (error) {
       console.log(error);
     }
