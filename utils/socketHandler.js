@@ -51,6 +51,7 @@ io.on("connection", (socket) => {
 
   socket.on("room", async ({ receiveUserId, sendUserId, chatText }) => {
     try {
+      let createdAt = new Date();
       let checkChat = false;
       if (io.sockets.adapter.rooms.get(roomNum).size === 2) {
         checkChat = true;
@@ -58,7 +59,7 @@ io.on("connection", (socket) => {
       console.log(io.sockets.adapter.rooms.get(roomNum).size);
       await chatService.createChat({ roomNum, sendUserId, chatText, checkChat });
       sendUserId = await userService.getUserByUserId({ userId: sendUserId });
-      const getChat = { sendUserId, receiveUserId, chatText };
+      const getChat = { sendUserId, receiveUserId, chatText, createdAt };
       io.to(roomNum).emit("chat", getChat);
       io.to(receiveUserId).emit("list", getChat);
     } catch (error) {
