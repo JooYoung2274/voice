@@ -56,7 +56,7 @@ io.on("connection", (socket) => {
         checkChat = true;
       }
       await chatService.createChat({ roomNum, sendUserId, chatText, checkChat });
-      sendUserId = await userService.getUserByUserId({ userId: receiveUserId });
+      sendUserId = await userService.getUserByUserId({ userId: sendUserId });
       const getChat = { sendUserId, receiveUserId, chatText };
       io.to(roomNum).emit("chat", getChat);
       io.to(receiveUserId).emit("list", getChat);
