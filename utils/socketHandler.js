@@ -55,6 +55,7 @@ io.on("connection", (socket) => {
       if (io.engine.clientsCount === 2) {
         checkChat = true;
       }
+      console.log(io.engine.clientsCount);
       await chatService.createChat({ roomNum, sendUserId, chatText, checkChat });
       sendUserId = await userService.getUserByUserId({ userId: sendUserId });
       const getChat = { sendUserId, receiveUserId, chatText };

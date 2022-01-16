@@ -27,6 +27,7 @@ const createChatRoom = async ({ userId, qUserId, roomNum }) => {
 
 const createChat = async ({ roomNum, sendUserId, chatText, checkChat }) => {
   try {
+    console.log(checkChat);
     const getChatRoom = await ChatRoom.findOne({ where: { roomNum } });
     await ChatParticipant.create({
       sendUserId,
