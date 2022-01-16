@@ -8,7 +8,6 @@ io.on("connection", (socket) => {
   const ip = req.headers["x-forwarded-for"] || req.connection.remoteAddress;
   console.log("접속됨", ip, socket.id, req.ip);
   let roomNum = 0;
-  let qqUserId;
   socket.on("disconnect", () => {
     console.log("접속해제", ip, socket.id);
     clearInterval(socket.interval);
@@ -31,10 +30,9 @@ io.on("connection", (socket) => {
   socket.on("joinRoom", async ({ userId, qUserId }) => {
     try {
       const arr = [userId, qUserId];
-      qqUserId = qUserId;
       arr.sort((a, b) => a - b);
       roomNum = arr[0].toString() + arr[1];
-      await chatService.createChatRoom({ userId, roomNum });
+      await chatService.createChatRoom({ userId, qUserId, roomNum });
       console.log("joinRoom!", roomNum);
       socket.join(roomNum);
       socket.leave(userId);
@@ -53,11 +51,15 @@ io.on("connection", (socket) => {
 
   socket.on("room", async ({ receiveUserId, sendUserId, chatText }) => {
     try {
-      const getChat = { receiveUserId, sendUserId, chatText };
-      const profile = await userService.getUserByUserId({ userId: receiveUserId });
-      await chatService.createChat({ roomNum, sendUserId, chatText });
-      io.to(roomNum).emit("chat", [getChat, profile]);
-      io.to(receiveUserId).emit("list", [getChat, profile]);
+      let checkChat = false;
+      if (io.engine.clientsCount === 2) {
+        checkChat = true;
+      }
+      await chatService.createChat({ roomNum, sendUserId, chatText, checkChat });
+      sendUserId = await userService.getUserByUserId({ userId: receiveUserId });
+      const getChat = { sendUserId, receiveUserId, chatText };
+      io.to(roomNum).emit("chat", getChat);
+      io.to(receiveUserId).emit("list", getChat);
     } catch (error) {
       console.log(error);
     }

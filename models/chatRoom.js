@@ -25,6 +25,10 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         type: Sequelize.INTEGER,
       },
+      userId2: {
+        allowNull: false,
+        type: Sequelize.INTEGER,
+      },
       roomNum: {
         allowNull: false,
         type: Sequelize.STRING,

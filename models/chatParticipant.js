@@ -28,6 +28,10 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         type: Sequelize.STRING,
       },
+      checkChat: {
+        allowNull: false,
+        type: Sequelize.BOOLEAN,
+      },
     },
     {
       sequelize,
