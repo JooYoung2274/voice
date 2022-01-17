@@ -5,30 +5,40 @@ const { or, and } = Op;
 const { customizedError } = require("../utils/error");
 
 const createChatRoom = async ({ userId, qUserId, roomNum }) => {
-  const getChatRoom = await ChatRoom.findOne({ where: { roomNum } });
-  if (!getChatRoom) {
-    await ChatRoom.create({
-      userId,
-      userId2: qUserId,
-      roomNum,
-    });
-    return;
-  }
-  await ChatParticipant.update(
-    { checkChat: true },
-    {
-      where: {
-        [and]: [{ chatRoomId: getChatRoom.chatRoomId }, { sendUserId: qUserId }],
+  try {
+    if (!userId || !qUserId || !roomNum) {
+      throw customizedError("잘못된 요청입니다", 400);
+    }
+    const getChatRoom = await ChatRoom.findOne({ where: { roomNum } });
+    if (!getChatRoom) {
+      await ChatRoom.create({
+        userId,
+        userId2: qUserId,
+        roomNum,
+      });
+      return;
+    }
+    await ChatParticipant.update(
+      { checkChat: true },
+      {
+        where: {
+          [and]: [{ chatRoomId: getChatRoom.chatRoomId }, { sendUserId: qUserId }],
+        },
       },
-    },
-  );
-  return;
+    );
+    return;
+  } catch (error) {
+    throw error;
+  }
 };
 
 const createChat = async ({ roomNum, sendUserId, chatText, checkChat }) => {
   try {
     console.log(checkChat);
     const getChatRoom = await ChatRoom.findOne({ where: { roomNum } });
+    if (!getChatRoom) {
+      throw customizedError("삭제된 채팅방입니다", 400);
+    }
     await ChatParticipant.create({
       sendUserId,
       roomNum,
@@ -105,7 +115,7 @@ const getList = async ({ userId }) => {
   let result = [];
   for (let i = 0; i < chatRoom.length; i++) {
     const chatList = await ChatParticipant.findOne({
-      attributes: ["sendUserId", "chatText", "createdAt"],
+      attributes: ["sendUserId", "chatText", "checkChat", "createdAt"],
       where: { chatRoomId: chatRoom[i].chatRoomId },
       order: [["chatParticipantId", "DESC"]],
     });
