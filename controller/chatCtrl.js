@@ -24,6 +24,7 @@ const getChatByIds = async (req, res, next) => {
 const getChatListByUserId = async (req, res, next) => {
   try {
     const { userId } = req.body;
+    console.log(userId);
     const result = await chatService.getList({ userId });
     res.status(200).send({ result });
   } catch (error) {
