@@ -119,7 +119,9 @@ const getList = async ({ userId }) => {
       where: { chatRoomId: chatRoom[i].chatRoomId },
       order: [["chatParticipantId", "DESC"]],
     });
-    result.push(chatList);
+    if (chatList) {
+      result.push(chatList);
+    }
   }
   for (let i = 0; i < result.length; i++) {
     const profile = await User.findOne({
