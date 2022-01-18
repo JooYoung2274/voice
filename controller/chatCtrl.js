@@ -23,6 +23,7 @@ const getChatByIds = async (req, res, next) => {
 
 const getChatListByUserId = async (req, res, next) => {
   try {
+    console.log(req.body);
     const { userId } = req.body;
     console.log(userId);
     const result = await chatService.getList({ userId });
