@@ -4,6 +4,7 @@ const getChatByIds = async (req, res, next) => {
   try {
     const { page, chat } = req.query;
     const { userId, qUserId } = req.body;
+    console.log(userId, qUserId);
     const arr = [userId, qUserId];
     arr.sort((a, b) => a - b);
     const roomNum = arr[0].toString() + arr[1];
