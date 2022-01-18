@@ -38,7 +38,8 @@ app.get("/", (req, res) => {
 });
 
 app.use(express.json());
-app.use("/api", reqLimiter, router);
+// app.use("/api", reqLimiter, router);
+app.use("/api", router);
 app.use(express.static("uploads"));
 
 app.use(logHandler);
