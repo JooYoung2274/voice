@@ -113,6 +113,16 @@ const getList = async ({ userId }) => {
   if (!chatRoom) {
     return;
   }
+  const userId1 = await User.findOne({
+    attributes: ["nickname", "contact", "profileImage", "introduce", "userId"],
+    where: { userId },
+  });
+
+  const userId2 = await User.findOne({
+    attributes: ["nickname", "contact", "profileImage", "introduce", "userId"],
+    where: { userId: chatRoom2.userId2 },
+  });
+
   let result = [];
   for (let i = 0; i < chatRoom.length; i++) {
     const chatList = await ChatParticipant.findOne({
@@ -130,9 +140,9 @@ const getList = async ({ userId }) => {
       where: { userId: result[i].sendUserId },
     });
     if (result[i].sendUserId !== userId) {
-      result[i].dataValues.receiveUserId = userId;
+      result[i].dataValues.receiveUserId = userId1;
     } else {
-      result[i].dataValues.receiveUserId = chatRoom2.userId2;
+      result[i].dataValues.receiveUserId = userId2;
     }
     result[i].sendUserId = profile;
   }
