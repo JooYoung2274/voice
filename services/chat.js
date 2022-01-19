@@ -32,7 +32,14 @@ const createChatRoom = async ({ userId, qUserId, roomNum }) => {
   }
 };
 
-const createChat = async ({ roomNum, sendUserId, receiveUserId, chatText, checkChat }) => {
+const createChat = async ({
+  roomNum,
+  sendUserId,
+  receiveUserId,
+  chatText,
+  checkChat,
+  chatType,
+}) => {
   try {
     console.log(checkChat);
     const getChatRoom = await ChatRoom.findOne({ where: { roomNum } });
@@ -43,6 +50,7 @@ const createChat = async ({ roomNum, sendUserId, receiveUserId, chatText, checkC
       sendUserId,
       receiveUserId,
       roomNum,
+      chatType,
       chatText,
       checkChat,
       chatRoomId: getChatRoom.chatRoomId,
@@ -75,7 +83,7 @@ const getRoomId = async ({ userId, qUserId, roomNum, page, chat }) => {
     const getChatRoom = await ChatRoom.findOne({ where: { roomNum } });
     if (getChatRoom) {
       const results = await ChatParticipant.findAll({
-        attributes: ["sendUserId", "chatText", "createdAt"],
+        attributes: ["sendUserId", "chatType", "chatText", "createdAt"],
         where: { chatRoomId: getChatRoom.chatRoomId },
         order: [["chatParticipantId", "DESC"]],
       });
@@ -134,7 +142,7 @@ const getList = async ({ userId }) => {
   let result = [];
   for (let i = 0; i < chatRoom.length; i++) {
     const chatList = await ChatParticipant.findOne({
-      attributes: ["sendUserId", "receiveUserId", "chatText", "checkChat", "createdAt"],
+      attributes: ["sendUserId", "receiveUserId", "chatType", "chatText", "checkChat", "createdAt"],
       where: { chatRoomId: chatRoom[i].chatRoomId },
       order: [["chatParticipantId", "DESC"]],
     });

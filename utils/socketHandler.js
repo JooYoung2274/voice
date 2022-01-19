@@ -57,7 +57,15 @@ io.on("connection", (socket) => {
         checkChat = true;
       }
       console.log(io.sockets.adapter.rooms.get(roomNum).size);
-      await chatService.createChat({ roomNum, sendUserId, receiveUserId, chatText, checkChat });
+      const chatType = "text";
+      await chatService.createChat({
+        roomNum,
+        sendUserId,
+        receiveUserId,
+        chatText,
+        checkChat,
+        chatType,
+      });
       sendUserId = await userService.getUserByUserId({ userId: sendUserId });
       const getChat = { sendUserId, receiveUserId, chatText, createdAt };
       io.to(roomNum).emit("chat", getChat);
@@ -66,7 +74,12 @@ io.on("connection", (socket) => {
       console.log(error);
     }
   });
-
+  socket.on("track", () => {
+    let createdAt = new Date();
+    const getChat = { sendUserId, receiveUserId, chatText, createdAt };
+    io.to(roomNum).emit("chat", getChat);
+    io.to(receiveUserId).emit("list", getChat);
+  });
   //   // emit은 전체 알림
   //   // to(socket.id).emit 은 해당 socket.id 가진 사람한테만 알림
   //   socket.on("user-send", (data) => {

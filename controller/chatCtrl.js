@@ -47,7 +47,7 @@ const checkNewChat = async (req, res, next) => {
 
 const postTrack = async (req, res, next) => {
   try {
-    const { location } = req.file;
+    // const { location } = req.file;
     const chatText = location;
     const checkChat = false;
     const { sendUserId, receiveUserId } = req.body;
@@ -55,7 +55,15 @@ const postTrack = async (req, res, next) => {
     arr.sort((a, b) => a - b);
     roomNum = arr[0].toString() + arr[1];
     // const { userId } = res.locals.user;
-    await chatService.createChat({ roomNum, sendUserId, chatText, checkChat });
+    const chatType = "url";
+    await chatService.createChat({
+      roomNum,
+      sendUserId,
+      receiveUserId,
+      chatText,
+      checkChat,
+      chatType,
+    });
     res.sendStatus(200);
   } catch (error) {
     next(error);
