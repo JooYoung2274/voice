@@ -205,4 +205,12 @@ const checkChat = async ({ userId }) => {
   return roomCheck;
 };
 
-module.exports = { createChatRoom, createChat, getRoomId, getList, checkChat };
+const getChatByIds = async ({ receiveUserId, sendUserId }) => {
+  const getchat = await ChatParticipant.findOne({
+    where: { receiveUserId, sendUserId, chatType: "url" },
+    order: [["chatParticipantId", "DESC"]],
+  });
+  return getchat;
+};
+
+module.exports = { createChatRoom, createChat, getRoomId, getList, checkChat, getChatByIds };

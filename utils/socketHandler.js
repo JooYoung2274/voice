@@ -74,9 +74,9 @@ io.on("connection", (socket) => {
       console.log(error);
     }
   });
-  socket.on("track", () => {
-    let createdAt = new Date();
-    const getChat = { sendUserId, receiveUserId, chatText, createdAt };
+  socket.on("track", async ({ receiveUserId, sendUserId }) => {
+    const getChat = await chatService.getChatByIds({ receiveUserId, sendUserId });
+
     io.to(roomNum).emit("chat", getChat);
     io.to(receiveUserId).emit("list", getChat);
   });
