@@ -49,7 +49,6 @@ const createChat = async ({
     await ChatParticipant.create({
       sendUserId,
       receiveUserId,
-      roomNum,
       sample,
       chatType,
       chatText,

@@ -6,7 +6,7 @@ const io = require("../config/socket").getIo();
 io.on("connection", (socket) => {
   const req = socket.request;
   const ip = req.headers["x-forwarded-for"] || req.connection.remoteAddress;
-  console.log("접속됨", ip, socket.id, req.ip);
+  console.log("접속됨", ip, socket.id);
   let roomNum = 0;
   socket.on("disconnect", () => {
     console.log("접속해제", ip, socket.id);
@@ -48,7 +48,6 @@ io.on("connection", (socket) => {
       if (io.sockets.adapter.rooms.get(roomNum).size === 2) {
         checkChat = true;
       }
-      console.log(io.sockets.adapter.rooms.get(roomNum).size);
       const chatType = "text";
       await chatService.createChat({
         roomNum,
@@ -67,6 +66,7 @@ io.on("connection", (socket) => {
       console.log(error);
     }
   });
+
   socket.on("track", async ({ receiveUserId, sendUserId }) => {
     try {
       const getChat = await chatService.getChatByIds({ receiveUserId, sendUserId });
