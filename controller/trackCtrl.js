@@ -13,7 +13,7 @@ const trackUploads = async (req, res, next) => {
     const tags = [tag1, tag2, tag3];
 
     const convertedFile = `${randomFilename()}.mp3`;
-    ffmpeg(location)
+    await ffmpeg(location)
       .toFormat("mp3")
       .on("error", (err) => {
         console.log("An error occurred: " + err.message);
