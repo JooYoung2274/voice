@@ -47,8 +47,8 @@ const checkNewChat = async (req, res, next) => {
 
 const postTrack = async (req, res, next) => {
   try {
-    // const { location } = req.file;
-    // const chatText = location;
+    const { location } = req.file;
+    const chatText = location;
     console.log(req.file);
     const checkChat = false;
     const { sendUserId, receiveUserId } = req.body;
