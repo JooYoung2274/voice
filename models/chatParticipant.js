@@ -20,6 +20,10 @@ module.exports = (sequelize, DataTypes) => {
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
+      receiveUserId: {
+        allowNull: false,
+        type: Sequelize.INTEGER,
+      },
       sendUserId: {
         allowNull: false,
         type: Sequelize.INTEGER,

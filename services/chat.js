@@ -32,7 +32,7 @@ const createChatRoom = async ({ userId, qUserId, roomNum }) => {
   }
 };
 
-const createChat = async ({ roomNum, sendUserId, chatText, checkChat }) => {
+const createChat = async ({ roomNum, sendUserId, receiveUserId, chatText, checkChat }) => {
   try {
     console.log(checkChat);
     const getChatRoom = await ChatRoom.findOne({ where: { roomNum } });
@@ -41,6 +41,7 @@ const createChat = async ({ roomNum, sendUserId, chatText, checkChat }) => {
     }
     await ChatParticipant.create({
       sendUserId,
+      receiveUserId,
       roomNum,
       chatText,
       checkChat,
@@ -106,46 +107,57 @@ const getList = async ({ userId }) => {
       [or]: [{ userId }, { userId2: userId }],
     },
   });
-  const chatRoom2 = await ChatRoom.findOne({
-    attributes: ["userId2"],
-    where: { userId },
+
+  const chatRoom1 = await ChatRoom.findAll({
+    attributes: ["chatRoomId", "userId", "userId2"],
+    where: {
+      [or]: [{ userId }],
+    },
   });
-  if (!chatRoom) {
-    return;
-  }
-  const userId1 = await User.findOne({
-    attributes: ["nickname", "contact", "profileImage", "introduce", "userId"],
-    where: { userId },
+  const chatRoom2 = await ChatRoom.findAll({
+    attributes: ["chatRoomId", "userId", "userId2"],
+    where: {
+      [or]: [{ userId2: userId }],
+    },
   });
 
-  const userId2 = await User.findOne({
-    attributes: ["nickname", "contact", "profileImage", "introduce", "userId"],
-    where: { userId: chatRoom2.userId2 },
-  });
+  if (!chatRoom1 || !chatRoom2) {
+    return;
+  }
+  // const qUserId = await User.findAll({
+  //   attributes: ["nickname", "contact", "profileImage", "introduce", "userId"],
+  //   where: {
+  //     [or]: [{ userId: chatRoom1.userId2 }, { userId: chatRoom2.userId }],
+  //   },
+  // });
 
   let result = [];
   for (let i = 0; i < chatRoom.length; i++) {
     const chatList = await ChatParticipant.findOne({
-      attributes: ["sendUserId", "chatText", "checkChat", "createdAt"],
+      attributes: ["sendUserId", "receiveUserId", "chatText", "checkChat", "createdAt"],
       where: { chatRoomId: chatRoom[i].chatRoomId },
       order: [["chatParticipantId", "DESC"]],
     });
     if (chatList) {
       result.push(chatList);
+      if (chatList.sendUserId === userId) {
+        const qUserId2 = await User.findOne({
+          attributes: ["nickname", "contact", "profileImage", "introduce", "userId"],
+          where: { userId: chatList.receiveUserId },
+        });
+        result[i].dataValues.userId = userId;
+        result[i].dataValues.qUserId = qUserId2;
+      } else if (chatList.receiveUserId === userId) {
+        const qUserId1 = await User.findOne({
+          attributes: ["nickname", "contact", "profileImage", "introduce", "userId"],
+          where: { userId: chatList.sendUserId },
+        });
+        result[i].dataValues.userId = userId;
+        result[i].dataValues.qUserId = qUserId1;
+      }
     }
   }
-  for (let i = 0; i < result.length; i++) {
-    const profile = await User.findOne({
-      attributes: ["nickname", "contact", "profileImage", "introduce", "userId"],
-      where: { userId: result[i].sendUserId },
-    });
-    if (result[i].sendUserId !== userId) {
-      result[i].dataValues.receiveUserId = userId1;
-    } else {
-      result[i].dataValues.receiveUserId = userId2;
-    }
-    result[i].sendUserId = profile;
-  }
+  console.log(result);
   return result;
 };
 
