@@ -19,7 +19,7 @@ const CATEGORYALL = "전체";
 const CATEGORYALLTEXT = "최근에 올라온 목소리";
 const TRACKNUM = 19;
 
-const createTrack = async ({ title, category, tags, trackThumbnailId, location, userId }) => {
+const createTrack = async ({ title, category, tags, trackThumbnailId, filename, userId }) => {
   if (!trackThumbnailId || !userId) {
     throw customizedError("잘못된 녹음 업로드 요청입니다.", 400);
   }
@@ -38,11 +38,12 @@ const createTrack = async ({ title, category, tags, trackThumbnailId, location, 
   if (!title || title.length > 40) {
     throw customizedError("제목은 존재해야하고 20자를 넘길 수 없습니다.", 400);
   }
+
   const createdTrack = await Track.create({
     title,
     categoryId,
     trackThumbnailId,
-    trackUrl: `${location}`,
+    trackUrl: filename,
     userId,
   });
   const trackId = createdTrack.trackId;

@@ -10,7 +10,7 @@ const {
   getUser,
 } = require("../controller/authCtrl");
 const { imageMulter } = require("../middleware/uploader");
-const imageUploader = imageMulter.single("profileImage");
+const imagePass = imageMulter.single("profileImage");
 const router = express.Router();
 
 router.get("/kakao", passport.authenticate("kakao"));
@@ -25,6 +25,6 @@ router.get("/naver", passport.authenticate("naver"));
 
 router.get("/naver/callback", naverCallback);
 
-router.post("/profile", imageUploader, needLogin, updateUser);
+router.post("/profile", imagePass, needLogin, updateUser);
 router.get("/me", needLogin, getUser);
 module.exports = router;

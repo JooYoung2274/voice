@@ -3,35 +3,22 @@ const listInfoService = require("../services/listinfo");
 const ffmpegPath = require("@ffmpeg-installer/ffmpeg").path;
 const ffmpeg = require("fluent-ffmpeg");
 ffmpeg.setFfmpegPath(ffmpegPath);
-const randomFilename = () => Math.random().toString(36).substr(2, 11) + Date.now();
 
 const trackUploads = async (req, res, next) => {
   try {
     const { title, category, tag1, tag2, tag3, trackThumbnailId } = req.body;
-    const { location } = req.file;
+    const { filename } = req.file;
     const { userId } = res.locals.user;
     const tags = [tag1, tag2, tag3];
 
-    const convertedFile = `${randomFilename()}.mp3`;
-    await ffmpeg(location)
-      .toFormat("mp3")
-      .on("error", (err) => {
-        console.log("An error occurred: " + err.message);
-      })
-      .on("progress", (progress) => {
-        // console.log(JSON.stringify(progress));
-        console.log("Processing: " + progress.targetSize + " KB converted");
-      })
-      .on("end", () => {
-        console.log("Processing finished !");
-      })
-      .save(`./uploads/${convertedFile}`); //path where you want to save your file
+    // const convertedFile = `${randomFilename()}.mp3`;
+    // ffmpeg(location).toFormat("mp3").save(`./uploads/${convertedFile}`); //path where you want to save your file
     const trackId = await trackService.createTrack({
       title,
       category,
       tags,
       trackThumbnailId,
-      location: `${process.env.SERVER_DOMAIN}/${convertedFile}`,
+      filename,
       userId,
     });
     res.status(200).json({ trackId });

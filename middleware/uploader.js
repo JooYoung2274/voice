@@ -1,15 +1,16 @@
 const multer = require("multer");
-const multerS3 = require("multer-s3");
-const aws = require("aws-sdk");
+// const multerS3 = require("multer-s3");
+// const aws = require("aws-sdk");
 const { customizedError } = require("../utils/error");
-const { S3_ACCESS_KEY_ID, S3_SECRET_ACEESS_KEY, S3_REGION, S3_BUCKET_NAME } = process.env;
-const IMAGES = "images";
-const TRACKS = "tracks";
-const s3 = new aws.S3({
-  accessKeyId: S3_ACCESS_KEY_ID,
-  secretAccessKey: S3_SECRET_ACEESS_KEY,
-  region: S3_REGION,
-});
+// const { S3_ACCESS_KEY_ID, S3_SECRET_ACEESS_KEY, S3_REGION, S3_BUCKET_NAME } = process.env;
+// const IMAGES = "images";
+// const TRACKS = "tracks";
+// const s3 = new aws.S3({
+//   accessKeyId: S3_ACCESS_KEY_ID,
+//   secretAccessKey: S3_SECRET_ACEESS_KEY,
+//   region: S3_REGION,
+// });
+CONVERTEDFILETYPE = "mp3";
 
 // 통과되는 image타입들
 const passImageTypes = ["jpg", "png", "jpeg"];
@@ -28,16 +29,16 @@ const fileTypeValidate = (fileType, passTypes) => {
 };
 
 // 파일 넣을 디렉토리 정하기
-const storageFor = (dir) =>
-  multerS3({
-    s3,
-    bucket: S3_BUCKET_NAME,
-    key: function (req, file, cb) {
-      const fileType = getfileType(file);
-      const directory = dir;
-      cb(null, `${directory}/${randomFilename()}.${fileType}`);
-    },
-  });
+// const storageFor = (dir) =>
+//   multerS3({
+//     s3,
+//     bucket: S3_BUCKET_NAME,
+//     key: function (req, file, cb) {
+//       const fileType = getfileType(file);
+//       const directory = dir;
+//       cb(null, `${directory}/${randomFilename()}.${fileType}`);
+//     },
+//   });
 
 // 파일 타입 필터링
 const fileFilterFor = (passTypes) => (req, file, cb) => {
@@ -63,7 +64,22 @@ const fileFilterFor = (passTypes) => (req, file, cb) => {
 // });
 
 // 업로드 하기
-const uploader = (storage, fileFilter) =>
+// const uploader = (storage, fileFilter) =>
+//   multer({
+//     storage: storage,
+//     fileFilter: fileFilter,
+//     limits: {
+//       fileSize: 20 * 1024 * 1024, //20메가 제한
+//     },
+//   });
+
+const storage = multer.diskStorage({
+  filename: function (req, file, cb) {
+    cb(null, `${randomFilename()}.${CONVERTEDFILETYPE}`); // 생성한 난수 + 현재 시각 + . + 파일 확장자명
+  },
+});
+
+const uploader = (fileFilter) =>
   multer({
     storage: storage,
     fileFilter: fileFilter,
@@ -73,14 +89,16 @@ const uploader = (storage, fileFilter) =>
   });
 
 // 이름 짓는게 더 직관적이여서 바로 대입하지 않고 변수 한 번더 선언
-const imageStorage = storageFor(IMAGES);
-const voiceStorage = storageFor(TRACKS);
+// const imageStorage = storageFor(IMAGES);
+// const voiceStorage = storageFor(TRACKS);
 const imageFileFilter = fileFilterFor(passImageTypes);
 const voiceFileFilter = fileFilterFor(passvoiceTypes);
 
 // multer 미들웨어 --1
-const imageMulter = uploader(imageStorage, imageFileFilter);
-const voiceMulter = uploader(voiceStorage, voiceFileFilter);
+// const imageMulter = uploader(imageStorage, imageFileFilter);
+// const voiceMulter = uploader(voiceStorage, voiceFileFilter);
+const imageMulter = uploader(imageFileFilter);
+const voiceMulter = uploader(voiceFileFilter);
 
 // local uploads에 파일 저장하고 싶을때--3 방법: 1 주석처리하고 2,3주석 풀면됨
 // const imageMulter = uploader(storage, imageFileFilter);
