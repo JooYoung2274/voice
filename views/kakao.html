@@ -58,6 +58,7 @@
         socket.emit("room", {
           receiveUserId, // 받는 사람
           sendUserId, // 보내는 사람
+          sample: null,
           chatText: document.getElementById("input1").value, //입력값
         });
         document.getElementById("input1").value = "";

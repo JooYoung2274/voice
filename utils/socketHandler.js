@@ -17,21 +17,15 @@ io.on("connection", (socket) => {
     console.error(error);
   });
 
-  socket.on("login", ({ userId }) => {
-    console.log("login!!", userId);
-    socket.join(Number(userId));
-  });
-
-  socket.on("login2", ({ qUserId }) => {
-    console.log("login2!!", qUserId);
-    socket.join(qUserId);
-  });
+  const roomNumMaker = (x, y) => {
+    const arr = [x, y];
+    arr.sort((a, b) => a - b);
+    roomNum = arr[0].toString() + arr[1];
+  };
 
   socket.on("joinRoom", async ({ userId, qUserId }) => {
     try {
-      const arr = [userId, qUserId];
-      arr.sort((a, b) => a - b);
-      roomNum = arr[0].toString() + arr[1];
+      roomNumMaker(userId, qUserId);
       await chatService.createChatRoom({ userId, qUserId, roomNum });
       console.log("joinRoom!", roomNum);
       socket.join(roomNum);
@@ -42,14 +36,12 @@ io.on("connection", (socket) => {
   });
 
   socket.on("leaveRoom", ({ userId, qUserId }) => {
-    const arr = [userId, qUserId];
-    arr.sort((a, b) => a - b);
-    roomNum = arr[0].toString() + arr[1];
+    roomNumMaker(userId, qUserId);
     console.log("leaveRoom!", roomNum);
     socket.leave(roomNum);
   });
 
-  socket.on("room", async ({ receiveUserId, sendUserId, chatText }) => {
+  socket.on("room", async ({ receiveUserId, sendUserId, chatText, sample }) => {
     try {
       let createdAt = new Date();
       let checkChat = false;
@@ -65,9 +57,10 @@ io.on("connection", (socket) => {
         chatText,
         checkChat,
         chatType,
+        sample,
       });
       sendUserId = await userService.getUserByUserId({ userId: sendUserId });
-      const getChat = { sendUserId, receiveUserId, chatText, createdAt };
+      const getChat = { sendUserId, receiveUserId, chatText, createdAt, sample };
       io.to(roomNum).emit("chat", getChat);
       io.to(receiveUserId).emit("list", getChat);
     } catch (error) {

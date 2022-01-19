@@ -3,7 +3,7 @@ const listInfoService = require("../services/listinfo");
 
 const trackUploads = async (req, res, next) => {
   try {
-    const { title, category, tag1, tag2, tag3, trackThumbnailId } = req.body;
+    const { title, category, tag1, tag2, tag3, trackThumbnailId, userId } = req.body;
     const { location } = req.file;
     const { userId } = res.locals.user;
     const tags = [tag1, tag2, tag3];

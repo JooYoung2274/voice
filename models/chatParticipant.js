@@ -28,6 +28,10 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         type: Sequelize.INTEGER,
       },
+      sample: {
+        allowNull: true,
+        type: Sequelize.STRING,
+      },
       chatType: {
         allowNull: false,
         type: Sequelize.STRING,

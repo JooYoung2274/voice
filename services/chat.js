@@ -39,9 +39,9 @@ const createChat = async ({
   chatText,
   checkChat,
   chatType,
+  sample,
 }) => {
   try {
-    console.log(checkChat);
     const getChatRoom = await ChatRoom.findOne({ where: { roomNum } });
     if (!getChatRoom) {
       throw customizedError("삭제된 채팅방입니다", 400);
@@ -50,6 +50,7 @@ const createChat = async ({
       sendUserId,
       receiveUserId,
       roomNum,
+      sample,
       chatType,
       chatText,
       checkChat,

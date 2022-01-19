@@ -49,13 +49,11 @@ const postTrack = async (req, res, next) => {
   try {
     const { location } = req.file;
     const chatText = location;
-    console.log(req.file);
     const checkChat = false;
-    const { sendUserId, receiveUserId } = req.body;
+    const { sendUserId, receiveUserId, sample } = req.body;
     const arr = [sendUserId, receiveUserId];
     arr.sort((a, b) => a - b);
     roomNum = arr[0].toString() + arr[1];
-    // const { userId } = res.locals.user;
     const chatType = "audio";
     await chatService.createChat({
       roomNum,
@@ -64,6 +62,7 @@ const postTrack = async (req, res, next) => {
       chatText,
       checkChat,
       chatType,
+      sample,
     });
     res.sendStatus(200);
   } catch (error) {
