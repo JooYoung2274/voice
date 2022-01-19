@@ -56,7 +56,7 @@ const postTrack = async (req, res, next) => {
     arr.sort((a, b) => a - b);
     roomNum = arr[0].toString() + arr[1];
     // const { userId } = res.locals.user;
-    const chatType = "url";
+    const chatType = "audio";
     await chatService.createChat({
       roomNum,
       sendUserId,
