@@ -140,9 +140,9 @@ const getList = async ({ userId }) => {
     });
     if (chatList) {
       result.push(chatList);
-      console.log(chatList.sendUserId);
-      console.log(chatList.receiveUserId);
-      console.log(userId);
+      console.log(typeof chatList.sendUserId);
+      console.log(typeof chatList.receiveUserId);
+      console.log(typeof userId);
       if (chatList.sendUserId === userId) {
         const qUserId2 = await User.findOne({
           attributes: ["nickname", "contact", "profileImage", "introduce", "userId"],
@@ -160,7 +160,7 @@ const getList = async ({ userId }) => {
       }
     }
   }
-  console.log(result);
+  // console.log(result);
   return result;
 };
 
