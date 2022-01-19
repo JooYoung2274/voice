@@ -143,14 +143,14 @@ const getList = async ({ userId }) => {
       console.log(typeof chatList.sendUserId);
       console.log(typeof chatList.receiveUserId);
       console.log(typeof userId);
-      if (chatList.sendUserId === userId) {
+      if (chatList.sendUserId === Number(userId)) {
         const qUserId2 = await User.findOne({
           attributes: ["nickname", "contact", "profileImage", "introduce", "userId"],
           where: { userId: chatList.receiveUserId },
         });
         result[i].dataValues.userId = userId;
         result[i].dataValues.qUserId = qUserId2;
-      } else if (chatList.receiveUserId === userId) {
+      } else if (chatList.receiveUserId === Number(userId)) {
         const qUserId1 = await User.findOne({
           attributes: ["nickname", "contact", "profileImage", "introduce", "userId"],
           where: { userId: chatList.sendUserId },
