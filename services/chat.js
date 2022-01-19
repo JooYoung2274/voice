@@ -207,7 +207,7 @@ const checkChat = async ({ userId }) => {
 
 const getChatByIds = async ({ receiveUserId, sendUserId }) => {
   const getchat = await ChatParticipant.findOne({
-    where: { receiveUserId, sendUserId, chatType: "url" },
+    where: { receiveUserId, sendUserId, chatType: "audio" },
     order: [["chatParticipantId", "DESC"]],
   });
   return getchat;
