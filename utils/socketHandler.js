@@ -75,15 +75,12 @@ io.on("connection", (socket) => {
     }
   });
   socket.on("track", async ({ receiveUserId, sendUserId }) => {
-    const getChat = await chatService.getChatByIds({ receiveUserId, sendUserId });
-
-    io.to(roomNum).emit("chat", getChat);
-    io.to(receiveUserId).emit("list", getChat);
+    try {
+      const getChat = await chatService.getChatByIds({ receiveUserId, sendUserId });
+      io.to(roomNum).emit("chat", getChat);
+      io.to(receiveUserId).emit("list", getChat);
+    } catch (error) {
+      console.log(error);
+    }
   });
-  //   // emit은 전체 알림
-  //   // to(socket.id).emit 은 해당 socket.id 가진 사람한테만 알림
-  //   socket.on("user-send", (data) => {
-  //     io.emit("chat", data); //socket에 참여하는 모든 유저에게 보냄 io.emit의 특징 (브로드캐스트)
-  //     // io.to(socket.id).emit("broadcast", data); //이건 한명한테만 보내는 코드 해당 socket.id(자동발급) 를 갖고있는 사람한테만보냄
-  //   });
 });
