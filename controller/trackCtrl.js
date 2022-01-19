@@ -31,7 +31,7 @@ const trackUploads = async (req, res, next) => {
       category,
       tags,
       trackThumbnailId,
-      location: `http://13.125.192.5/${convertedFile}`,
+      location: `${process.env.SERVER_DOMAIN}/${convertedFile}`,
       userId,
     });
     res.status(200).json({ trackId });
