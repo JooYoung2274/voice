@@ -15,6 +15,10 @@ io.on(EVENT.CONNECTION, (socket) => {
     console.error(error);
   });
 
+  socket.on("login", ({ userId }) => {
+    socket.join(userId);
+  });
+
   // roomNum Maker
   const roomNumMaker = (x, y) => {
     const arr = [x, y];
