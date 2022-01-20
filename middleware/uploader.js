@@ -12,7 +12,7 @@ const s3 = new aws.S3({
 });
 
 // 통과되는 image타입들
-const passImageTypes = ["jpg", "png", "jpeg"];
+const passImageTypes = ["jpg", "png", "jpeg", "gif"];
 // 통과되는 track타입들
 const passvoiceTypes = ["mp4", "mp3", "flac", "wav", "ogg", "mpeg", "x-m4a", "webm"];
 
