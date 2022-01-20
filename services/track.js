@@ -18,6 +18,12 @@ const CATEGORYALLID = 1;
 const CATEGORYALL = "전체";
 const CATEGORYALLTEXT = "최근에 올라온 목소리";
 const TRACKNUM = 19;
+const { S3_HOST } = process.env;
+const TRACKS = "tracks";
+
+const { randomFilename } = require("../middleware/uploader");
+
+const { convertAndSaveS3 } = require("../utils/converter");
 
 const createTrack = async ({ title, category, tags, trackThumbnailId, location, userId }) => {
   if (!trackThumbnailId || !userId) {
@@ -38,11 +44,16 @@ const createTrack = async ({ title, category, tags, trackThumbnailId, location, 
   if (!title || title.length > 40) {
     throw customizedError("제목은 존재해야하고 20자를 넘길 수 없습니다.", 400);
   }
+  const ranFileName = `${randomFilename()}.mp3`;
+  await convertAndSaveS3(ranFileName, location);
+
+  const newLocation = `${S3_HOST}/test/${ranFileName}`;
+
   const createdTrack = await Track.create({
     title,
     categoryId,
     trackThumbnailId,
-    trackUrl: `${location}`,
+    trackUrl: newLocation,
     userId,
   });
   const trackId = createdTrack.trackId;
