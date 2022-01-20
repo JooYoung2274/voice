@@ -8,6 +8,7 @@ const SOCKET_EVENT = {
   LIST: "list",
   FILE: "file",
   CHAT: "chat",
+  LOGIN: "login",
 };
 
 const ROUTE = {};

@@ -5,7 +5,15 @@ const { or, and } = Op;
 const { customizedError } = require("../utils/error");
 
 const chatBasicForm = {
-  attributes: ["sendUserId", "receiveUserId", "chatType", "chatText", "checkChat", "createdAt"],
+  attributes: [
+    "sendUserId",
+    "receiveUserId",
+    "chatType",
+    "chatText",
+    "checkChat",
+    "createdAt",
+    "sample",
+  ],
   order: [["chatParticipantId", "DESC"]],
 };
 

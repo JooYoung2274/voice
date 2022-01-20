@@ -15,7 +15,7 @@ io.on(EVENT.CONNECTION, (socket) => {
     console.error(error);
   });
 
-  socket.on("login", ({ userId }) => {
+  socket.on(EVENT.LOGIN, ({ userId }) => {
     socket.join(userId);
   });
 
