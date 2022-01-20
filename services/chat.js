@@ -137,7 +137,7 @@ const getList = async ({ userId }) => {
         [or]: [{ userId }, { userId2: userId }],
       },
     });
-
+    console.log(chatRoom);
     if (!chatRoom) {
       return;
     }
@@ -149,7 +149,7 @@ const getList = async ({ userId }) => {
         ...chatBasicForm,
       });
       console.log(chatList);
-      if (chatList) {
+      if (chatList.receiveUserId !== null) {
         result.push(chatList);
         // console.log(result);
         if (chatList.sendUserId === Number(userId)) {
