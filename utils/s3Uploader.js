@@ -12,11 +12,12 @@ const s3 = new aws.S3({
   region: S3_REGION,
 });
 
-const s3UploadFor = (dir) =>
+const s3UploadFor = (dir, file) =>
   s3.upload(
     {
       Bucket: S3_BUCKET_NAME,
-      Key: `${dir}`,
+      Key: `${dir}/logo.mp3`,
+      Body: file,
     },
     function (err, data) {
       if (err) {
@@ -26,9 +27,9 @@ const s3UploadFor = (dir) =>
     },
   );
 
-const s3UploadForImage = s3UploadFor(IMAGES); //유저 프로필이미지
-const s3UploadForVoice = s3UploadFor(TRACKS); //업로드한 track
-const s3UploadForChatVoice = s3UploadFor(CHATTRACKS); //채팅 음성메세지
+const s3UploadForImage = (file) => s3UploadFor(IMAGES, file); //유저 프로필이미지
+const s3UploadForVoice = (file) => s3UploadFor(TRACKS, file); //업로드한 track
+const s3UploadForChatVoice = (file) => s3UploadFor(CHATTRACKS, file); //채팅 음성메세지
 // const s3UploadForChatImage = s3UploadFor(CHATIMAGES); //채팅 이미지메세지
 
 module.exports = { s3UploadForImage, s3UploadForVoice, s3UploadForChatVoice };
