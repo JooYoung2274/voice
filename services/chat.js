@@ -149,7 +149,7 @@ const getList = async ({ userId }) => {
         ...chatBasicForm,
       });
       if (!chatList) {
-        return;
+        result.splice(i, 1);
       }
       result.push(chatList);
       // console.log(result);
