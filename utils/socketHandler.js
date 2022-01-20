@@ -3,75 +3,90 @@ const userService = require("../services/auth");
 
 const io = require("../config/socket").getIo();
 
-io.on("connection", (socket) => {
-  const req = socket.request;
-  const ip = req.headers["x-forwarded-for"] || req.connection.remoteAddress;
-  console.log("접속됨", ip, socket.id);
-  let roomNum = 0;
-  socket.on("disconnect", () => {
-    console.log("접속해제", ip, socket.id);
+const { SOCKET_EVENT: EVENT } = require("../config/constants");
+
+io.on(EVENT.CONNECTION, (socket) => {
+  socket.on(EVENT.DISCONNECT, () => {
     clearInterval(socket.interval);
   });
 
-  socket.on("error", (error) => {
+  // socket error
+  socket.on(EVENT.ERROR, (error) => {
     console.error(error);
   });
 
+  // roomNum Maker
   const roomNumMaker = (x, y) => {
     const arr = [x, y];
     arr.sort((a, b) => a - b);
-    roomNum = arr[0].toString() + arr[1];
+    let roomNum = arr[0].toString() + arr[1];
+    return roomNum;
   };
 
-  socket.on("joinRoom", async ({ userId, qUserId }) => {
+  // socket room join
+  socket.on(EVENT.JOIN_ROOM, async ({ userId, qUserId }) => {
     try {
-      roomNumMaker(userId, qUserId);
+      const roomNum = await roomNumMaker(userId, qUserId);
       await chatService.createChatRoom({ userId, qUserId, roomNum });
-      console.log("joinRoom!", roomNum);
       socket.join(roomNum);
-      socket.leave(Number(userId));
+      socket.leave(userId);
     } catch (error) {
       console.log(error);
     }
   });
 
-  socket.on("leaveRoom", ({ userId, qUserId }) => {
-    roomNumMaker(userId, qUserId);
-    console.log("leaveRoom!", roomNum);
-    socket.leave(roomNum);
+  // socket room leave
+  socket.on(EVENT.LEAVE_ROOM, async ({ userId, qUserId }) => {
+    try {
+      const roomNum = await roomNumMaker(userId, qUserId);
+      socket.leave(roomNum);
+    } catch (error) {
+      console.log(error);
+    }
   });
 
-  socket.on("room", async ({ receiveUserId, sendUserId, chatText, sample }) => {
+  // socket room (chat)
+  socket.on(EVENT.ROOM, async ({ receiveUserId, sendUserId, chatText, sample }) => {
     try {
-      let createdAt = new Date();
+      const roomNum = await roomNumMaker(sendUserId, receiveUserId);
+      const createdAt = new Date();
+      const chatType = "text";
+
       let checkChat = false;
       if (io.sockets.adapter.rooms.get(roomNum).size === 2) {
         checkChat = true;
       }
-      const chatType = "text";
-      await chatService.createChat({
-        roomNum,
+
+      const getChat = {
         sendUserId,
         receiveUserId,
         chatText,
         checkChat,
         chatType,
+        createdAt,
         sample,
+      };
+
+      await chatService.createChat({
+        roomNum,
+        ...getChat,
       });
       sendUserId = await userService.getUserByUserId({ userId: sendUserId });
-      const getChat = { sendUserId, receiveUserId, chatText, createdAt, sample };
-      io.to(roomNum).emit("chat", getChat);
-      io.to(receiveUserId).emit("list", getChat);
+      getChat.sendUserId = sendUserId;
+      io.to(roomNum).emit(EVENT.CHAT, getChat);
+      io.to(receiveUserId).emit(EVENT.LIST, getChat);
     } catch (error) {
       console.log(error);
     }
   });
 
-  socket.on("file", async ({ receiveUserId, sendUserId, chatType }) => {
+  // socket file (track, image) post
+  socket.on(EVENT.FILE, async ({ receiveUserId, sendUserId, chatType }) => {
     try {
+      const roomNum = await roomNumMaker(sendUserId, receiveUserId);
       const getChat = await chatService.getChatByIds({ receiveUserId, sendUserId, chatType });
-      io.to(roomNum).emit("chat", getChat);
-      io.to(receiveUserId).emit("list", getChat);
+      io.to(roomNum).emit(EVENT.CHAT, getChat);
+      io.to(receiveUserId).emit(EVENT.LIST, getChat);
     } catch (error) {
       console.log(error);
     }

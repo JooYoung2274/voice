@@ -10,5 +10,6 @@ server = app.listen(SERVER_PORT, () => {
   console.log(`listening at ${SERVER_DOMAIN}:${SERVER_PORT}`);
 });
 
+// socket connection
 require("./config/socket").init(server);
 require("./utils/socketHandler");
