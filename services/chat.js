@@ -137,6 +137,7 @@ const getList = async ({ userId }) => {
       });
       if (chatList) {
         result.push(chatList);
+        console.log(result);
         if (chatList.sendUserId === Number(userId)) {
           const qUserId2 = await User.findOne({
             attributes: ["nickname", "contact", "profileImage", "introduce", "userId"],
