@@ -135,9 +135,10 @@ const getList = async ({ userId }) => {
         where: { chatRoomId: chatRoom[i].chatRoomId },
         ...chatBasicForm,
       });
+      console.log(chatList);
       if (chatList) {
         result.push(chatList);
-        console.log(result);
+        // console.log(result);
         if (chatList.sendUserId === Number(userId)) {
           const qUserId2 = await User.findOne({
             attributes: ["nickname", "contact", "profileImage", "introduce", "userId"],
