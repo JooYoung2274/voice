@@ -154,20 +154,18 @@ const getList = async ({ userId }) => {
     }
 
     for (let i = 0; i < result.length; i++) {
-      if (chatList.sendUserId === Number(userId)) {
+      if (result[i].sendUserId === Number(userId)) {
         const qUserId2 = await User.findOne({
           attributes: ["nickname", "contact", "profileImage", "introduce", "userId"],
-          where: { userId: chatList.receiveUserId },
+          where: { userId: result[i].receiveUserId },
         });
         result[i].dataValues.userId = userId;
         result[i].dataValues.qUserId = qUserId2;
-      } else if (chatList.receiveUserId === Number(userId)) {
-        console.log("DSFASDFSDAFASDF");
+      } else if (result[i].receiveUserId === Number(userId)) {
         const qUserId1 = await User.findOne({
           attributes: ["nickname", "contact", "profileImage", "introduce", "userId"],
-          where: { userId: chatList.sendUserId },
+          where: { userId: result[i].sendUserId },
         });
-        console.log(result[i]);
         result[i].dataValues.userId = userId;
         result[i].dataValues.qUserId = qUserId1;
       }
