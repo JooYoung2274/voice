@@ -73,11 +73,13 @@ const fileFilterFor = (passTypes) => (req, file, cb) => {
 //     },
 //   });
 
-const storage = multer.diskStorage({
-  filename: function (req, file, cb) {
-    cb(null, `${randomFilename()}.${CONVERTEDFILETYPE}`); // 생성한 난수 + 현재 시각 + . + 파일 확장자명
-  },
-});
+// const storage = multer.diskStorage({
+//   filename: function (req, file, cb) {
+//     cb(null, `${randomFilename()}.${CONVERTEDFILETYPE}`); // 생성한 난수 + 현재 시각 + . + 파일 확장자명
+//   },
+// });
+
+const storage = multer.memoryStorage();
 
 const uploader = (fileFilter) =>
   multer({

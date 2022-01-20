@@ -7,12 +7,13 @@ ffmpeg.setFfmpegPath(ffmpegPath);
 const trackUploads = async (req, res, next) => {
   try {
     const { title, category, tag1, tag2, tag3, trackThumbnailId } = req.body;
-    const { filename } = req.file;
+    console.log(req.file);
+    const { buffer } = req.file;
     const { userId } = res.locals.user;
     const tags = [tag1, tag2, tag3];
-
+    console.log(ffmpegPath);
     // const convertedFile = `${randomFilename()}.mp3`;
-    // ffmpeg(location).toFormat("mp3").save(`./uploads/${convertedFile}`); //path where you want to save your file
+    ffmpeg(buffer).toFormat("mp3").save(`./uploads`); //path where you want to save your file
     const trackId = await trackService.createTrack({
       title,
       category,
