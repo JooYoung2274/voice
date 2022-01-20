@@ -50,7 +50,7 @@ const postTrack = async (req, res, next) => {
   try {
     const { sendUserId, receiveUserId, sample } = req.body;
     const { location } = req.file;
-    // const chatText = location;
+    const chatText = location;
     const checkChat = false;
     const chatType = "audio";
     const roomNum = await roomNumMaker(sendUserId, receiveUserId);
@@ -59,7 +59,7 @@ const postTrack = async (req, res, next) => {
       roomNum,
       sendUserId,
       receiveUserId,
-      location,
+      chatText,
       checkChat,
       chatType,
       sample,

@@ -53,7 +53,7 @@ const createChat = async ({
   roomNum,
   sendUserId,
   receiveUserId,
-  location,
+  chatText,
   checkChat,
   chatType,
   sample,
@@ -69,7 +69,7 @@ const createChat = async ({
       receiveUserId,
       sample,
       chatType,
-      chatText: newLocation,
+      chatText,
       checkChat,
       chatRoomId: getChatRoom.chatRoomId,
     });
