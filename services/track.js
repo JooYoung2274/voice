@@ -45,9 +45,9 @@ const createTrack = async ({ title, category, tags, trackThumbnailId, location, 
     throw customizedError("제목은 존재해야하고 20자를 넘길 수 없습니다.", 400);
   }
   const ranFileName = `${randomFilename()}.mp3`;
-  await convertAndSaveS3(ranFileName);
+  await convertAndSaveS3(ranFileName, location);
 
-  const newLocation = `${S3_HOST}/${TRACKS}/${ranFileName}`;
+  const newLocation = `${S3_HOST}/test/${ranFileName}`;
 
   const createdTrack = await Track.create({
     title,
