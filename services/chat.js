@@ -64,11 +64,6 @@ const createChat = async ({
       throw customizedError("삭제된 채팅방입니다", 400);
     }
 
-    const ranFileName = `${randomFilename()}.mp3`;
-    await convertAndSaveS3(ranFileName, location);
-
-    const newLocation = `${S3_HOST}/tracks/${ranFileName}`;
-
     await ChatParticipant.create({
       sendUserId,
       receiveUserId,
