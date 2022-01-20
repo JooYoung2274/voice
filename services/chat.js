@@ -137,7 +137,7 @@ const getList = async ({ userId }) => {
         [or]: [{ userId }, { userId2: userId }],
       },
     });
-    console.log(chatRoom);
+
     if (!chatRoom) {
       return;
     }
@@ -148,27 +148,27 @@ const getList = async ({ userId }) => {
         where: { chatRoomId: chatRoom[i].chatRoomId },
         ...chatBasicForm,
       });
-      console.log(chatList);
-      if (chatList.receiveUserId !== null) {
-        result.push(chatList);
-        // console.log(result);
-        if (chatList.sendUserId === Number(userId)) {
-          const qUserId2 = await User.findOne({
-            attributes: ["nickname", "contact", "profileImage", "introduce", "userId"],
-            where: { userId: chatList.receiveUserId },
-          });
-          result[i].dataValues.userId = userId;
-          result[i].dataValues.qUserId = qUserId2;
-        } else if (chatList.receiveUserId === Number(userId)) {
-          console.log("DSFASDFSDAFASDF");
-          const qUserId1 = await User.findOne({
-            attributes: ["nickname", "contact", "profileImage", "introduce", "userId"],
-            where: { userId: chatList.sendUserId },
-          });
-          console.log(result[i]);
-          result[i].dataValues.userId = userId;
-          result[i].dataValues.qUserId = qUserId1;
-        }
+      if (!chatList) {
+        return;
+      }
+      result.push(chatList);
+      // console.log(result);
+      if (chatList.sendUserId === Number(userId)) {
+        const qUserId2 = await User.findOne({
+          attributes: ["nickname", "contact", "profileImage", "introduce", "userId"],
+          where: { userId: chatList.receiveUserId },
+        });
+        result[i].dataValues.userId = userId;
+        result[i].dataValues.qUserId = qUserId2;
+      } else if (chatList.receiveUserId === Number(userId)) {
+        console.log("DSFASDFSDAFASDF");
+        const qUserId1 = await User.findOne({
+          attributes: ["nickname", "contact", "profileImage", "introduce", "userId"],
+          where: { userId: chatList.sendUserId },
+        });
+        console.log(result[i]);
+        result[i].dataValues.userId = userId;
+        result[i].dataValues.qUserId = qUserId1;
       }
     }
     return result;
