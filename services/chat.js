@@ -152,31 +152,26 @@ const getList = async ({ userId }) => {
         result.push(chatList);
       }
     }
-    console.log(result);
-    // for (let i = 0; i < result.length; i++) {
-    //   if (!result[i]) {
-    //     result.splice(i, 1);
-    //   }
-    // }
 
-    if (chatList.sendUserId === Number(userId)) {
-      const qUserId2 = await User.findOne({
-        attributes: ["nickname", "contact", "profileImage", "introduce", "userId"],
-        where: { userId: chatList.receiveUserId },
-      });
-      result[i].dataValues.userId = userId;
-      result[i].dataValues.qUserId = qUserId2;
-    } else if (chatList.receiveUserId === Number(userId)) {
-      console.log("DSFASDFSDAFASDF");
-      const qUserId1 = await User.findOne({
-        attributes: ["nickname", "contact", "profileImage", "introduce", "userId"],
-        where: { userId: chatList.sendUserId },
-      });
-      console.log(result[i]);
-      result[i].dataValues.userId = userId;
-      result[i].dataValues.qUserId = qUserId1;
+    for (let i = 0; i < result.length; i++) {
+      if (chatList.sendUserId === Number(userId)) {
+        const qUserId2 = await User.findOne({
+          attributes: ["nickname", "contact", "profileImage", "introduce", "userId"],
+          where: { userId: chatList.receiveUserId },
+        });
+        result[i].dataValues.userId = userId;
+        result[i].dataValues.qUserId = qUserId2;
+      } else if (chatList.receiveUserId === Number(userId)) {
+        console.log("DSFASDFSDAFASDF");
+        const qUserId1 = await User.findOne({
+          attributes: ["nickname", "contact", "profileImage", "introduce", "userId"],
+          where: { userId: chatList.sendUserId },
+        });
+        console.log(result[i]);
+        result[i].dataValues.userId = userId;
+        result[i].dataValues.qUserId = qUserId1;
+      }
     }
-
     return result;
   } catch (error) {
     throw error;
