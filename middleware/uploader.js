@@ -4,7 +4,7 @@ const aws = require("aws-sdk");
 const { customizedError } = require("../utils/error");
 const { S3_ACCESS_KEY_ID, S3_SECRET_ACEESS_KEY, S3_REGION, S3_BUCKET_NAME } = process.env;
 const IMAGES = "images";
-const TRACKS = "tracks";
+const UNTRACKS = "untracks";
 const s3 = new aws.S3({
   accessKeyId: S3_ACCESS_KEY_ID,
   secretAccessKey: S3_SECRET_ACEESS_KEY,
@@ -74,7 +74,7 @@ const uploader = (storage, fileFilter) =>
 
 // 이름 짓는게 더 직관적이여서 바로 대입하지 않고 변수 한 번더 선언
 const imageStorage = storageFor(IMAGES);
-const voiceStorage = storageFor(TRACKS);
+const voiceStorage = storageFor(UNTRACKS);
 const imageFileFilter = fileFilterFor(passImageTypes);
 const voiceFileFilter = fileFilterFor(passvoiceTypes);
 
@@ -86,4 +86,4 @@ const voiceMulter = uploader(voiceStorage, voiceFileFilter);
 // const imageMulter = uploader(storage, imageFileFilter);
 // const voiceMulter = uploader(storage, voiceFileFilter);
 
-module.exports = { imageMulter, voiceMulter };
+module.exports = { imageMulter, voiceMulter, s3, randomFilename };
