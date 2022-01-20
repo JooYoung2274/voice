@@ -47,7 +47,7 @@ const createTrack = async ({ title, category, tags, trackThumbnailId, location, 
   const ranFileName = `${randomFilename()}.mp3`;
   await convertAndSaveS3(ranFileName, location);
 
-  const newLocation = `${S3_HOST}/test/${ranFileName}`;
+  const newLocation = `${S3_HOST}/tracks/${ranFileName}`;
 
   const createdTrack = await Track.create({
     title,

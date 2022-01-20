@@ -3,6 +3,10 @@ const { ChatRoom, ChatParticipant, User } = require("../models");
 const { Op } = require("sequelize");
 const { or, and } = Op;
 const { customizedError } = require("../utils/error");
+const { S3_HOST } = process.env;
+const { randomFilename } = require("../middleware/uploader");
+
+const { convertAndSaveS3 } = require("../utils/converter");
 
 const chatBasicForm = {
   attributes: [
@@ -49,7 +53,7 @@ const createChat = async ({
   roomNum,
   sendUserId,
   receiveUserId,
-  chatText,
+  location,
   checkChat,
   chatType,
   sample,
@@ -59,12 +63,18 @@ const createChat = async ({
     if (!getChatRoom) {
       throw customizedError("삭제된 채팅방입니다", 400);
     }
+
+    const ranFileName = `${randomFilename()}.mp3`;
+    await convertAndSaveS3(ranFileName, location);
+
+    const newLocation = `${S3_HOST}/tracks/${ranFileName}`;
+
     await ChatParticipant.create({
       sendUserId,
       receiveUserId,
       sample,
       chatType,
-      chatText,
+      chatText: newLocation,
       checkChat,
       chatRoomId: getChatRoom.chatRoomId,
     });
