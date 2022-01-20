@@ -67,9 +67,9 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on("track", async ({ receiveUserId, sendUserId }) => {
+  socket.on("file", async ({ receiveUserId, sendUserId, chatType }) => {
     try {
-      const getChat = await chatService.getChatByIds({ receiveUserId, sendUserId });
+      const getChat = await chatService.getChatByIds({ receiveUserId, sendUserId, chatType });
       io.to(roomNum).emit("chat", getChat);
       io.to(receiveUserId).emit("list", getChat);
     } catch (error) {

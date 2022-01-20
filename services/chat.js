@@ -205,9 +205,9 @@ const checkChat = async ({ userId }) => {
   return roomCheck;
 };
 
-const getChatByIds = async ({ receiveUserId, sendUserId }) => {
+const getChatByIds = async ({ receiveUserId, sendUserId, chatType }) => {
   const getchat = await ChatParticipant.findOne({
-    where: { receiveUserId, sendUserId, chatType: "audio" },
+    where: { receiveUserId, sendUserId },
     order: [["chatParticipantId", "DESC"]],
   });
   const user = await User.findOne({
