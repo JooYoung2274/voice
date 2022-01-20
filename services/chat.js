@@ -145,10 +145,12 @@ const getList = async ({ userId }) => {
           result[i].dataValues.userId = userId;
           result[i].dataValues.qUserId = qUserId2;
         } else if (chatList.receiveUserId === Number(userId)) {
+          console.log("DSFASDFSDAFASDF");
           const qUserId1 = await User.findOne({
             attributes: ["nickname", "contact", "profileImage", "introduce", "userId"],
             where: { userId: chatList.sendUserId },
           });
+          console.log(result[i]);
           result[i].dataValues.userId = userId;
           result[i].dataValues.qUserId = qUserId1;
         }
