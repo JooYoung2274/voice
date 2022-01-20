@@ -148,10 +148,12 @@ const getList = async ({ userId }) => {
         where: { chatRoomId: chatRoom[i].chatRoomId },
         ...chatBasicForm,
       });
+      result.push(chatList);
+
       if (!chatList) {
         result.splice(i, 1);
       }
-      result.push(chatList);
+
       // console.log(result);
       if (chatList.sendUserId === Number(userId)) {
         const qUserId2 = await User.findOne({
