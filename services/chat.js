@@ -152,25 +152,24 @@ const getList = async ({ userId }) => {
 
       if (!chatList) {
         result.splice(i, 1);
-      }
-
-      // console.log(result);
-      if (chatList.sendUserId === Number(userId)) {
-        const qUserId2 = await User.findOne({
-          attributes: ["nickname", "contact", "profileImage", "introduce", "userId"],
-          where: { userId: chatList.receiveUserId },
-        });
-        result[i].dataValues.userId = userId;
-        result[i].dataValues.qUserId = qUserId2;
-      } else if (chatList.receiveUserId === Number(userId)) {
-        console.log("DSFASDFSDAFASDF");
-        const qUserId1 = await User.findOne({
-          attributes: ["nickname", "contact", "profileImage", "introduce", "userId"],
-          where: { userId: chatList.sendUserId },
-        });
-        console.log(result[i]);
-        result[i].dataValues.userId = userId;
-        result[i].dataValues.qUserId = qUserId1;
+      } else {
+        if (chatList.sendUserId === Number(userId)) {
+          const qUserId2 = await User.findOne({
+            attributes: ["nickname", "contact", "profileImage", "introduce", "userId"],
+            where: { userId: chatList.receiveUserId },
+          });
+          result[i].dataValues.userId = userId;
+          result[i].dataValues.qUserId = qUserId2;
+        } else if (chatList.receiveUserId === Number(userId)) {
+          console.log("DSFASDFSDAFASDF");
+          const qUserId1 = await User.findOne({
+            attributes: ["nickname", "contact", "profileImage", "introduce", "userId"],
+            where: { userId: chatList.sendUserId },
+          });
+          console.log(result[i]);
+          result[i].dataValues.userId = userId;
+          result[i].dataValues.qUserId = qUserId1;
+        }
       }
     }
     return result;
