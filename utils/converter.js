@@ -24,28 +24,30 @@ const deleteMp3 = (ranFileName) => {
 const convertAndSaveS3 = (ranFileName, location) => {
   const key = location.split(".com/")[1];
   let params = { Bucket: S3_BUCKET_NAME, Key: key };
-  ffmpeg()
-    .input(location)
-    .toFormat("mp3")
-    .output(ranFileName)
-    .on("error", (err) => {
-      console.log("An error occurred: " + err.message);
-    })
-    .on("progress", (progress) => {
-      console.log("Processing: " + progress.targetSize + " KB converted");
-    })
-    .on("end", () => {
-      console.log("Processing finished !");
-      const fileContent = fs.readFileSync(ranFileName);
-      params.Key = `tracks/${ranFileName}`;
-      params.Body = fileContent;
-      s3.putObject(params, function (err, data) {
-        console.log(err, data);
-      });
-      deleteMp3(ranFileName);
-      console.log("업로드!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-    })
-    .run();
+  return new Promise((resolve, reject) => {
+    ffmpeg()
+      .input(location)
+      .toFormat("mp3")
+      .output(ranFileName)
+      .on("error", (err) => {
+        console.log("An error occurred: " + err.message);
+      })
+      .on("progress", (progress) => {
+        console.log("Processing: " + progress.targetSize + " KB converted");
+      })
+      .on("end", () => {
+        console.log("Processing finished !");
+        const fileContent = fs.readFileSync(ranFileName);
+        params.Key = `tracks/${ranFileName}`;
+        params.Body = fileContent;
+        s3.putObject(params, function (err, data) {
+          console.log(err, data);
+        });
+        deleteMp3(ranFileName);
+        console.log("업로드!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+      })
+      .run();
+  });
 };
 
 module.exports = { convertAndSaveS3 };

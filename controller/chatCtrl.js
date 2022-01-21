@@ -59,9 +59,8 @@ const postTrack = async (req, res, next) => {
     const roomNum = await roomNumMaker(sendUserId, receiveUserId);
 
     const ranFileName = `${randomFilename()}.mp3`;
-    convertAndSaveS3(ranFileName, location);
+    await convertAndSaveS3(ranFileName, location);
     const newLocation = `${S3_HOST}/tracks/${ranFileName}`;
-
     await chatService.createChat({
       roomNum,
       sendUserId,
