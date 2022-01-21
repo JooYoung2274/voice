@@ -65,11 +65,13 @@ module.exports = (app) => {
         callbackURL: callbackURL(KAKAO),
       },
       async (accessToken, refreshToken, profile, done) => {
+        console.log(profile);
         try {
           const exUser = await User.findOne({
             where: { snsId: profile.id, flatformType: profile.provider },
           });
           if (exUser) {
+            console.log(exUser);
             let firstLogin = false;
             done(null, exUser, { firstLogin });
           } else {
@@ -81,6 +83,7 @@ module.exports = (app) => {
               profileImage: profileImage,
             });
             let firstLogin = true;
+            console.log(newUser);
             done(null, newUser, { firstLogin });
           }
         } catch (error) {
