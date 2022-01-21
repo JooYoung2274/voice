@@ -34,6 +34,7 @@ const kakaoCallback = (req, res, next) => {
       introduce,
       userId,
     };
+    console.log(result);
     res.send({ user: result });
   })(req, res, next);
 };
