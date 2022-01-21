@@ -188,7 +188,7 @@ const checkChat = async ({ userId }) => {
     return;
   }
 
-  let roomCheck = false;
+  let roomCheck = true;
   let newChatCount = 0;
   for (let i = 0; i < chatRoom.length; i++) {
     const chatList = await ChatParticipant.findOne({
@@ -197,14 +197,12 @@ const checkChat = async ({ userId }) => {
     });
 
     if (!chatList.checkChat && chatList.sendUserId !== userId) {
-      continue;
-    } else if (chatList.checkChat) {
       newChatCount++;
     }
   }
 
-  if (newChatCount === chatRoom.length) {
-    roomCheck = true;
+  if (newChatCount) {
+    roomCheck = false;
     return roomCheck;
   }
   return roomCheck;
