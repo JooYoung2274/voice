@@ -199,8 +199,8 @@ const checkChat = async ({ userId }) => {
     if (chatList !== null) {
       if (chatList.checkChat === false && chatList.sendUserId !== xx) {
         roomCheck = false;
+        return roomCheck;
       }
-      break;
     } else {
       continue;
     }
