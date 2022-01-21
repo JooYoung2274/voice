@@ -26,7 +26,12 @@ app.use(hpp()); //오염된 req.query방어
 
 const { logHandler, errorHandler } = require("./middleware/errorHandler");
 
-app.use(cors());
+app.use(
+  cors({
+    origin: true,
+    credentials: true,
+  }),
+);
 
 app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerFile));
 dotenv.config();
