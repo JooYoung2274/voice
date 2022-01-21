@@ -21,7 +21,7 @@ const deleteMp3 = (ranFileName) => {
   });
 };
 
-const convertAndSaveS3 = (ranFileName, location) => {
+const convertAndSaveS3 = async (ranFileName, location) => {
   const key = location.split(".com/")[1];
   let params = { Bucket: S3_BUCKET_NAME, Key: key };
   ffmpeg()
