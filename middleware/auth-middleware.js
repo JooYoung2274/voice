@@ -40,7 +40,11 @@ const needLogin = (req, res, next) => {
 const notNeedLogin = (req, res, next) => {
   const { authorization } = req.headers;
   if (authorization) {
-    const [tokenType, tokenValue] = authorization.split(" ");
+    let [tokenType, tokenValue] = authorization.split(" ");
+
+    if (tokenValue[tokenValue.length - 1] === ";") {
+      tokenValue = tokenValue.split(";")[0];
+    }
 
     if (tokenType !== "Bearer") {
       throw customizedError("토큰이 유효하지 않습니다.", 401);
