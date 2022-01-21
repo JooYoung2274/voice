@@ -2,7 +2,7 @@ const chatService = require("../services/chat");
 const { randomFilename } = require("../middleware/uploader");
 const { convertAndSaveS3 } = require("../utils/converter");
 
-const { S3_HOST } = process.env;
+const { S3_HOST, TRACKS } = process.env;
 
 const roomNumMaker = (x, y) => {
   const arr = [x, y];

@@ -14,7 +14,6 @@ const s3 = new aws.S3({
 const deleteMp3 = (ranFileName) => {
   const filePath = path.join(`/home/ubuntu/voice/${ranFileName}`);
   fs.access(filePath, fs.constants.F_OK, (err) => {
-    // A
     if (err) return console.log("삭제할 수 없는 파일입니다");
     fs.unlink(filePath, (err) =>
       err ? console.log(err) : console.log(`${filePath} 를 정상적으로 삭제했습니다`),
@@ -25,7 +24,6 @@ const deleteMp3 = (ranFileName) => {
 const convertAndSaveS3 = (ranFileName, location) => {
   const key = location.split(".com/")[1];
   let params = { Bucket: S3_BUCKET_NAME, Key: key };
-
   ffmpeg()
     .input(location)
     .toFormat("mp3")

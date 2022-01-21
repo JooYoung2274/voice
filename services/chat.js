@@ -197,9 +197,9 @@ const checkChat = async ({ userId }) => {
     });
 
     if (!chatList.checkChat && chatList.sendUserId !== userId) {
-      newChatCount++;
       break;
     }
+    newChatCount++;
   }
 
   if (newChatCount) {
