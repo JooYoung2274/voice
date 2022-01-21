@@ -8,6 +8,7 @@ const {
   googleCallback,
   naverCallback,
   getUser,
+  getUserInfo,
 } = require("../controller/authCtrl");
 const { imageMulter } = require("../middleware/uploader");
 const imageUploader = imageMulter.single("profileImage");
@@ -27,4 +28,5 @@ router.get("/naver/callback", naverCallback);
 
 router.post("/profile", imageUploader, needLogin, updateUser);
 router.get("/me", needLogin, getUser);
+router.get("/user", getUserInfo);
 module.exports = router;

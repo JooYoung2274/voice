@@ -85,10 +85,22 @@ const getUser = async (req, res, next) => {
     next(error);
   }
 };
+
+const getUserInfo = async (req, res, next) => {
+  try {
+    const { userId } = req.body;
+    const result = await userService.getUserByUserId({ userId });
+    res.status(200).send({ result });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   updateUser,
   kakaoCallback,
   googleCallback,
   naverCallback,
   getUser,
+  getUserInfo,
 };

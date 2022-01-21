@@ -20,9 +20,21 @@ module.exports = (sequelize, DataTypes) => {
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
+      receiveUserId: {
+        allowNull: false,
+        type: Sequelize.INTEGER,
+      },
       sendUserId: {
         allowNull: false,
         type: Sequelize.INTEGER,
+      },
+      sample: {
+        allowNull: true,
+        type: Sequelize.STRING,
+      },
+      chatType: {
+        allowNull: false,
+        type: Sequelize.STRING,
       },
       chatText: {
         allowNull: false,

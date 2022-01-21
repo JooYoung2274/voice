@@ -29,8 +29,8 @@
     <button id="login">login</button>
     <button id="login2">login2</button>
     <script>
-      const userId = 2;
-      const qUserId = 1;
+      const userId = 3;
+      const qUserId = 2;
       const sendUserId = userId; //보내는 사람의 id 값 할당
       const receiveUserId = qUserId;
       // const chat = document.getElementById("input1").value;
@@ -58,6 +58,7 @@
         socket.emit("room", {
           receiveUserId, // 받는 사람
           sendUserId, // 보내는 사람
+          sample: null,
           chatText: document.getElementById("input1").value, //입력값
         });
         document.getElementById("input1").value = "";

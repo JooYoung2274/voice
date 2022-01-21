@@ -1,12 +1,21 @@
 const chatService = require("../services/chat");
-//testestetset
+const { randomFilename } = require("../middleware/uploader");
+const { convertAndSaveS3 } = require("../utils/converter");
+
+const { S3_HOST } = process.env;
+
+const roomNumMaker = (x, y) => {
+  const arr = [x, y];
+  arr.sort((a, b) => a - b);
+  let roomNum = arr[0].toString() + arr[1];
+  return roomNum;
+};
+
 const getChatByIds = async (req, res, next) => {
   try {
     const { page, chat } = req.query;
     const { userId, qUserId } = req.body;
-    const arr = [userId, qUserId];
-    arr.sort((a, b) => a - b);
-    const roomNum = arr[0].toString() + arr[1];
+    const roomNum = await roomNumMaker(userId, qUserId);
     const getChat = await chatService.getRoomId({
       userId,
       qUserId,
@@ -35,7 +44,6 @@ const checkNewChat = async (req, res, next) => {
   try {
     const { userId } = req.body;
     const roomCheck = await chatService.checkChat({ userId });
-    console.log(roomCheck);
     res.status(200).send({ roomCheck });
   } catch (error) {
     next(error);
@@ -44,19 +52,54 @@ const checkNewChat = async (req, res, next) => {
 
 const postTrack = async (req, res, next) => {
   try {
+    const { sendUserId, receiveUserId, sample } = req.body;
     const { location } = req.file;
-    const chatText = location;
     const checkChat = false;
-    const { sendUserId, receiveUserId } = req.body;
-    const arr = [sendUserId, receiveUserId];
-    arr.sort((a, b) => a - b);
-    roomNum = arr[0].toString() + arr[1];
-    // const { userId } = res.locals.user;
-    await chatService.createChat({ roomNum, sendUserId, chatText, checkChat });
+    const chatType = "audio";
+    const roomNum = await roomNumMaker(sendUserId, receiveUserId);
+
+    const ranFileName = `${randomFilename()}.mp3`;
+    convertAndSaveS3(ranFileName, location);
+    const newLocation = `${S3_HOST}/tracks/${ranFileName}`;
+
+    await chatService.createChat({
+      roomNum,
+      sendUserId,
+      receiveUserId,
+      chatText: newLocation,
+      checkChat,
+      chatType,
+      sample,
+    });
     res.sendStatus(200);
   } catch (error) {
     next(error);
   }
 };
 
-module.exports = { getChatByIds, getChatListByUserId, checkNewChat, postTrack };
+const postImage = async (req, res, next) => {
+  try {
+    const { sendUserId, receiveUserId } = req.body;
+    const { location } = req.file;
+    const chatText = location;
+    const checkChat = false;
+    const chatType = "image";
+    const sample = null;
+    const roomNum = await roomNumMaker(sendUserId, receiveUserId);
+
+    await chatService.createChat({
+      roomNum,
+      sendUserId,
+      receiveUserId,
+      chatText,
+      checkChat,
+      chatType,
+      sample,
+    });
+    res.sendStatus(200);
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { getChatByIds, getChatListByUserId, checkNewChat, postTrack, postImage };
