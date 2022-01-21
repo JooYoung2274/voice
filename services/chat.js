@@ -184,26 +184,26 @@ const checkChat = async ({ userId }) => {
       [or]: [{ userId: xx }, { userId2: xx }],
     },
   });
+
   let roomCheck = true;
   if (!chatRoom) {
     return roomCheck;
   }
 
-  let newChatCount = 0;
   for (let i = 0; i < chatRoom.length; i++) {
     const chatList = await ChatParticipant.findOne({
       where: { chatRoomId: chatRoom[i].chatRoomId },
       ...chatBasicForm,
     });
+
     if (chatList !== null) {
-      if (chatList.checkChat === 0 && chatList.sendUserId !== xx) {
-        newChatCount++;
+      if (chatList.checkChat === false && chatList.sendUserId !== xx) {
+        roomCheck = false;
       }
+      break;
+    } else {
+      continue;
     }
-  }
-  if (newChatCount !== 0) {
-    roomCheck = false;
-    return roomCheck;
   }
   return roomCheck;
 };
