@@ -28,5 +28,5 @@ router.get("/naver/callback", naverCallback);
 
 router.post("/profile", imageUploader, needLogin, updateUser);
 router.get("/me", needLogin, getUser);
-router.get("/user", getUserInfo);
+router.get("/user/:userId", getUserInfo);
 module.exports = router;
