@@ -44,6 +44,7 @@ const convertAndSaveS3 = (ranFileName, location) => {
           console.log(err, data);
         });
         deleteMp3(ranFileName);
+        console.log(__dirname);
         console.log("업로드!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
       })
       .run();
