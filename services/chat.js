@@ -196,12 +196,12 @@ const checkChat = async ({ userId }) => {
       ...chatBasicForm,
     });
 
-    if (!chatList.checkChat && chatList.sendUserId !== userId) {
+    if (chatList.checkChat === 0 && chatList.sendUserId !== userId) {
       newChatCount++;
     }
   }
-
-  if (newChatCount) {
+  console.log(newChatCount);
+  if (newChatCount !== 0) {
     roomCheck = false;
     return roomCheck;
   }
