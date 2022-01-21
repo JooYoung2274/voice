@@ -12,7 +12,7 @@ const s3 = new aws.S3({
 });
 
 const deleteMp3 = (ranFileName) => {
-  const filePath = path.join(`/home/ubuntu/voice/${ranFileName}`);
+  const filePath = path.join(`/Users/juyoungkim/Desktop/voice/${ranFileName}`);
   fs.access(filePath, fs.constants.F_OK, (err) => {
     if (err) return console.log("삭제할 수 없는 파일입니다");
     fs.unlink(filePath, (err) =>
@@ -21,7 +21,7 @@ const deleteMp3 = (ranFileName) => {
   });
 };
 
-const convertAndSaveS3 = async (ranFileName, location) => {
+const convertAndSaveS3 = (ranFileName, location) => {
   const key = location.split(".com/")[1];
   let params = { Bucket: S3_BUCKET_NAME, Key: key };
   ffmpeg()
@@ -43,6 +43,7 @@ const convertAndSaveS3 = async (ranFileName, location) => {
         console.log(err, data);
       });
       deleteMp3(ranFileName);
+      console.log("업로드!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
     })
     .run();
 };
