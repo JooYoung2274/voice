@@ -10,6 +10,7 @@ const needLogin = (req, res, next) => {
       throw customizedError("토큰이 유효하지 않습니다.", 401);
     }
     const [tokenType, tokenValue] = authorization.split(" ");
+    console.log(tokenType, tokenValue);
     if (tokenType !== "Bearer") {
       throw customizedError("토큰이 유효하지 않습니다.", 401);
     }
