@@ -59,19 +59,19 @@ const postTrack = async (req, res, next) => {
     const roomNum = await roomNumMaker(sendUserId, receiveUserId);
 
     const ranFileName = `${randomFilename()}.mp3`;
-    await convertAndSaveS3(ranFileName, location);
     const newLocation = `${S3_HOST}/tracks/${ranFileName}`;
-
-    await chatService.createChat({
-      roomNum,
-      sendUserId,
-      receiveUserId,
-      chatText: newLocation,
-      checkChat,
-      chatType,
-      sample,
+    await convertAndSaveS3(ranFileName, location).then(() => {
+      chatService.createChat({
+        roomNum,
+        sendUserId,
+        receiveUserId,
+        chatText: newLocation,
+        checkChat,
+        chatType,
+        sample,
+      });
+      res.sendStatus(200);
     });
-    res.sendStatus(200);
   } catch (error) {
     next(error);
   }
