@@ -177,10 +177,11 @@ const getList = async ({ userId }) => {
 };
 
 const checkChat = async ({ userId }) => {
+  const xx = Number(userId);
   const chatRoom = await ChatRoom.findAll({
     attributes: ["chatRoomId"],
     where: {
-      [or]: [{ userId }, { userId2: userId }],
+      [or]: [{ userId: xx }, { userId2: xx }],
     },
   });
 
@@ -196,7 +197,7 @@ const checkChat = async ({ userId }) => {
       ...chatBasicForm,
     });
 
-    if (chatList.checkChat === 0 && chatList.sendUserId !== userId) {
+    if (chatList.checkChat === 0 && chatList.sendUserId !== xx) {
       newChatCount++;
     }
   }
