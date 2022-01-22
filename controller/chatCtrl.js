@@ -52,49 +52,11 @@ const checkNewChat = async (req, res, next) => {
 
 const postTrack = async (req, res, next) => {
   try {
-    const { sendUserId, receiveUserId, sample } = req.body;
-    const { location } = req.file;
-    const checkChat = false;
-    const chatType = "audio";
-    const roomNum = await roomNumMaker(sendUserId, receiveUserId);
-
-    // const ranFileName = `${randomFilename()}.mp3`;
-    // const newLocation = `${S3_HOST}/tracks/${ranFileName}`;
-    // await convertAndSaveS3(ranFileName, location).then(() => {
-    //   chatService.createChat({
-    //     roomNum,
-    //     sendUserId,
-    //     receiveUserId,
-    //     chatText: newLocation,
-    //     checkChat,
-    //     chatType,
-    //     sample,
-    //   });
-    //   res.sendStatus(200);
-    // });
-    await chatService.createChat({
-      roomNum,
-      sendUserId,
-      receiveUserId,
-      chatText: location,
-      checkChat,
-      chatType,
-      sample,
-    });
-    res.sendStatus(200);
-  } catch (error) {
-    next(error);
-  }
-};
-
-const postImage = async (req, res, next) => {
-  try {
-    const { sendUserId, receiveUserId, device } = req.body;
+    const { sendUserId, receiveUserId, sample, device } = req.body;
     const { location } = req.file;
     const chatText = location;
     const checkChat = false;
-    const chatType = "image";
-    const sample = null;
+    const chatType = "audio";
     const roomNum = await roomNumMaker(sendUserId, receiveUserId);
 
     if (device !== "iphone") {
@@ -124,6 +86,31 @@ const postImage = async (req, res, next) => {
       });
       res.sendStatus(200);
     }
+  } catch (error) {
+    next(error);
+  }
+};
+
+const postImage = async (req, res, next) => {
+  try {
+    const { sendUserId, receiveUserId } = req.body;
+    const { location } = req.file;
+    const chatText = location;
+    const checkChat = false;
+    const chatType = "image";
+    const sample = null;
+    const roomNum = await roomNumMaker(sendUserId, receiveUserId);
+
+    await chatService.createChat({
+      roomNum,
+      sendUserId,
+      receiveUserId,
+      chatText,
+      checkChat,
+      chatType,
+      sample,
+    });
+    res.sendStatus(200);
   } catch (error) {
     next(error);
   }
