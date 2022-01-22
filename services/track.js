@@ -53,7 +53,7 @@ const createTrack = async ({
     throw customizedError("제목은 존재해야하고 20자를 넘길 수 없습니다.", 400);
   }
 
-  if (!iphone) {
+  if (iphone === "false") {
     const ranFileName = `${randomFilename()}.mp3`;
     convertAndSaveS3(ranFileName, location);
     const newLocation = `${S3_HOST}/${TRACKS}/${ranFileName}`;
