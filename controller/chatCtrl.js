@@ -89,7 +89,7 @@ const postTrack = async (req, res, next) => {
 
 const postImage = async (req, res, next) => {
   try {
-    const { sendUserId, receiveUserId, iphone } = req.body;
+    const { sendUserId, receiveUserId, device } = req.body;
     const { location } = req.file;
     const chatText = location;
     const checkChat = false;
@@ -97,7 +97,7 @@ const postImage = async (req, res, next) => {
     const sample = null;
     const roomNum = await roomNumMaker(sendUserId, receiveUserId);
 
-    if (!iphone) {
+    if (device !== "iphone") {
       const ranFileName = `${randomFilename()}.mp3`;
       const newLocation = `${S3_HOST}/tracks/${ranFileName}`;
       await convertAndSaveS3(ranFileName, location).then(() => {
