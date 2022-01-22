@@ -32,7 +32,7 @@ const createTrack = async ({
   trackThumbnailId,
   location,
   userId,
-  iphone,
+  device,
 }) => {
   if (!trackThumbnailId || !userId) {
     throw customizedError("잘못된 녹음 업로드 요청입니다.", 400);
