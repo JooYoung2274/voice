@@ -45,10 +45,10 @@ const convertAndSaveS3 = (ranFileName, location) => {
         });
         deleteMp3(ranFileName);
         console.log("업로드!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-        // setTimeout(() => {
-        //   console.log("work!");
-        //   resolve();
-        // }, 500);
+        setTimeout(() => {
+          console.log("work!");
+          resolve();
+        }, 500);
       })
       .run();
   });
