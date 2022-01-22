@@ -25,7 +25,15 @@ const { randomFilename } = require("../middleware/uploader");
 
 const { convertAndSaveS3 } = require("../utils/converter");
 
-const createTrack = async ({ title, category, tags, trackThumbnailId, location, userId }) => {
+const createTrack = async ({
+  title,
+  category,
+  tags,
+  trackThumbnailId,
+  location,
+  userId,
+  iphone,
+}) => {
   if (!trackThumbnailId || !userId) {
     throw customizedError("잘못된 녹음 업로드 요청입니다.", 400);
   }
@@ -44,30 +52,56 @@ const createTrack = async ({ title, category, tags, trackThumbnailId, location, 
   if (!title || title.length > 40) {
     throw customizedError("제목은 존재해야하고 20자를 넘길 수 없습니다.", 400);
   }
-  const ranFileName = `${randomFilename()}.mp3`;
-  convertAndSaveS3(ranFileName, location);
-  const newLocation = `${S3_HOST}/${TRACKS}/${ranFileName}`;
 
-  const createdTrack = await Track.create({
-    title,
-    categoryId,
-    trackThumbnailId,
-    trackUrl: newLocation,
-    userId,
-  });
-  const trackId = createdTrack.trackId;
-  for (let i = 0; i < tags.length; i++) {
-    if (tags[i]) {
-      await TrackTag.create({
-        trackId,
-        tag: tags[i],
-        categoryId,
-      });
+  if (!iphone) {
+    const ranFileName = `${randomFilename()}.mp3`;
+    convertAndSaveS3(ranFileName, location);
+    const newLocation = `${S3_HOST}/${TRACKS}/${ranFileName}`;
+
+    const createdTrack = await Track.create({
+      title,
+      categoryId,
+      trackThumbnailId,
+      trackUrl: newLocation,
+      userId,
+    });
+
+    const trackId = createdTrack.trackId;
+    for (let i = 0; i < tags.length; i++) {
+      if (tags[i]) {
+        await TrackTag.create({
+          trackId,
+          tag: tags[i],
+          categoryId,
+        });
+      }
     }
-  }
-  const result = trackId;
+    const result = trackId;
 
-  return result;
+    return result;
+  } else {
+    const createdTrack = await Track.create({
+      title,
+      categoryId,
+      trackThumbnailId,
+      trackUrl: location,
+      userId,
+    });
+
+    const trackId = createdTrack.trackId;
+    for (let i = 0; i < tags.length; i++) {
+      if (tags[i]) {
+        await TrackTag.create({
+          trackId,
+          tag: tags[i],
+          categoryId,
+        });
+      }
+    }
+    const result = trackId;
+
+    return result;
+  }
 };
 
 const deleteTrackByTrackId = async ({ trackId }) => {
