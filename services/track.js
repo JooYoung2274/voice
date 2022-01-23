@@ -68,7 +68,7 @@ const createTrack = async ({
       const trackId = createdTrack.trackId;
       for (let i = 0; i < tags.length; i++) {
         if (tags[i]) {
-          await TrackTag.create({
+          TrackTag.create({
             trackId,
             tag: tags[i],
             categoryId,
