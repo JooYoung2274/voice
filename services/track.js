@@ -54,12 +54,13 @@ const createTrack = async ({
   }
 
   if (device !== "iphone") {
-    // let createdTrack;
+    let createdTrack;
+    let result;
     const ranFileName = `${randomFilename()}.mp3`;
     const newLocation = `${S3_HOST}/${TRACKS}/${ranFileName}`;
     await convertAndSaveS3(ranFileName, location)
       .then(() => {
-        const createdTrack = Track.create({
+        createdTrack = Track.create({
           title,
           categoryId,
           trackThumbnailId,
@@ -67,7 +68,7 @@ const createTrack = async ({
           userId,
         });
       })
-      .then((createdTrack) => {
+      .then(() => {
         const trackId = createdTrack.trackId;
         for (let i = 0; i < tags.length; i++) {
           if (tags[i]) {
@@ -78,9 +79,9 @@ const createTrack = async ({
             });
           }
         }
-        const result = trackId;
+        result = trackId;
       })
-      .then((result) => {
+      .then(() => {
         return result;
       });
   } else {
