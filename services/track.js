@@ -53,60 +53,33 @@ const createTrack = async ({
     throw customizedError("제목은 존재해야하고 20자를 넘길 수 없습니다.", 400);
   }
 
-  if (device !== "iphone") {
-    let createdTrack;
-    let result;
-    const ranFileName = `${randomFilename()}.mp3`;
-    const newLocation = `${S3_HOST}/${TRACKS}/${ranFileName}`;
-    await convertAndSaveS3(ranFileName, location)
-      .then(() => {
-        createdTrack = Track.create({
-          title,
-          categoryId,
-          trackThumbnailId,
-          trackUrl: newLocation,
-          userId,
-        });
-      })
-      .then(() => {
-        const trackId = createdTrack.trackId;
-        for (let i = 0; i < tags.length; i++) {
-          if (tags[i]) {
-            TrackTag.create({
-              trackId,
-              tag: tags[i],
-              categoryId,
-            });
-          }
-        }
-        result = trackId;
-      })
-      .then(() => {
-        return result;
+  let createdTrack;
+  let result;
+  const ranFileName = `${randomFilename()}.mp3`;
+  const newLocation = `${S3_HOST}/${TRACKS}/${ranFileName}`;
+  await convertAndSaveS3(ranFileName, location);
+
+  const createdTrack = await Track.create({
+    title,
+    categoryId,
+    trackThumbnailId,
+    trackUrl: newLocation,
+    userId,
+  });
+
+  const trackId = createdTrack.trackId;
+  for (let i = 0; i < tags.length; i++) {
+    if (tags[i]) {
+      await TrackTag.create({
+        trackId,
+        tag: tags[i],
+        categoryId,
       });
-  } else {
-    const createdTrack = await Track.create({
-      title,
-      categoryId,
-      trackThumbnailId,
-      trackUrl: location,
-      userId,
-    });
-
-    const trackId = createdTrack.trackId;
-    for (let i = 0; i < tags.length; i++) {
-      if (tags[i]) {
-        await TrackTag.create({
-          trackId,
-          tag: tags[i],
-          categoryId,
-        });
-      }
     }
-    const result = trackId;
-
-    return result;
   }
+  const result = trackId;
+
+  return result;
 };
 
 const deleteTrackByTrackId = async ({ trackId }) => {
