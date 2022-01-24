@@ -1,7 +1,7 @@
 const { Track, Like, Category, TrackTag, Tag, User } = require("../models");
 const { Op } = require("sequelize");
 const { S3_HOST } = process.env;
-const DIRECTORY = "etc";
+const { DIRECTORY, IMAGE, CLASS } = require("../config/constants2");
 
 //해당하는 모든 trackId 찾기
 const TrackIdsByUserId = async (userId) => {
@@ -163,20 +163,20 @@ const getRanks = async () => {
     let classes = "";
     let classImage = "";
     if (rate > 0 && rate <= 0.2) {
-      classes = "탑스타 와오";
-      classImage = `${S3_HOST}/${DIRECTORY}/OAO_5단계.png`;
+      classes = CLASS.FIFTH;
+      classImage = `${S3_HOST}/${DIRECTORY.ETC}/${IMAGE.FIFTH}`;
     } else if (rate <= 0.4) {
-      classes = "핫한 와오";
-      classImage = `${S3_HOST}/${DIRECTORY}/OAO_4단계.png`;
+      classes = CLASS.FOURTH;
+      classImage = `${S3_HOST}/${DIRECTORY.ETC}/${IMAGE.FOURTH}`;
     } else if (rate <= 0.6) {
-      classes = "라이징스타 와오";
-      classImage = `${S3_HOST}/${DIRECTORY}/OAO_3단계.png`;
+      classes = CLASS.THIRD;
+      classImage = `${S3_HOST}/${DIRECTORY.ETC}/${IMAGE.THIRD}`;
     } else if (rate <= 0.8) {
-      classes = "끼쟁이 와오";
-      classImage = `${S3_HOST}/${DIRECTORY}/OAO_2단계.png`;
+      classes = CLASS.SECOND;
+      classImage = `${S3_HOST}/${DIRECTORY.ETC}/${IMAGE.SECOND}`;
     } else {
-      classes = "수줍은 와오";
-      classImage = `${S3_HOST}/${DIRECTORY}/OAO_1단계.png`;
+      classes = CLASS.FIRST;
+      classImage = `${S3_HOST}/${DIRECTORY.ETC}/${IMAGE.FIRST}`;
     }
     return { rank: rank, class: classes, classImage: classImage, ...el };
   });
