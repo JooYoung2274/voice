@@ -53,31 +53,55 @@ const createTrack = async ({
     throw customizedError("제목은 존재해야하고 20자를 넘길 수 없습니다.", 400);
   }
 
-  const ranFileName = `${randomFilename()}.mp3`;
-  const newLocation = `${S3_HOST}/${TRACKS}/${ranFileName}`;
-  await convertAndSaveS3(ranFileName, location);
+  if (device !== "iphone") {
+    const ranFileName = `${randomFilename()}.mp3`;
+    const newLocation = `${S3_HOST}/${TRACKS}/${ranFileName}`;
+    await convertAndSaveS3(ranFileName, location);
 
-  const createdTrack = await Track.create({
-    title,
-    categoryId,
-    trackThumbnailId,
-    trackUrl: newLocation,
-    userId,
-  });
+    const createdTrack = await Track.create({
+      title,
+      categoryId,
+      trackThumbnailId,
+      trackUrl: newLocation,
+      userId,
+    });
 
-  const trackId = createdTrack.trackId;
-  for (let i = 0; i < tags.length; i++) {
-    if (tags[i]) {
-      await TrackTag.create({
-        trackId,
-        tag: tags[i],
-        categoryId,
-      });
+    const trackId = createdTrack.trackId;
+    for (let i = 0; i < tags.length; i++) {
+      if (tags[i]) {
+        await TrackTag.create({
+          trackId,
+          tag: tags[i],
+          categoryId,
+        });
+      }
     }
-  }
-  const result = trackId;
+    const result = trackId;
 
-  return result;
+    return result;
+  } else {
+    const createdTrack = await Track.create({
+      title,
+      categoryId,
+      trackThumbnailId,
+      trackUrl: location,
+      userId,
+    });
+
+    const trackId = createdTrack.trackId;
+    for (let i = 0; i < tags.length; i++) {
+      if (tags[i]) {
+        await TrackTag.create({
+          trackId,
+          tag: tags[i],
+          categoryId,
+        });
+      }
+    }
+    const result = trackId;
+
+    return result;
+  }
 };
 
 const deleteTrackByTrackId = async ({ trackId }) => {
