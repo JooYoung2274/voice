@@ -8,7 +8,7 @@ const reqLimiter = rateLimit.default({
   max: SECURITY.MAX,
   delayMs: SECURITY.DELAY_MS,
   handler(req, res, next) {
-    next(customizedError(MESSAGE.REQ_LIMITER, MESSAGE.REQ_STATUS));
+    next(customizedError(MESSAGE.REQ_LIMITER, 429));
   },
 });
 

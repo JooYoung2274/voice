@@ -2,13 +2,13 @@ const jwt = require("jsonwebtoken");
 const { User } = require("../models");
 const { customizedError } = require("../utils/error");
 const { JWT_SECRET } = process.env;
-const { ERROR } = require("../config/constants");
+const { MESSAGE } = require("../config/constants");
 //로그인 필수
 const needLogin = (req, res, next) => {
   try {
     const { authorization } = req.headers;
     if (!authorization) {
-      throw customizedError(ERROR.TOKEN, 401);
+      throw customizedError(MESSAGE.TOKEN, 401);
     }
     let [tokenType, tokenValue] = authorization.split(" ");
     console.log(tokenType, tokenValue);
@@ -17,12 +17,12 @@ const needLogin = (req, res, next) => {
       tokenValue = tokenValue.split(";")[0];
     }
     if (tokenType !== "Bearer") {
-      throw customizedError(ERROR.TOKEN, 401);
+      throw customizedError(MESSAGE.TOKEN, 401);
     }
     console.log(tokenType, tokenValue);
     const result = jwt.verify(tokenValue, JWT_SECRET, (error, decoded) => {
       if (error) {
-        throw customizedError(ERROR.TOKEN, 401);
+        throw customizedError(MESSAGE.TOKEN, 401);
       }
       return decoded;
     });
@@ -48,7 +48,7 @@ const notNeedLogin = (req, res, next) => {
     }
 
     if (tokenType !== "Bearer") {
-      throw customizedError(ERROR.TOKEN, 401);
+      throw customizedError(MESSAGE.TOKEN, 401);
     }
     const { userId } = jwt.verify(tokenValue, JWT_SECRET);
     User.findOne({ where: { userId: userId } }).then((user) => {

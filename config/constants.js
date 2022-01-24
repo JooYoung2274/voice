@@ -87,6 +87,7 @@ const DIRECTORY = {
 const ETC = {
   PROFILE: "profile",
   UPLOAD_KEY: "profileImage",
+  CATEGORY_ID: 1,
 };
 
 const SECURITY = {
@@ -97,10 +98,6 @@ const SECURITY = {
 
 const MESSAGE = {
   REQ_LIMITER: "1초에 15번만 요청할 수 있습니다.",
-  REQ_STATUS: 429,
-};
-
-const ERROR = {
   TOKEN: "토큰이 유효하지 않습니다.",
   NICK_USED: "사용중인 닉네임입니다",
   NICK_LENGTH: "닉네임은 4자이상 15자 이하여야 합니다.",
@@ -122,6 +119,5 @@ module.exports = {
   IMAGE,
   SECURITY,
   MESSAGE,
-  ERROR,
   ETC,
 };
