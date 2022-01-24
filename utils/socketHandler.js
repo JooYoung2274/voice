@@ -89,8 +89,8 @@ io.on(EVENT.CONNECTION, (socket) => {
     try {
       console.log("소켓!!!!!!!!!!!!!!!!!");
       setTimeout(() => {
-        const roomNum = await roomNumMaker(sendUserId, receiveUserId);
-        const getChat = await chatService.getChatByIds({ receiveUserId, sendUserId, chatType });
+        const roomNum = roomNumMaker(sendUserId, receiveUserId);
+        const getChat = chatService.getChatByIds({ receiveUserId, sendUserId, chatType });
         io.to(roomNum).emit(EVENT.CHAT, getChat);
         io.to(receiveUserId).emit(EVENT.LIST, getChat);
       }, 500);
