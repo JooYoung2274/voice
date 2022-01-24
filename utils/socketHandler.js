@@ -88,12 +88,11 @@ io.on(EVENT.CONNECTION, (socket) => {
   socket.on(EVENT.FILE, async ({ receiveUserId, sendUserId, chatType }) => {
     try {
       console.log("소켓!!!!!!!!!!!!!!!!!");
-      setTimeout(() => {
-        const roomNum = roomNumMaker(sendUserId, receiveUserId);
-        const getChat = chatService.getChatByIds({ receiveUserId, sendUserId, chatType });
-        io.to(roomNum).emit(EVENT.CHAT, getChat);
-        io.to(receiveUserId).emit(EVENT.LIST, getChat);
-      }, 500);
+
+      const roomNum = await roomNumMaker(sendUserId, receiveUserId);
+      const getChat = await chatService.getChatByIds({ receiveUserId, sendUserId, chatType });
+      io.to(roomNum).emit(EVENT.CHAT, getChat);
+      io.to(receiveUserId).emit(EVENT.LIST, getChat);
     } catch (error) {
       console.log(error);
     }
