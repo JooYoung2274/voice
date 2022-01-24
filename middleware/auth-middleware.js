@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 const { User } = require("../models");
 const { customizedError } = require("../utils/error");
 const { JWT_SECRET } = process.env;
-const { ERROR } = require("../config/constants2");
+const { ERROR } = require("../config/constants");
 //로그인 필수
 const needLogin = (req, res, next) => {
   try {

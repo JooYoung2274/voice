@@ -1,6 +1,6 @@
 const { Comment, Track, User } = require("../models");
 const { customizedError } = require("../utils/error");
-const { ERROR } = require("../config/constants2");
+const { ERROR } = require("../config/constants");
 
 const findCommentsByTrackId = async ({ trackId }) => {
   const findedComments = await Comment.findAll({

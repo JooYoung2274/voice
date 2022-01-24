@@ -2,7 +2,7 @@ const userService = require("../services/auth");
 const passport = require("passport");
 const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = process.env;
-const { AUTH_PLATFORM: PLATFORM } = require("../config/constants2");
+const { AUTH_PLATFORM: PLATFORM } = require("../config/constants");
 
 const updateUser = async (req, res, next) => {
   try {

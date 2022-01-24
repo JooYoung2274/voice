@@ -1,6 +1,6 @@
 const { User } = require("../models");
 const { customizedError } = require("../utils/error");
-const { ERROR } = require("../config/constants2");
+const { ERROR } = require("../config/constants");
 
 const getUserBy = async (col) => {
   try {

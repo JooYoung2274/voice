@@ -13,7 +13,7 @@ const {
   GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET,
 } = process.env;
-const { AUTH_PLATFORM: PLATFORM, IMAGE, DIRECTORY } = require("../config/constants2");
+const { AUTH_PLATFORM: PLATFORM, IMAGE, DIRECTORY } = require("../config/constants");
 
 const profileImage = `${S3_HOST}/${DIRECTORY.ETC}/${IMAGE.PROFILE}`;
 const callbackURL = (company) => `${DOMAIN}/api/auth/${company}/callback`;

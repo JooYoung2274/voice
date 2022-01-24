@@ -1,7 +1,7 @@
 const { Track, Like, Category, TrackTag, Tag, User } = require("../models");
 const { Op } = require("sequelize");
 const { S3_HOST } = process.env;
-const { DIRECTORY, IMAGE, CLASS } = require("../config/constants2");
+const { DIRECTORY, IMAGE, CLASS } = require("../config/constants");
 
 //해당하는 모든 trackId 찾기
 const TrackIdsByUserId = async (userId) => {

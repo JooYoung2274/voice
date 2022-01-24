@@ -2,7 +2,7 @@ const express = require("express");
 const commentController = require("../controller/commentCtrl");
 // middleware auth 경로바꾸기
 const authMiddleware = require("../middleware/auth-middleware");
-const { ROUTE } = require("../config/constants2");
+const { ROUTE } = require("../config/constants");
 
 const router = express.Router();
 

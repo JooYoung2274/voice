@@ -1,4 +1,4 @@
-const { ERROR } = require("../config/constants2");
+const { ERROR } = require("../config/constants");
 
 function logHandler(err, req, res, next) {
   console.error("[" + new Date() + "]\n" + err.stack);
