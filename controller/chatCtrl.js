@@ -2,7 +2,7 @@ const chatService = require("../services/chat");
 const { randomFilename } = require("../middleware/uploader");
 const { convertAndSaveS3 } = require("../utils/converter");
 
-const { S3_HOST, TRACKS } = process.env;
+const { S3_HOST } = process.env;
 const { DIRECTORY } = require("../config/constants");
 
 const roomNumMaker = (x, y) => {
@@ -62,7 +62,7 @@ const postTrack = async (req, res, next) => {
 
     if (device !== DIRECTORY.IPHONE) {
       const ranFileName = `${randomFilename()}.mp3`;
-      const newLocation = `${S3_HOST}/${DIRECTORY.TRACKS}}/${ranFileName}`;
+      const newLocation = `${S3_HOST}/${DIRECTORY.TRACKS}/${ranFileName}`;
       await convertAndSaveS3(ranFileName, location);
 
       await chatService.createChat({
