@@ -63,18 +63,17 @@ const postTrack = async (req, res, next) => {
     if (device !== DIRECTORY.IPHONE) {
       const ranFileName = `${randomFilename()}.mp3`;
       const newLocation = `${S3_HOST}/${TRACKS}}/${ranFileName}`;
-      await convertAndSaveS3(ranFileName, location).then(() => {
-        chatService.createChat({
-          roomNum,
-          sendUserId,
-          receiveUserId,
-          chatText: newLocation,
-          checkChat,
-          chatType,
-          sample,
-        });
-        res.sendStatus(200);
+      await convertAndSaveS3(ranFileName, location);
+      chatService.createChat({
+        roomNum,
+        sendUserId,
+        receiveUserId,
+        chatText: newLocation,
+        checkChat,
+        chatType,
+        sample,
       });
+      res.sendStatus(200);
     } else {
       await chatService.createChat({
         roomNum,
