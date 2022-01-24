@@ -54,15 +54,15 @@ const createTrack = async ({
   }
 
   if (device !== "iphone") {
-    // const ranFileName = `${randomFilename()}.mp3`;
-    // const newLocation = `${S3_HOST}/${TRACKS}/${ranFileName}`;
-    // await convertAndSaveS3(ranFileName, location);
+    const ranFileName = `${randomFilename()}.mp3`;
+    const newLocation = `${S3_HOST}/${TRACKS}/${ranFileName}`;
+    await convertAndSaveS3(ranFileName, location);
 
     const createdTrack = await Track.create({
       title,
       categoryId,
       trackThumbnailId,
-      trackUrl: location,
+      trackUrl: newLocation,
       userId,
     });
 
