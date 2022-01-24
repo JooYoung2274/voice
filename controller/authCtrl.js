@@ -2,9 +2,7 @@ const userService = require("../services/auth");
 const passport = require("passport");
 const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = process.env;
-const KAKAO = "kakao";
-const NAVER = "naver";
-const GOOGLE = "google";
+const { AUTH_PLATFORM: PLATFORM } = require("../config/constants2");
 
 const updateUser = async (req, res, next) => {
   try {
@@ -20,7 +18,7 @@ const updateUser = async (req, res, next) => {
 };
 
 const kakaoCallback = (req, res, next) => {
-  passport.authenticate(KAKAO, { failureRedirect: "/" }, (err, user, info) => {
+  passport.authenticate(PLATFORM.KAKAO, { failureRedirect: "/" }, (err, user, info) => {
     if (err) return next(err);
     const { userId, nickname, contact, profileImage, introduce } = user;
     const { firstLogin } = info;
@@ -40,7 +38,7 @@ const kakaoCallback = (req, res, next) => {
 };
 
 const googleCallback = (req, res, next) => {
-  passport.authenticate(GOOGLE, { failureRedirect: "/" }, (err, user, info) => {
+  passport.authenticate(PLATFORM.GOOGLE, { failureRedirect: "/" }, (err, user, info) => {
     if (err) return next(err);
     const { userId, nickname, contact, profileImage, introduce } = user;
     const { firstLogin } = info;
@@ -59,7 +57,7 @@ const googleCallback = (req, res, next) => {
 };
 
 const naverCallback = (req, res, next) => {
-  passport.authenticate(NAVER, { failureRedirect: "/" }, (err, user, info) => {
+  passport.authenticate(PLATFORM.NAVER, { failureRedirect: "/" }, (err, user, info) => {
     if (err) return next(err);
     const { userId, nickname, contact, profileImage, introduce } = user;
     const { firstLogin } = info;
