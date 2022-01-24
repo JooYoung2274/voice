@@ -11,9 +11,6 @@ const SOCKET_EVENT = {
   LOGIN: "login",
 };
 
-const ROUTE = {};
-
 module.exports = {
-  ROUTE,
   SOCKET_EVENT,
 };
