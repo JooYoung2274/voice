@@ -14,7 +14,7 @@ const { reqLimiter } = require("./middleware/security");
 const { DIRECTORY } = require("./config/constants");
 
 const corsOptions = {
-  origin: "https://oao-voice.com",
+  origin: ["https://oao-voice.com", "http://localhost:3000"],
   credentials: true,
 };
 

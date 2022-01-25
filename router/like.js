@@ -1,10 +1,10 @@
 const express = require("express");
+const router = express.Router();
 const likeController = require("../controller/likeCtrl");
-// middleware auth 경로바꾸기
 const { needLogin } = require("../middleware/auth-middleware");
 
-const router = express.Router();
+const { ROUTE } = require("../config/constants");
 
-router.post("/:trackId/like", needLogin, likeController.likePost);
+router.post(ROUTE.LIKE, needLogin, likeController.likePost);
 
 module.exports = router;

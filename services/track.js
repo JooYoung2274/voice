@@ -247,7 +247,7 @@ const likeCreatedSort = (trackA, trackB) => {
 };
 
 // 메인에 처음에 주어지는 카테고리
-const categoryFirst = { category: MESSAGE.CATEGORYALL, categoryText: MESSAGE.CATEGORYALLTEXT };
+const categoryFirst = { category: DIRECTORY.CATEGORYALL, categoryText: DIRECTORY.CATEGORYALLTEXT };
 
 // 그냥 트랙들뽑기
 const getTracks = async () => {
