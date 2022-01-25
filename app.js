@@ -14,8 +14,8 @@ const { reqLimiter } = require("./middleware/security");
 const { DIRECTORY } = require("./config/constants");
 
 const corsOptions = {
-  origin: "*",
-  credentials: false,
+  origin: ["https://oao-voice.com", "http://localhost:3000"],
+  credentials: true,
 };
 
 app.use(helmet.hidePoweredBy({ setTo: "PHP 8.1.1" })); //req header x-powerd-by 변경
