@@ -1,9 +1,9 @@
 const express = require("express");
-const searchController = require("../controller/searchCtrl");
-// middleware auth 경로바꾸기
-
 const router = express.Router();
+const searchController = require("../controller/searchCtrl");
 
-router.get("/", searchController.searchGet);
+const { ROUTE } = require("../config/constants");
+
+router.get(ROUTE.SEARCH, searchController.searchGet);
 
 module.exports = router;

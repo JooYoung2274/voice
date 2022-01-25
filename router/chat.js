@@ -1,10 +1,9 @@
 const express = require("express");
+const router = express.Router();
 const chatController = require("../controller/chatCtrl");
-const { needLogin } = require("../middleware/auth-middleware");
 const { voiceMulter, imageMulter } = require("../middleware/uploader");
 const trackUploader = voiceMulter.single("trackFile");
 const imageUploader = imageMulter.single("image");
-const router = express.Router();
 
 const { ROUTE } = require("../config/constants");
 

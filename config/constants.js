@@ -28,6 +28,15 @@ const CORS = {
 };
 
 const ROUTE = {
+  INDEX: {
+    TRACKS: "/tracks",
+    COMMON: "/common",
+    AUTH: "/auth",
+    LIST: "/listinfo",
+    SEARCH: "/search",
+    PLAYLIST: "/playlist",
+    CHAT: "/chat",
+  },
   TRACK: {
     LIST: "/listinfo",
     TRACK: "/",
@@ -61,6 +70,10 @@ const ROUTE = {
     CREATE_COMMENT: "/:trackId/comment",
     COMMENT: "/:trackId/comment/:commentId",
   },
+  LIKE: "/:trackId/like",
+  LIST: "/",
+  PLAYLIST: "/",
+  SEARCH: "/",
 };
 
 const IMAGE = {

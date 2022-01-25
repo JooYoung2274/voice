@@ -1,4 +1,5 @@
 const express = require("express");
+const router = express.Router();
 const trackRouter = require("./track");
 const commonRouter = require("./common");
 const commentRouter = require("./comment.js");
@@ -8,16 +9,17 @@ const listInfoRouter = require("./listinfo");
 const searchRouter = require("./search");
 const playListRouter = require("./playList");
 const chatRouter = require("./chat");
-const router = express.Router();
 
-router.use("/tracks", trackRouter);
-router.use("/common", commonRouter);
-router.use("/tracks", commentRouter);
-router.use("/tracks", likeRouter);
-router.use("/auth", AuthRouter);
-router.use("/listinfo", listInfoRouter);
-router.use("/search", searchRouter);
-router.use("/playlist", playListRouter);
-router.use("/chat", chatRouter);
+const { ROUTE } = require("../config/constants");
+
+router.use(ROUTE.INDEX.TRACKS, trackRouter);
+router.use(ROUTE.INDEX.COMMON, commonRouter);
+router.use(ROUTE.INDEX.TRACKS, commentRouter);
+router.use(ROUTE.INDEX.TRACKS, likeRouter);
+router.use(ROUTE.INDEX.AUTH, AuthRouter);
+router.use(ROUTE.INDEX.LIST, listInfoRouter);
+router.use(ROUTE.INDEX.SEARCH, searchRouter);
+router.use(ROUTE.INDEX.PLAYLIST, playListRouter);
+router.use(ROUTE.INDEX.CHAT, chatRouter);
 
 module.exports = router;
