@@ -1,7 +1,7 @@
 const { TrackTag, Tag } = require("../models");
 const sequelize = require("sequelize");
 const Op = sequelize.Op;
-const CATEGORYALLID = 1;
+const { ETC } = require("../config/constants");
 
 // 실제 db에 있는 태그만 필터링
 const filteringTags = async (tags) => {
@@ -19,7 +19,7 @@ const filteringTags = async (tags) => {
 const getTrackIdsByTagAndCtryId = async ({ tag, categoryId }) => {
   // 카테고리와 태그로 트랙태그관계 뽑음
   let findedTrackTags = [];
-  if (categoryId === CATEGORYALLID) {
+  if (categoryId === ETC.CATEGORYALLID) {
     findedTrackTags = await TrackTag.findAll({
       attributes: ["trackId", "tag"],
       where: { tag: { [Op.or]: tag } },

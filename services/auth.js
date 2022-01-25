@@ -1,6 +1,6 @@
 const { User } = require("../models");
 const { customizedError } = require("../utils/error");
-const { ERROR } = require("../config/constants");
+const { MESSAGE } = require("../config/constants");
 
 const getUserBy = async (col) => {
   try {
@@ -30,22 +30,22 @@ const updateUser = async ({ userId, reqFile, nickname, contact, introduce }) => 
     const findedUser = await getUserByNickname({ nickname });
     if (findedUser) {
       if (findedUser.userId !== userId) {
-        throw customizedError(ERROR.NICK_USED, 400);
+        throw customizedError(MESSAGE.NICK_USED, 400);
       }
     }
     if (nickname.length < 4 || nickname.length > 15) {
-      throw customizedError(ERROR.NICK_LENGTH, 400);
+      throw customizedError(MESSAGE.NICK_LENGTH, 400);
     }
     const nickCheck = nickname.match(/^[a-zA-Zㄱ-힣0-9]*$/);
     if (!nickCheck) {
-      throw customizedError(ERROR.NICK_VALIDATE, 400);
+      throw customizedError(MESSAGE.NICK_VALIDATE, 400);
     }
     if (contact) {
       const emailCheck = contact.match(/^([a-z0-9_\.-]+)@([\da-zA-Z\.-]+)\.([a-z\.]{2,6})$/);
-      if (!emailCheck) throw customizedError(ERROR.EMAIL_VALIDATE, 400);
+      if (!emailCheck) throw customizedError(MESSAGE.EMAIL_VALIDATE, 400);
     }
     if (introduce.length > 100) {
-      throw customizedError(ERROR.INTRODUCE, 400);
+      throw customizedError(MESSAGE.INTRODUCE, 400);
     }
     if (reqFile) {
       const { location } = reqFile;
