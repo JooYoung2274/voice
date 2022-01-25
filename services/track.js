@@ -8,22 +8,18 @@ const {
   TrackThumbnail,
   PlayList,
 } = require("../models");
-const { getTrackIdsByTagAndCtryId, filteringTags } = require("./tag");
-const { getCtryByCtry } = require("./category");
-const sequelize = require("sequelize");
 const { Op } = require("sequelize");
 const { or, like, ne } = Op;
-const { customizedError } = require("../utils/error");
-const CATEGORYALLID = 1;
-const CATEGORYALL = "전체";
-const CATEGORYALLTEXT = "최근에 올라온 목소리";
-const TRACKNUM = 19;
+
 const { S3_HOST } = process.env;
-const TRACKS = "tracks";
 
+const { getTrackIdsByTagAndCtryId, filteringTags } = require("./tag");
+const { getCtryByCtry } = require("./category");
+const { customizedError } = require("../utils/error");
 const { randomFilename } = require("../middleware/uploader");
-
 const { convertAndSaveS3 } = require("../utils/converter");
+
+const { MESSAGE, DIRECTORY, NUMBER } = require("../config/constants");
 
 const createTrack = async ({
   title,
@@ -35,27 +31,27 @@ const createTrack = async ({
   device,
 }) => {
   if (!trackThumbnailId || !userId) {
-    throw customizedError("잘못된 녹음 업로드 요청입니다.", 400);
+    throw customizedError(MESSAGE.WRONG_REQ, 400);
   }
 
   const findedTags = await filteringTags(tags);
   if (findedTags.length === 0) {
-    throw customizedError("적어도 하나의 태그는 선택해야 합니다.", 400);
+    throw customizedError(MESSAGE.NOT_TAG, 400);
   }
 
   const findedCategory = await getCtryByCtry({ category });
   if (!findedCategory) {
-    throw customizedError("현재 운영하고 있는 카테고리가 아닙니다.", 400);
+    throw customizedError(MESSAGE.WRONG_CATEGORY, 400);
   }
   const { categoryId } = findedCategory;
 
   if (!title || title.length > 40) {
-    throw customizedError("제목은 존재해야하고 20자를 넘길 수 없습니다.", 400);
+    throw customizedError(MESSAGE.TITLE_VALIDATE, 400);
   }
 
-  if (device !== "iphone") {
+  if (device !== DIRECTORY.IPHONE) {
     const ranFileName = `${randomFilename()}.mp3`;
-    const newLocation = `${S3_HOST}/${TRACKS}/${ranFileName}`;
+    const newLocation = `${S3_HOST}/${DIRECTORY.TRACKS}/${ranFileName}`;
     await convertAndSaveS3(ranFileName, location);
 
     const createdTrack = await Track.create({
@@ -108,7 +104,7 @@ const deleteTrackByTrackId = async ({ trackId }) => {
   const result = await Track.destroy({ where: { trackId: trackId } });
 
   if (!result) {
-    throw customizedError("존재하지 않는 트랙입니다.", 400);
+    throw customizedError(MESSAGE.NOT_TRACK, 400);
   }
   return;
 };
@@ -122,27 +118,27 @@ const updateTrackByTrackId = async ({
   userId,
 }) => {
   if (!trackThumbnailId || !trackId) {
-    throw customizedError("잘못된 접근입니다.", 400);
+    throw customizedError(MESSAGE.WRONG_REQ, 400);
   }
 
   const findedTags = await filteringTags(tags);
   if (findedTags.length === 0) {
-    throw customizedError("적어도 하나의 태그는 선택해야 합니다.", 400);
+    throw customizedError(MESSAGE.NOT_TAG, 400);
   }
 
   // category값 아예안올때도 확인
   const findedCategory = await getCtryByCtry({ category });
   if (!findedCategory) {
-    throw customizedError("현재 운영하고 있는 카테고리가 아닙니다.", 400);
+    throw customizedError(MESSAGE.WRONG_CATEGORY, 400);
   }
   const { categoryId } = findedCategory;
   if (!title || title.length > 40) {
-    throw customizedError("제목은 존재해야하고 20자를 넘길 수 없습니다.", 400);
+    throw customizedError(MESSAGE.TITLE_VALIDATE, 400);
   }
 
   const track = await Track.findOne({ where: { trackId } });
   if (track.userId !== userId) {
-    throw customizedError("권한이 없습니다.", 400);
+    throw customizedError(MESSAGE.TOKEN, 400);
   }
 
   await Track.update({ categoryId, trackThumbnailId, title }, { where: { trackId } });
@@ -188,7 +184,7 @@ const getTracksByUserId = async ({ userId, myPage }) => {
     return { results, likesArray, userDate };
   }
   if (!tracks || !userDate) {
-    throw customizedError("존재하지 않는 포트폴리오 페이지 입니다.", 400);
+    throw customizedError(MESSAGE.NOT_MYPAGE, 400);
   }
   return { results, userDate };
 };
@@ -199,7 +195,7 @@ const getTrackByTrackId = async ({ trackId }) => {
     where: { trackId: trackId },
   });
   if (!track) {
-    throw customizedError("존재하지 않는 트랙입니다.", 400);
+    throw customizedError(MESSAGE.NOT_TRACK, 400);
   }
   const findedTrack = await insertLikeAndCmtCnt(track);
   return findedTrack;
@@ -251,7 +247,7 @@ const likeCreatedSort = (trackA, trackB) => {
 };
 
 // 메인에 처음에 주어지는 카테고리
-const categoryFirst = { category: CATEGORYALL, categoryText: CATEGORYALLTEXT };
+const categoryFirst = { category: MESSAGE.CATEGORYALL, categoryText: MESSAGE.CATEGORYALLTEXT };
 
 // 그냥 트랙들뽑기
 const getTracks = async () => {
@@ -306,7 +302,7 @@ const getTracksByKeyword = async ({ keyword }) => {
 
 // 카테고리별 여러 트랙뽑기
 const getTracksByCtryId = async ({ categoryId }) => {
-  if (categoryId === CATEGORYALLID) {
+  if (categoryId === NUMBER.CATEGORYALLID) {
     const findedTracks = await getTracks();
     return findedTracks;
   }
@@ -321,7 +317,7 @@ const getTracksOrdLike = async ({ tracks }) => {
   tracks = tracks
     .map((track) => insertLikeAndCmtCnt(track)) //likeCnt 넣어주기
     .sort((trackA, trackB) => likeCreatedSort(trackA, trackB)) //likeCnt 내림차순 likeCnt같다면 createdAt최신순
-    .slice(0, TRACKNUM); //20개씩 자르기
+    .slice(0, NUMBER.TRACKNUM); //20개씩 자르기
   return tracks;
 };
 
@@ -338,7 +334,7 @@ const getTracksByOrdCreatedLimit = async ({ tracks }) => {
   tracks = tracks
     .map((track) => insertLikeAndCmtCnt(track)) //likeCnt 넣어주기
     .sort((trackA, trackB) => createdSort(trackA, trackB)) // trackId 최신순
-    .slice(0, TRACKNUM);
+    .slice(0, NUMBER.TRACKNUM);
   return tracks;
 };
 
@@ -360,18 +356,7 @@ const getTracksByTrackIds = async ({ trackIds }) => {
   }
   return results;
 };
-///////////////////////////////////////////////////////////////
-// const accSort = (trackA, trackB) => {
-//   return trackB.dataValues.trackId - trackA.dataValues.trackId;
-// };
 
-// const getTracksByOrdAcc = async ({ tracks }) => {
-//   tracks = tracks
-//     .map((track) => insertLikeCnt(track)) //likeCnt 넣어주기
-//     .sort((trackA, trackB) => accSort(trackA, trackB));
-//   return tracks;
-// };
-///////////////////////////////////////////////////////////////
 // keyword로 찾은 트랙 최종 service
 const getTracksForSearch = async ({ keyword, page, track }) => {
   // keyword로 track들 찾기
@@ -403,12 +388,12 @@ const getTracksForCategory = async ({ tags, category, page, track }) => {
     let end = page * pageSize;
     const findedCategory = await getCtryByCtry({ category });
     if (!findedCategory) {
-      throw customizedError("운영하고 있는 카테고리가 아닙니다.", 400);
+      throw customizedError(MESSAGE.WRONG_CATEGORY, 400);
     }
     const { categoryId } = findedCategory;
     // 파라미터에서 항상 tag1=tag2=tag3=형식으로 온다고 가정
     if (tags.length !== 3) {
-      throw customizedError("올바른 태그 요청이 아닙니다.", 400);
+      throw customizedError(MESSAGE.NOT_TAG, 400);
     }
 
     // 카테고리만 올경우
@@ -456,7 +441,7 @@ const getTracksForMain = async () => {
       order: [["category", "ASC"]],
       where: {
         category: {
-          [ne]: CATEGORYALL,
+          [ne]: MESSAGE.CATEGORYALL,
         },
       },
     });
@@ -489,7 +474,7 @@ const getTracksForMain = async () => {
 const updateListByTrackId = async ({ trackId, userId }) => {
   try {
     if (!trackId.length) {
-      throw customizedError("선택된 트랙이 없습니다.", 400);
+      throw customizedError(MESSAGE.WRONG_REQ, 400);
     }
     await PlayList.destroy({ where: { userId: userId } });
     for (let i = 0; i < trackId.length; i++) {

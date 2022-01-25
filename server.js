@@ -1,6 +1,4 @@
 const { connectDB } = require("./services/index");
-const http = require("http");
-const https = require("https");
 const app = require("./app.js");
 
 const { SERVER_PORT, SERVER_DOMAIN } = process.env;

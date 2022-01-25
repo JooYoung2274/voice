@@ -26,21 +26,6 @@ const myTracksGet = async (req, res, next) => {
   }
 };
 
-// const detailTrackGet = async (req, res, next) => {
-//   try {
-//     const { trackId } = req.params;
-//     const test = true;
-//     const likes = await likeService.findLikesByTrackId({ trackId });
-//     const track = await trackService.getTrackByTrackId({ trackId, test, likes });
-//     const comments = await commentService.findCommentsByTrackId({ trackId });
-
-//     res.status(200).json({ track, comments });
-//   } catch (error) {
-//     console.log(error);
-//     next(error);
-//   }
-// };
-
 const mainTracksGet = async (req, res, next) => {
   try {
     const results = await trackService.getTracksForMain();
