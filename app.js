@@ -28,7 +28,7 @@ app.use(helmet.frameguard({ action: "deny" })); //iframe 클릭재킹
 app.use(hpp()); //오염된 req.query방어
 
 const { logHandler, errorHandler } = require("./middleware/errorHandler");
-app.use(cors(corsOptions));
+app.use(cors());
 
 app.use(timeout(DIRECTORY.TIMEOUT));
 
