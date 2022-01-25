@@ -25,7 +25,9 @@ app.use(hpp()); //오염된 req.query방어
 const { logHandler, errorHandler } = require("./middleware/errorHandler");
 
 app.use(timeout(DIRECTORY.TIMEOUT));
+
 app.use(cors());
+
 app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerFile));
 dotenv.config();
 passportConfig(app);

@@ -17,6 +17,11 @@ const SOCKET_EVENT = {
   LOGIN: "login",
 };
 
+const SOCKET_CORS = {
+  origin: "*",
+  methods: ["GET", "POST"],
+};
+
 const CORS = {
   origin: "https://oao-voice.com",
   credentials: true,
@@ -140,6 +145,7 @@ const MESSAGE = {
 
 module.exports = {
   AUTH_PLATFORM,
+  SOCKET_CORS,
   SOCKET_EVENT,
   DIRECTORY,
   ROUTE,
