@@ -3,6 +3,7 @@ const { randomFilename } = require("../middleware/uploader");
 const { convertAndSaveS3 } = require("../utils/converter");
 
 const { S3_HOST } = process.env;
+const { DIRECTORY } = require("../config/constants");
 
 const roomNumMaker = (x, y) => {
   const arr = [x, y];
@@ -52,26 +53,40 @@ const checkNewChat = async (req, res, next) => {
 
 const postTrack = async (req, res, next) => {
   try {
-    const { sendUserId, receiveUserId, sample } = req.body;
+    const { sendUserId, receiveUserId, sample, device } = req.body;
     const { location } = req.file;
+    const chatText = location;
     const checkChat = false;
-    const chatType = "audio";
+    const chatType = DIRECTORY.AUDIO;
     const roomNum = await roomNumMaker(sendUserId, receiveUserId);
 
-    const ranFileName = `${randomFilename()}.mp3`;
-    convertAndSaveS3(ranFileName, location);
-    const newLocation = `${S3_HOST}/tracks/${ranFileName}`;
+    if (device !== DIRECTORY.IPHONE) {
+      const ranFileName = `${randomFilename()}.mp3`;
+      const newLocation = `${S3_HOST}/${DIRECTORY.TRACKS}/${ranFileName}`;
+      await convertAndSaveS3(ranFileName, location);
 
-    await chatService.createChat({
-      roomNum,
-      sendUserId,
-      receiveUserId,
-      chatText: newLocation,
-      checkChat,
-      chatType,
-      sample,
-    });
-    res.sendStatus(200);
+      await chatService.createChat({
+        roomNum,
+        sendUserId,
+        receiveUserId,
+        chatText: newLocation,
+        checkChat,
+        chatType,
+        sample,
+      });
+      res.sendStatus(200);
+    } else {
+      await chatService.createChat({
+        roomNum,
+        sendUserId,
+        receiveUserId,
+        chatText,
+        checkChat,
+        chatType,
+        sample,
+      });
+      res.sendStatus(200);
+    }
   } catch (error) {
     next(error);
   }
@@ -83,7 +98,7 @@ const postImage = async (req, res, next) => {
     const { location } = req.file;
     const chatText = location;
     const checkChat = false;
-    const chatType = "image";
+    const chatType = DIRECTORY.IMAGE;
     const sample = null;
     const roomNum = await roomNumMaker(sendUserId, receiveUserId);
 

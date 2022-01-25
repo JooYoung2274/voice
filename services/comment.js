@@ -1,5 +1,6 @@
 const { Comment, Track, User } = require("../models");
 const { customizedError } = require("../utils/error");
+const { MESSAGE } = require("../config/constants");
 
 const findCommentsByTrackId = async ({ trackId }) => {
   const findedComments = await Comment.findAll({
@@ -24,11 +25,11 @@ const createComment = async ({ comment, trackId, userId }) => {
       where: { trackId },
     });
     if (!findedTrack) {
-      throw customizedError("존재하지 않는 트랙입니다.", 400);
+      throw customizedError(MESSAGE.TRACK_UNDEFINED, 400);
     }
     // 댓글 만들기
     if (comment.length > 100) {
-      throw customizedError("댓글은 50자를 넘길 수 없습니다.", 400);
+      throw customizedError(MESSAGE.COMMENT_LENGTH, 400);
     }
     await Comment.create({
       comment,
@@ -85,10 +86,7 @@ const deleteComment = async ({ userId, trackId, commentId }) => {
     // delete 로직
     const deleted = await Comment.destroy({ where: { commentId, trackId, userId } });
     if (!deleted) {
-      throw customizedError(
-        "존재하지 않는 댓글이거나 트랙에 포함되지 않거나 댓글쓴사람이 아닙니다",
-        400,
-      );
+      throw customizedError(MESSAGE.COMMENT_DELETE_FAIL, 400);
     }
     // 클라이언트에게 줄 댓글 가공
     results = await Comment.findAll({

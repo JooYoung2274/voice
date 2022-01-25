@@ -3,10 +3,8 @@ const { ChatRoom, ChatParticipant, User } = require("../models");
 const { Op } = require("sequelize");
 const { or, and } = Op;
 const { customizedError } = require("../utils/error");
-const { S3_HOST } = process.env;
-const { randomFilename } = require("../middleware/uploader");
 
-const { convertAndSaveS3 } = require("../utils/converter");
+const { MESSAGE } = require("../config/constants");
 
 const chatBasicForm = {
   attributes: [
@@ -24,7 +22,7 @@ const chatBasicForm = {
 const createChatRoom = async ({ userId, qUserId, roomNum }) => {
   try {
     if (!userId || !qUserId || !roomNum) {
-      throw customizedError("잘못된 요청입니다", 400);
+      throw customizedError(MESSAGE.WRONG_REQ, 400);
     }
     const getChatRoom = await ChatRoom.findOne({ where: { roomNum } });
     if (!getChatRoom) {
@@ -61,7 +59,7 @@ const createChat = async ({
   try {
     const getChatRoom = await ChatRoom.findOne({ where: { roomNum } });
     if (!getChatRoom) {
-      throw customizedError("삭제된 채팅방입니다", 400);
+      throw customizedError(MESSAGE.ISNOT_CHATROOM, 400);
     }
 
     await ChatParticipant.create({
@@ -99,7 +97,7 @@ const getRoomId = async ({ userId, qUserId, roomNum, page, chat }) => {
     });
 
     if (!profile1 || !profile2) {
-      throw customizedError("가입하지 않은 사용자입니다.", 400);
+      throw customizedError(MESSAGE.NOT_USER, 400);
     }
     ``;
 
@@ -177,34 +175,33 @@ const getList = async ({ userId }) => {
 };
 
 const checkChat = async ({ userId }) => {
+  const xx = Number(userId);
   const chatRoom = await ChatRoom.findAll({
     attributes: ["chatRoomId"],
     where: {
-      [or]: [{ userId }, { userId2: userId }],
+      [or]: [{ userId: xx }, { userId2: xx }],
     },
   });
 
+  let roomCheck = true;
   if (!chatRoom) {
-    return;
+    return roomCheck;
   }
 
-  let roomCheck = false;
-  let newChatCount = 0;
   for (let i = 0; i < chatRoom.length; i++) {
     const chatList = await ChatParticipant.findOne({
       where: { chatRoomId: chatRoom[i].chatRoomId },
       ...chatBasicForm,
     });
 
-    if (!chatList.checkChat && chatList.sendUserId !== userId) {
-      newChatCount++;
-      break;
+    if (chatList !== null) {
+      if (chatList.checkChat === false && chatList.sendUserId !== xx) {
+        roomCheck = false;
+        return roomCheck;
+      }
+    } else {
+      continue;
     }
-  }
-
-  if (newChatCount) {
-    roomCheck = true;
-    return roomCheck;
   }
   return roomCheck;
 };

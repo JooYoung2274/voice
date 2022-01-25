@@ -13,12 +13,9 @@ const {
   GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET,
 } = process.env;
-const DIRECTORY = "etc";
-const BASIC_PROFILE = "profile.png";
-const profileImage = `${S3_HOST}/${DIRECTORY}/${BASIC_PROFILE}`;
-const KAKAO = "kakao";
-const NAVER = "naver";
-const GOOGLE = "google";
+const { AUTH_PLATFORM: PLATFORM, IMAGE, DIRECTORY } = require("../config/constants");
+
+const profileImage = `${S3_HOST}/${DIRECTORY.ETC}/${IMAGE.PROFILE}`;
 const callbackURL = (company) => `${DOMAIN}/api/auth/${company}/callback`;
 
 let newNickname = "";
@@ -30,7 +27,7 @@ module.exports = (app) => {
       {
         clientID: NAVER_CLIENT_ID,
         clientSecret: NAVER_CLIENT_SECRET,
-        callbackURL: callbackURL(NAVER),
+        callbackURL: callbackURL(PLATFORM.NAVER),
       },
       async (accessToken, refreshToken, profile, done) => {
         try {
@@ -62,14 +59,16 @@ module.exports = (app) => {
     new kakaoStrategy(
       {
         clientID: KAKAO_CLIENT_ID,
-        callbackURL: callbackURL(KAKAO),
+        callbackURL: callbackURL(PLATFORM.KAKAO),
       },
       async (accessToken, refreshToken, profile, done) => {
+        console.log(profile);
         try {
           const exUser = await User.findOne({
             where: { snsId: profile.id, flatformType: profile.provider },
           });
           if (exUser) {
+            console.log(exUser);
             let firstLogin = false;
             done(null, exUser, { firstLogin });
           } else {
@@ -81,6 +80,7 @@ module.exports = (app) => {
               profileImage: profileImage,
             });
             let firstLogin = true;
+            console.log(newUser);
             done(null, newUser, { firstLogin });
           }
         } catch (error) {
@@ -95,7 +95,7 @@ module.exports = (app) => {
       {
         clientID: GOOGLE_CLIENT_ID,
         clientSecret: GOOGLE_CLIENT_SECRET,
-        callbackURL: callbackURL(GOOGLE),
+        callbackURL: callbackURL(PLATFORM.GOOGLE),
       },
       async (accessToken, refreshToken, profile, done) => {
         try {

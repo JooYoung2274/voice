@@ -3,7 +3,7 @@ const userService = require("../services/auth");
 
 const io = require("../config/socket").getIo();
 
-const { SOCKET_EVENT: EVENT } = require("../config/constants");
+const { SOCKET_EVENT: EVENT, DIRECTORY } = require("../config/constants");
 
 io.on(EVENT.CONNECTION, (socket) => {
   socket.on(EVENT.DISCONNECT, () => {
@@ -54,7 +54,7 @@ io.on(EVENT.CONNECTION, (socket) => {
     try {
       const roomNum = await roomNumMaker(sendUserId, receiveUserId);
       const createdAt = new Date();
-      const chatType = "text";
+      const chatType = DIRECTORY.CHAT_TYPE;
 
       let checkChat = false;
       if (io.sockets.adapter.rooms.get(roomNum).size === 2) {

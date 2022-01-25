@@ -8,9 +8,12 @@ const dotenv = require("dotenv");
 const cors = require("cors");
 const helmet = require("helmet");
 const hpp = require("hpp");
+const timeout = require("connect-timeout");
 const { reqLimiter } = require("./middleware/security");
 
-let corsOptions = {
+const { DIRECTORY } = require("./config/constants");
+
+const corsOptions = {
   origin: "https://oao-voice.com",
   credentials: true,
 };
@@ -25,23 +28,17 @@ app.use(helmet.frameguard({ action: "deny" })); //iframe 클릭재킹
 app.use(hpp()); //오염된 req.query방어
 
 const { logHandler, errorHandler } = require("./middleware/errorHandler");
+app.use(cors(corsOptions));
 
-app.use(cors());
+app.use(timeout(DIRECTORY.TIMEOUT));
 
 app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerFile));
 dotenv.config();
 passportConfig(app);
 
-// //jenkinstest용
-app.get("/", (req, res) => {
-  res.sendFile(__dirname + "/views/kakao.html");
-});
-
 app.use(express.json());
-// app.use("/api", reqLimiter, router);
-app.use("/api", router);
+app.use("/api", reqLimiter, router);
 app.use(express.static("uploads"));
-
 app.use(logHandler);
 app.use(errorHandler);
 

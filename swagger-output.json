@@ -8,7 +8,9 @@
   "host": "localhost:3000",
   "basePath": "/",
   "tags": [],
-  "schemes": ["http"],
+  "schemes": [
+    "http"
+  ],
   "consumes": [],
   "produces": [],
   "paths": {
@@ -24,7 +26,7 @@
         }
       }
     },
-    "/api/tracks/listinfo": {
+    "/api/tracksROUTE.TRACK.LIST": {
       "get": {
         "tags": [],
         "description": "",
@@ -32,14 +34,11 @@
         "responses": {
           "200": {
             "description": "OK"
-          },
-          "400": {
-            "description": "Bad Request"
           }
         }
       }
     },
-    "/api/tracks/": {
+    "/api/tracksROUTE.TRACK.TRACK": {
       "post": {
         "tags": [],
         "description": "",
@@ -55,6 +54,9 @@
             "schema": {
               "type": "object",
               "properties": {
+                "title": {
+                  "example": "any"
+                },
                 "category": {
                   "example": "any"
                 },
@@ -67,7 +69,10 @@
                 "tag3": {
                   "example": "any"
                 },
-                "trackThumbnailUrl": {
+                "trackThumbnailId": {
+                  "example": "any"
+                },
+                "device": {
                   "example": "any"
                 }
               }
@@ -77,42 +82,18 @@
         "responses": {
           "200": {
             "description": "OK"
-          },
-          "400": {
-            "description": "Bad Request"
-          },
-          "401": {
-            "description": "Unauthorized"
           }
         }
       }
     },
-    "/api/tracks/{trackId}": {
+    "/api/tracksROUTE.TRACK.TRACKPAGE": {
       "get": {
         "tags": [],
         "description": "",
-        "parameters": [
-          {
-            "name": "trackId",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          }
-        ],
+        "parameters": [],
         "responses": {
           "200": {
             "description": "OK"
-          },
-          "400": {
-            "description": "Bad Request"
-          },
-          "401": {
-            "description": "Unauthorized"
           }
         }
       },
@@ -121,12 +102,6 @@
         "description": "",
         "parameters": [
           {
-            "name": "trackId",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
             "name": "authorization",
             "in": "header",
             "type": "string"
@@ -135,12 +110,6 @@
         "responses": {
           "200": {
             "description": "OK"
-          },
-          "400": {
-            "description": "Bad Request"
-          },
-          "401": {
-            "description": "Unauthorized"
           }
         }
       },
@@ -148,12 +117,6 @@
         "tags": [],
         "description": "",
         "parameters": [
-          {
-            "name": "trackId",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
           {
             "name": "authorization",
             "in": "header",
@@ -165,6 +128,9 @@
             "schema": {
               "type": "object",
               "properties": {
+                "title": {
+                  "example": "any"
+                },
                 "category": {
                   "example": "any"
                 },
@@ -177,7 +143,7 @@
                 "tag3": {
                   "example": "any"
                 },
-                "trackThumbnailUrl": {
+                "trackThumbnailId": {
                   "example": "any"
                 }
               }
@@ -187,42 +153,43 @@
         "responses": {
           "200": {
             "description": "OK"
-          },
-          "400": {
-            "description": "Bad Request"
-          },
-          "401": {
-            "description": "Unauthorized"
           }
         }
       }
     },
-    "/api/common/": {
-      "get": {
-        "tags": [],
-        "description": "",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "400": {
-            "description": "Bad Request"
-          }
-        }
-      }
-    },
-    "/api/common/user/{userId}": {
-      "get": {
+    "/api/tracksROUTE.TRACK.PLAYLIST": {
+      "post": {
         "tags": [],
         "description": "",
         "parameters": [
           {
-            "name": "userId",
-            "in": "path",
-            "required": true,
+            "name": "authorization",
+            "in": "header",
             "type": "string"
           },
+          {
+            "name": "obj",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "trackId": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "get": {
+        "tags": [],
+        "description": "",
+        "parameters": [
           {
             "name": "authorization",
             "in": "header",
@@ -232,36 +199,41 @@
         "responses": {
           "200": {
             "description": "OK"
-          },
-          "401": {
-            "description": "Unauthorized"
           }
         }
       }
     },
-    "/api/common/track/{trackId}": {
+    "/api/commonROUTE.COMMON.MAINPAGE": {
+      "get": {
+        "tags": [],
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/commonROUTE.COMMON.MYPAGE": {
       "get": {
         "tags": [],
         "description": "",
         "parameters": [
           {
-            "name": "trackId",
-            "in": "path",
-            "required": true,
+            "name": "authorization",
+            "in": "header",
             "type": "string"
           }
         ],
         "responses": {
           "200": {
             "description": "OK"
-          },
-          "400": {
-            "description": "Bad Request"
           }
         }
       }
     },
-    "/api/common/search": {
+    "/api/commonROUTE.COMMON.SEARCH": {
       "get": {
         "tags": [],
         "description": "",
@@ -285,30 +257,31 @@
             "name": "tag3",
             "in": "query",
             "type": "string"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "track",
+            "in": "query",
+            "type": "string"
           }
         ],
         "responses": {
           "200": {
             "description": "OK"
-          },
-          "400": {
-            "description": "Bad Request"
           }
         }
       }
     },
-    "/api/tracks/{trackId}/comment": {
+    "/api/tracksROUTE.COMMENT.CREATE_COMMENT": {
       "post": {
         "tags": [],
         "description": "",
         "parameters": [
           {
-            "name": "trackId",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
             "name": "authorization",
             "in": "header",
             "type": "string"
@@ -329,74 +302,16 @@
         "responses": {
           "200": {
             "description": "OK"
-          },
-          "401": {
-            "description": "Unauthorized"
           }
         }
       }
     },
-    "/api/tracks/{trackId}/comment/{commentId}": {
-      "put": {
-        "tags": [],
-        "description": "",
-        "parameters": [
-          {
-            "name": "trackId",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "commentId",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "obj",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "comment": {
-                  "example": "any"
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        }
-      },
+    "/api/tracksROUTE.COMMENT.COMMENT": {
       "delete": {
         "tags": [],
         "description": "",
         "parameters": [
           {
-            "name": "trackId",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "commentId",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
             "name": "authorization",
             "in": "header",
             "type": "string"
@@ -405,9 +320,6 @@
         "responses": {
           "200": {
             "description": "OK"
-          },
-          "401": {
-            "description": "Unauthorized"
           }
         }
       }
@@ -432,14 +344,11 @@
         "responses": {
           "200": {
             "description": "OK"
-          },
-          "401": {
-            "description": "Unauthorized"
           }
         }
       }
     },
-    "/api/auth/kakao": {
+    "/api/authROUTE.AUTH.KAKAO": {
       "get": {
         "tags": [],
         "description": "",
@@ -447,7 +356,7 @@
         "responses": {}
       }
     },
-    "/api/auth/kakao/callback": {
+    "/api/authROUTE.AUTH.KAKAO_CALLBACK": {
       "get": {
         "tags": [],
         "description": "",
@@ -455,7 +364,7 @@
         "responses": {}
       }
     },
-    "/api/auth/google": {
+    "/api/authROUTE.AUTH.GOOGLE": {
       "get": {
         "tags": [],
         "description": "",
@@ -463,7 +372,7 @@
         "responses": {}
       }
     },
-    "/api/auth/google/callback": {
+    "/api/authROUTE.AUTH.GOOGLE_CALLBACK": {
       "get": {
         "tags": [],
         "description": "",
@@ -471,7 +380,7 @@
         "responses": {}
       }
     },
-    "/api/auth/naver": {
+    "/api/authROUTE.AUTH.NAVER": {
       "get": {
         "tags": [],
         "description": "",
@@ -479,7 +388,7 @@
         "responses": {}
       }
     },
-    "/api/auth/naver/callback": {
+    "/api/authROUTE.AUTH.NAVER_CALLBACK": {
       "get": {
         "tags": [],
         "description": "",
@@ -487,8 +396,24 @@
         "responses": {}
       }
     },
-    "/api/auth/profile": {
+    "/api/authROUTE.AUTH.PROFILE": {
       "post": {
+        "tags": [],
+        "description": "",
+        "parameters": [],
+        "responses": {}
+      }
+    },
+    "/api/authROUTE.AUTH.MY_INFO": {
+      "get": {
+        "tags": [],
+        "description": "",
+        "parameters": [],
+        "responses": {}
+      }
+    },
+    "/api/authROUTE.AUTH.USER_INFO": {
+      "get": {
         "tags": [],
         "description": "",
         "parameters": [],
@@ -503,9 +428,230 @@
         "responses": {
           "200": {
             "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/search/": {
+      "get": {
+        "tags": [],
+        "description": "",
+        "parameters": [
+          {
+            "name": "keyword",
+            "in": "query",
+            "type": "string"
           },
-          "400": {
-            "description": "Bad Request"
+          {
+            "name": "page",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "track",
+            "in": "query",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/playlist/": {
+      "post": {
+        "tags": [],
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "obj",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "trackId": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "get": {
+        "tags": [],
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/chatROUTE.CHAT.CHAT": {
+      "post": {
+        "tags": [],
+        "description": "",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "chat",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "obj",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "userId": {
+                  "example": "any"
+                },
+                "qUserId": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/chatROUTE.CHAT.LIST": {
+      "post": {
+        "tags": [],
+        "description": "",
+        "parameters": [
+          {
+            "name": "obj",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "userId": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/chatROUTE.CHAT.NEW": {
+      "post": {
+        "tags": [],
+        "description": "",
+        "parameters": [
+          {
+            "name": "obj",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "userId": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/chatROUTE.CHAT.TRACK": {
+      "post": {
+        "tags": [],
+        "description": "",
+        "parameters": [
+          {
+            "name": "obj",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "sendUserId": {
+                  "example": "any"
+                },
+                "receiveUserId": {
+                  "example": "any"
+                },
+                "sample": {
+                  "example": "any"
+                },
+                "device": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/chatROUTE.CHAT.IMAGE": {
+      "post": {
+        "tags": [],
+        "description": "",
+        "parameters": [
+          {
+            "name": "obj",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "sendUserId": {
+                  "example": "any"
+                },
+                "receiveUserId": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
           }
         }
       }

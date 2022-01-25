@@ -5,12 +5,14 @@ const { needLogin } = require("../middleware/auth-middleware");
 const { voiceMulter } = require("../middleware/uploader");
 const trackUploader = voiceMulter.single("trackFile");
 
-router.get("/listinfo", trackController.listInfoGet);
-router.post("/", needLogin, trackUploader, trackController.trackUploads);
-router.get("/:trackId", trackController.trackPage);
-router.delete("/:trackId", needLogin, trackController.trackDelete);
-router.put("/:trackId", needLogin, trackController.trackUpdate);
-router.post("/playlist", needLogin, trackController.listUpdate);
-router.get("/playlist", needLogin, trackController.listGet);
+const { ROUTE } = require("../config/constants");
+
+router.get(ROUTE.TRACK.LIST, trackController.listInfoGet);
+router.post(ROUTE.TRACK.TRACK, needLogin, trackUploader, trackController.trackUploads);
+router.get(ROUTE.TRACK.TRACKPAGE, trackController.trackPage);
+router.delete(ROUTE.TRACK.TRACKPAGE, needLogin, trackController.trackDelete);
+router.put(ROUTE.TRACK.TRACKPAGE, needLogin, trackController.trackUpdate);
+router.post(ROUTE.TRACK.PLAYLIST, needLogin, trackController.listUpdate);
+router.get(ROUTE.TRACK.PLAYLIST, needLogin, trackController.listGet);
 
 module.exports = router;
