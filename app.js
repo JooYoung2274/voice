@@ -30,15 +30,15 @@ app.use(hpp()); //오염된 req.query방어
 const { logHandler, errorHandler } = require("./middleware/errorHandler");
 app.use(cors());
 
+app.use(timeout(DIRECTORY.TIMEOUT));
+
 app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerFile));
 dotenv.config();
 passportConfig(app);
 
 app.use(express.json());
 app.use("/api", reqLimiter, router);
-app.use("/api", router);
 app.use(express.static("uploads"));
-// app.use(timeout(DIRECTORY.TIMEOUT));
 app.use(logHandler);
 app.use(errorHandler);
 
