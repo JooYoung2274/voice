@@ -14,7 +14,7 @@ const { reqLimiter } = require("./middleware/security");
 const { DIRECTORY } = require("./config/constants");
 
 const corsOptions = {
-  origin: "https://oao-voice.com",
+  origin: "*",
   credentials: true,
 };
 
@@ -29,7 +29,7 @@ app.use(hpp()); //오염된 req.query방어
 
 const { logHandler, errorHandler } = require("./middleware/errorHandler");
 
-app.use(cors());
+app.use(cors(corsOptions));
 
 app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerFile));
 dotenv.config();
