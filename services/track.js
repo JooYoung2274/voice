@@ -441,7 +441,7 @@ const getTracksForMain = async () => {
       order: [["category", "ASC"]],
       where: {
         category: {
-          [ne]: MESSAGE.CATEGORYALL,
+          [ne]: DIRECTORY.CATEGORYALL,
         },
       },
     });
