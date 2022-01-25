@@ -13,6 +13,11 @@ const { reqLimiter } = require("./middleware/security");
 
 const { DIRECTORY } = require("./config/constants");
 
+const corsOptions = {
+  origin: "https://oao-voice.com",
+  credentials: true,
+};
+
 app.use(helmet.hidePoweredBy({ setTo: "PHP 8.1.1" })); //req header x-powerd-by 변경
 app.use(helmet.xssFilter()); //xss cross site script 공격 방어
 app.use(helmet.noSniff());
