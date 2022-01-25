@@ -8,10 +8,10 @@ const dotenv = require("dotenv");
 const cors = require("cors");
 const helmet = require("helmet");
 const hpp = require("hpp");
-const timeout = require("connect-timeout");
+// const timeout = require("connect-timeout");
 const { reqLimiter } = require("./middleware/security");
 
-const { DIRECTORY } = require("./config/constants");
+// const { DIRECTORY } = require("./config/constants");
 
 const corsOptions = {
   origin: "*",
@@ -38,7 +38,7 @@ app.use(express.json());
 app.use("/api", reqLimiter, router);
 app.use("/api", router);
 app.use(express.static("uploads"));
-app.use(timeout(DIRECTORY.TIMEOUT));
+// app.use(timeout(DIRECTORY.TIMEOUT));
 app.use(logHandler);
 app.use(errorHandler);
 
