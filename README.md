@@ -65,10 +65,9 @@
 
 |      이름       |        설명        |
 | :-------------: | :----------------: |
-|     AWS EC2     |       Server       |
 |     Node.js     | Javascript Runtime |
 |     Express     |   Web Framework    |
-| Atlas (MongoDB) |      Database      |
+|      MYSQL      |      Database      |
 |     Jenkins     |       CI/CD        |
 
 <br><br>
@@ -77,19 +76,25 @@
 
 |      name       |         Appliance          | version  |
 | :-------------: | :------------------------: | :------: |
-|     aws-sdk     |          S3 접근           | 2.1048.0 |
-|     certbot     |         https 적용         |  5.0.3   |
+|     aws-sdk     |          S3 접근           | 2.1049.0 |
+|  fluent-ffmpeg  |         녹음파일 컨버팅         |  2.1.2   |
 |      cors       |   Request resource 제한    |  2.8.5   |
 |     dotenv      |       환경변수 설정        |  10.0.0  |
-|     helmet      |       HTTP 헤더 보안       |  5.0.2   |
-|    mongoose     | 변동성 많은 DB. NoSQL 적용 |  6.1.3   |
+|     helmet      |       HTTP 헤더 보안       |  4.6.0   |
+|    connect-timeout | 서버 타임아웃 관리 |  1.9.0   |
 |     multer      |     이미지 데이터 처리     |  1.4.4   |
 |    multer-S3    |      사진 파일 업로드      |  2.10.0  |
-|    node-cron    |         자동 갱신          |  3.0.0   |
-|     swagger     |         API 문서화         |  0.7.5   |
+|    express-rate-limit    |         api 요청 제한          |  6.0.1   |
+|     swagger-ui-express     |         API 문서화         |  4.3.0   |
 | swagger-autogen |     swagger 자동 적용      |  2.18.0  |
-|    prettier     |        코드 포맷팅         |  2.5.1   |
-|      Jest       |           테스트           |  27.4.7  |
+|    hpp    |        보안        |  0.2.3  |
+|      jsonwebtoken       |           사용자 인증 토큰          |  8.5.1 |
+|      mysql2       |           ??          |  2.3.3 |
+|      passport       |           소셜로그인 기능 구현          |  0.5.2 |
+|      randomstring       |           랜덤 문자열 생성          |  1.2.1 |
+|      sequelize       |          sequelize 사용          |  6.12.0  |
+|      sequelize-cli       |           sequelize-cli 사용          |  6.3.0 |
+|      socket-io       |          채팅         |  4.4.1  |
 
 <br><br>
 
