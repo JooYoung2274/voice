@@ -105,7 +105,7 @@
 1. DATABASE 해킹 이슈
 2. 서버비용 과다 부과 이슈
 
-[트러블 슈팅 해결과정]("https://www.notion.so/joo-page/13748f6d658a4811b35c58ac6ee4f0e6")
+[트러블 슈팅 해결과정](https://www.notion.so/joo-page/13748f6d658a4811b35c58ac6ee4f0e6)
 
 </br>
 
