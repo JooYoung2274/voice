@@ -57,7 +57,7 @@
 <code> Back-end </code>
 </br>
 
-- [Back-end 개발Page](https://www.notion.so/e9540033f1024b5195ee73ca91c6f0a9)
+- [Front-end GITHUB](https://github.com/team-voice-project/frontend)
 </p>
 <br><br>
 
