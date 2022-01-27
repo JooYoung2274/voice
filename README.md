@@ -98,30 +98,14 @@
 
 <br><br>
 
-## ✌🏻 개인 역할 및 트러블 슈팅 해결과정
+## 🏻🛠 백앤드 트러블 슈팅 해결과정
 
-<code>임찬수</code> 목소리 녹음, 목소리 플레이, 채팅, 프로필수정 구현
-</br>
-
-<code>김용성</code> 상세페이지, 마이페이지, 좋아요 및 댓글 구현
-</br>
-
-<code>김자운</code> 메인페이지, 카테고리 분류, 검색, 무한스크롤 구현
-
-<code>Trouble Shooting</code> [트러블 슈팅 해결과정]("https://exuberant-dart-a7f.notion.site/0e96630aa4604f8ba979067733964100")
+<code>Trouble Shooting</code> 
+[트러블 슈팅 해결과정]("https://exuberant-dart-a7f.notion.site/0e96630aa4604f8ba979067733964100")
 
 </br>
 
 ## 📝 후기 및 팀 노션 페이지
 
-<code>임찬수</code>
-</br>
-
-<code>김용성</code>
-</br>
-
-<code>김자운</code>
-
-</br>
 
 <code>팀 노션 페이지</code> [OAO voice](https://www.notion.so/2-a01320eed0fa4387bc7b9ceb2d2d6d00)
