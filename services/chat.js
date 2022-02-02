@@ -6,6 +6,7 @@ const { customizedError } = require("../utils/error");
 
 const { MESSAGE } = require("../config/constants");
 
+// 채팅 저장 기본 폼
 const chatBasicForm = {
   attributes: [
     "sendUserId",
@@ -19,11 +20,13 @@ const chatBasicForm = {
   order: [["chatParticipantId", "DESC"]],
 };
 
+// chatRoom DB에 생성.
 const createChatRoom = async ({ userId, qUserId, roomNum }) => {
   try {
     if (!userId || !qUserId || !roomNum) {
       throw customizedError(MESSAGE.WRONG_REQ, 400);
     }
+    // 기존 채팅 방이 없으면 생성 후 리턴
     const getChatRoom = await ChatRoom.findOne({ where: { roomNum } });
     if (!getChatRoom) {
       await ChatRoom.create({
@@ -33,6 +36,7 @@ const createChatRoom = async ({ userId, qUserId, roomNum }) => {
       });
       return;
     }
+    // 기존 채팅방에 있으면 해당 채팅방의 checkChat 전부 true로 업데이트 후 리턴
     await ChatParticipant.update(
       { checkChat: true },
       {
@@ -47,6 +51,7 @@ const createChatRoom = async ({ userId, qUserId, roomNum }) => {
   }
 };
 
+// 채팅 내용 저장 api
 const createChat = async ({
   roomNum,
   sendUserId,
@@ -77,6 +82,8 @@ const createChat = async ({
   }
 };
 
+// 채팅방 입장 시 채팅 내용 불러오기 api
+// 페이지 별로 프론트에서 정해진 갯수만큼 리턴하게 구성
 const getRoomId = async ({ userId, qUserId, roomNum, page, chat }) => {
   try {
     let start = 0;
@@ -108,6 +115,8 @@ const getRoomId = async ({ userId, qUserId, roomNum, page, chat }) => {
         ...chatBasicForm,
       });
 
+      // 채팅을 누가 읽느냐에 따라서 리턴값이 달라짐.
+      // 프론트 쪽에서 원하는 형식에 맞게 구성해서 리턴(프론트요청)
       const getChat = results.slice(start, end);
       getChat.reverse();
       for (let i = 0; i < getChat.length; i++) {
@@ -127,6 +136,7 @@ const getRoomId = async ({ userId, qUserId, roomNum, page, chat }) => {
   }
 };
 
+// 채팅 리스트 페이지 들어갔을 때 리스트 불러오기 api
 const getList = async ({ userId }) => {
   try {
     const chatRoom = await ChatRoom.findAll({
@@ -151,6 +161,8 @@ const getList = async ({ userId }) => {
       }
     }
 
+    // 해당 채팅방의 마지막 내용과 사용자가 누구랑 채팅하는지에 대한 정보가 있어야함.
+    // 프론트 요청으로 프론트에서 원하는 형식으로 변경해서 리턴
     for (let i = 0; i < result.length; i++) {
       if (result[i].sendUserId === Number(userId)) {
         const qUserId2 = await User.findOne({
@@ -174,6 +186,7 @@ const getList = async ({ userId }) => {
   }
 };
 
+// 채팅을 읽었는지 확인하는 api
 const checkChat = async ({ userId }) => {
   const xx = Number(userId);
   const chatRoom = await ChatRoom.findAll({
@@ -206,6 +219,7 @@ const checkChat = async ({ userId }) => {
   return roomCheck;
 };
 
+// 채팅내용 불러오기 api
 const getChatByIds = async ({ receiveUserId, sendUserId, chatType }) => {
   const getchat = await ChatParticipant.findOne({
     where: { receiveUserId, sendUserId },
