@@ -28,8 +28,6 @@
 
 <!--  [![Hnet-image](https://user-images.githubusercontent.com/90129613/145665770-a2eb072f-3148-4e3b-afd9-0f9a8105c322.gif)](https://www.youtube.com/watch?v=n08_pEMKvvQ)<br> -->
 
-유투브 편집자 구합니다.
-
 ## 🧑🏼‍💻 개발기간 및 팀원소개
 
 ### 기간: 2021.12.20 ~ 2022.01.27
