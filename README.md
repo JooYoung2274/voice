@@ -38,7 +38,7 @@
 
 <p><a href="https://github.com/JooYoung2274"><img width="180"  src="https://img.shields.io/static/v1?label=Node.js&message=Juyoung Kim&color=08CE5D&style=for-the-badge&>"/></a></p>
    <p><a href="https://github.com/doyeon8621" target="_blank"><img width="180"  src="https://img.shields.io/static/v1?label=Node.js&message=Doyeon Lee&color=08CE5D&style=for-the-badge&>"/></a></p>
-   <p><a href="https://github.com/golddong98" target="_blank"><img width="180"  src="https://img.shields.io/static/v1?label=Node.js&message=Keumdong Kim&color=08CE5D&style=for-the-badge&>"/></a></p>
+   <p><a href="https://github.com/golddong98" target="_blank"><img width="180"  src="https://img.shields.io/static/v1?label=Node.js&message=Geumdong Kim&color=08CE5D&style=for-the-badge&>"/></a></p>
 
 ### Front-end
 
