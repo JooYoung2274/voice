@@ -8,9 +8,7 @@
   "host": "localhost:3000",
   "basePath": "/",
   "tags": [],
-  "schemes": [
-    "http"
-  ],
+  "schemes": ["http"],
   "consumes": [],
   "produces": [],
   "paths": {
@@ -26,7 +24,7 @@
         }
       }
     },
-    "/api/tracksROUTE.TRACK.LIST": {
+    "/api/tracks/listinfo": {
       "get": {
         "tags": [],
         "description": "",
@@ -38,7 +36,7 @@
         }
       }
     },
-    "/api/tracksROUTE.TRACK.TRACK": {
+    "/api/tracks": {
       "post": {
         "tags": [],
         "description": "",
@@ -86,7 +84,7 @@
         }
       }
     },
-    "/api/tracksROUTE.TRACK.TRACKPAGE": {
+    "/api/tracks/:trackId": {
       "get": {
         "tags": [],
         "description": "",
@@ -157,7 +155,7 @@
         }
       }
     },
-    "/api/tracksROUTE.TRACK.PLAYLIST": {
+    "/api/tracks/playlist": {
       "post": {
         "tags": [],
         "description": "",
@@ -203,7 +201,7 @@
         }
       }
     },
-    "/api/commonROUTE.COMMON.MAINPAGE": {
+    "/api/common": {
       "get": {
         "tags": [],
         "description": "",
@@ -215,7 +213,7 @@
         }
       }
     },
-    "/api/commonROUTE.COMMON.MYPAGE": {
+    "/api/common/user/:userId": {
       "get": {
         "tags": [],
         "description": "",
@@ -233,7 +231,7 @@
         }
       }
     },
-    "/api/commonROUTE.COMMON.SEARCH": {
+    "/api/common/search": {
       "get": {
         "tags": [],
         "description": "",
@@ -276,7 +274,7 @@
         }
       }
     },
-    "/api/tracksROUTE.COMMENT.CREATE_COMMENT": {
+    "/api/tracks/:trackId/comment": {
       "post": {
         "tags": [],
         "description": "",
@@ -306,7 +304,7 @@
         }
       }
     },
-    "/api/tracksROUTE.COMMENT.COMMENT": {
+    "/api/tracks/:trackId/comment/:commentId": {
       "delete": {
         "tags": [],
         "description": "",
@@ -324,7 +322,7 @@
         }
       }
     },
-    "/api/tracks/{trackId}/like": {
+    "/api/tracks/:trackId/like": {
       "post": {
         "tags": [],
         "description": "",
@@ -348,7 +346,7 @@
         }
       }
     },
-    "/api/authROUTE.AUTH.KAKAO": {
+    "/api/auth/kakao": {
       "get": {
         "tags": [],
         "description": "",
@@ -356,7 +354,7 @@
         "responses": {}
       }
     },
-    "/api/authROUTE.AUTH.KAKAO_CALLBACK": {
+    "/api/auth/kakao/callback": {
       "get": {
         "tags": [],
         "description": "",
@@ -364,7 +362,7 @@
         "responses": {}
       }
     },
-    "/api/authROUTE.AUTH.GOOGLE": {
+    "/api/auth/google": {
       "get": {
         "tags": [],
         "description": "",
@@ -372,7 +370,7 @@
         "responses": {}
       }
     },
-    "/api/authROUTE.AUTH.GOOGLE_CALLBACK": {
+    "/api/auth/google/callback": {
       "get": {
         "tags": [],
         "description": "",
@@ -380,7 +378,7 @@
         "responses": {}
       }
     },
-    "/api/authROUTE.AUTH.NAVER": {
+    "/api/auth/naver": {
       "get": {
         "tags": [],
         "description": "",
@@ -388,7 +386,7 @@
         "responses": {}
       }
     },
-    "/api/authROUTE.AUTH.NAVER_CALLBACK": {
+    "/api/auth/naver/callback": {
       "get": {
         "tags": [],
         "description": "",
@@ -396,7 +394,7 @@
         "responses": {}
       }
     },
-    "/api/authROUTE.AUTH.PROFILE": {
+    "/api/auth/profile": {
       "post": {
         "tags": [],
         "description": "",
@@ -404,7 +402,7 @@
         "responses": {}
       }
     },
-    "/api/authROUTE.AUTH.MY_INFO": {
+    "/api/auth/me": {
       "get": {
         "tags": [],
         "description": "",
@@ -412,7 +410,7 @@
         "responses": {}
       }
     },
-    "/api/authROUTE.AUTH.USER_INFO": {
+    "/api/auth/user/:userId": {
       "get": {
         "tags": [],
         "description": "",
@@ -506,7 +504,7 @@
         }
       }
     },
-    "/api/chatROUTE.CHAT.CHAT": {
+    "/api/chat": {
       "post": {
         "tags": [],
         "description": "",
@@ -544,7 +542,7 @@
         }
       }
     },
-    "/api/chatROUTE.CHAT.LIST": {
+    "/api/chat/list": {
       "post": {
         "tags": [],
         "description": "",
@@ -569,7 +567,7 @@
         }
       }
     },
-    "/api/chatROUTE.CHAT.NEW": {
+    "/api/chat/new": {
       "post": {
         "tags": [],
         "description": "",
@@ -594,7 +592,7 @@
         }
       }
     },
-    "/api/chatROUTE.CHAT.TRACK": {
+    "/api/chat/track": {
       "post": {
         "tags": [],
         "description": "",
@@ -628,7 +626,7 @@
         }
       }
     },
-    "/api/chatROUTE.CHAT.IMAGE": {
+    "/api/chat/image": {
       "post": {
         "tags": [],
         "description": "",
