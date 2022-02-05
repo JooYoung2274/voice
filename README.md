@@ -37,14 +37,14 @@
 ### Back-end
 
 <p><a href="https://github.com/JooYoung2274"><img width="180"  src="https://img.shields.io/static/v1?label=Node.js&message=Juyoung Kim&color=08CE5D&style=for-the-badge&>"/></a></p>
-<p><a href="https://github.com/doyeon8621" target="_blank"><img width="180"  src="https://img.shields.io/static/v1?label=Node.js&message=Doyeon Lee&color=08CE5D&style=for-the-badge&>"/></a></p>
-<p><a href="https://github.com/golddong98" target="_blank"><img width="180"  src="https://img.shields.io/static/v1?label=Node.js&message=Geumdong Kim&color=08CE5D&style=for-the-badge&>"/></a></p>
+<p><a href="https://github.com/doyeon8621"><img width="180"  src="https://img.shields.io/static/v1?label=Node.js&message=Doyeon Lee&color=08CE5D&style=for-the-badge&>"/></a></p>
+<p><a href="https://github.com/golddong98"><img width="180"  src="https://img.shields.io/static/v1?label=Node.js&message=Geumdong Kim&color=08CE5D&style=for-the-badge&>"/></a></p>
 
 ### Front-end
 
-<p><a href="https://github.com/cslim0527" target="_blank"><img width="180"  src="https://img.shields.io/static/v1?label=React&message=Chansu Lim&color=61dafb&style=for-the-badge&>"/></a></p>
-<p><a href="https://github.com/YYZA" target="_blank"><img width="180"  src="https://img.shields.io/static/v1?label=React&message=Yongsung Kim&color=61dafb&style=for-the-badge&>"/></a></p>
-<p><a href="https://github.com/jawoon816" target="_blank"><img width="180"  src="https://img.shields.io/static/v1?label=React&message=Jawoon Kim&color=61dafb&style=for-the-badge&>"/></a></p>
+<p><a href="https://github.com/cslim0527"><img width="180"  src="https://img.shields.io/static/v1?label=React&message=Chansu Lim&color=61dafb&style=for-the-badge&>"/></a></p>
+<p><a href="https://github.com/YYZA"><img width="180"  src="https://img.shields.io/static/v1?label=React&message=Yongsung Kim&color=61dafb&style=for-the-badge&>"/></a></p>
+<p><a href="https://github.com/jawoon816"><img width="180"  src="https://img.shields.io/static/v1?label=React&message=Jawoon Kim&color=61dafb&style=for-the-badge&>"/></a></p>
 
 </br>
 
